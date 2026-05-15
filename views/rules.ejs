@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pravidla – <%= settings.contest_title %></title>
+  <style>
+    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+    :root {
+      --bg:<%= settings.color_bg || '#fafaf9' %>;
+      --bg2:#f1f0ec; --surface:#fff; --text:#1a1a18; --text2:#5a5955; --text3:#9a9893;
+      --border:rgba(0,0,0,0.1); --primary:<%= settings.color_primary || '#1a1a18' %>;
+      --accent:<%= settings.color_accent || '#0F6E56' %>; --accent-bg:#E1F5EE;
+      --r:10px;
+    }
+    body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; background:var(--bg); color:var(--text); line-height:1.7; }
+    a { color:inherit; text-decoration:none; }
+    nav { background:#fff; border-bottom:0.5px solid var(--border); position:sticky; top:0; z-index:50; }
+    .nav-inner { max-width:900px; margin:0 auto; padding:0 1.5rem; height:54px; display:flex; align-items:center; justify-content:space-between; }
+    .nav-logo { font-size:15px; font-weight:500; }
+    .nav-links { display:flex; gap:2px; }
+    .nav-links a { padding:6px 13px; border-radius:7px; font-size:13px; color:var(--text2); transition:all .15s; }
+    .nav-links a:hover, .nav-links a.active { background:var(--bg2); color:var(--text); }
+    .container { max-width:680px; margin:0 auto; padding:2.5rem 1.5rem; }
+    h1 { font-size:24px; font-weight:500; letter-spacing:-.4px; margin-bottom:1.5rem; }
+    .rules-content { font-size:15px; color:var(--text); white-space:pre-wrap; line-height:1.8; }
+    footer { text-align:center; padding:2rem; font-size:13px; color:var(--text3); border-top:0.5px solid var(--border); margin-top:3rem; }
+  </style>
+</head>
+<body>
+<nav>
+  <div class="nav-inner">
+    <a href="/" class="nav-logo">📸 <%= settings.contest_title %></a>
+    <div class="nav-links">
+      <a href="/">Domů</a>
+      <a href="/galerie">Galerie</a>
+      <a href="/vysledky">Výsledky</a>
+      <a href="/pravidla" class="active">Pravidla</a>
+      <% if (typeof isAdmin !== 'undefined' && isAdmin) { %><a href="/admin">Admin</a><% } %>
+    </div>
+  </div>
+</nav>
+<div class="container">
+  <h1>📋 Pravidla soutěže</h1>
+  <div class="rules-content"><%= settings.rules_text %></div>
+</div>
+<footer>© 2026 Jan Svoboda Photography &nbsp;·&nbsp; <a href="/admin/login">Admin</a></footer>
+</body>
+</html>

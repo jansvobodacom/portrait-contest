@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin – Soutěž portrétů</title>
+  <style>
+    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+    :root { --bg:#fafaf9; --bg2:#f1f0ec; --surface:#fff; --text:#1a1a18; --text2:#5a5955; --text3:#9a9893; --border:rgba(0,0,0,0.1); --border2:rgba(0,0,0,0.2); --green:#0F6E56; --green-bg:#E1F5EE; --green-brd:#5DCAA5; --amber:#854F0B; --amber-bg:#FAEEDA; --amber-brd:#FAC775; --red:#A32D2D; --red-bg:#FCEBEB; --red-brd:#F09595; --r:10px; }
+    body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; background:var(--bg); color:var(--text); }
+    a { color:inherit; text-decoration:none; }
+    nav { background:var(--surface); border-bottom:0.5px solid var(--border); }
+    .nav-inner { max-width:1020px; margin:0 auto; padding:0 1.5rem; height:54px; display:flex; align-items:center; justify-content:space-between; }
+    .nav-logo { font-size:15px; font-weight:500; }
+    .nav-right { display:flex; align-items:center; gap:14px; font-size:13px; color:var(--text2); }
+    .container { max-width:1020px; margin:0 auto; padding:2rem 1.5rem; }
+    .alert { padding:10px 16px; border-radius:7px; font-size:14px; margin-bottom:1.5rem; }
+    .alert-success { background:var(--green-bg); color:var(--green); }
+    .alert-error { background:var(--red-bg); color:var(--red); }
+    h1 { font-size:22px; font-weight:500; margin-bottom:1.5rem; }
+    /* Stats */
+    .stats { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:2rem; }
+    .stat { background:var(--bg2); border-radius:var(--r); padding:1rem; }
+    .stat-label { font-size:12px; color:var(--text2); margin-bottom:4px; }
+    .stat-val { font-size:24px; font-weight:500; }
+
+    /* === PHASE SWITCHER === */
+    .phase-box { background:var(--surface); border:0.5px solid var(--border); border-radius:var(--r); padding:1.5rem; margin-bottom:2rem; }
+    .phase-box h2 { font-size:16px; font-weight:500; margin-bottom:6px; }
+    .phase-box p { font-size:13px; color:var(--text2); margin-bottom:1.25rem; }
+    .phase-steps { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+    .phase-step { border:1.5px solid var(--border); border-radius:var(--r); padding:1.25rem; text-align:center; position:relative; }
+    .phase-step.current { border-color:var(--text); background:var(--bg2); }
+    .phase-step.done { border-color:var(--green-brd); background:var(--green-bg); }
+    .ps-num { font-size:11px; font-weight:600; letter-spacing:.5px; text-transform:uppercase; color:var(--text3); margin-bottom:6px; }
+    .phase-step.current .ps-num { color:var(--text); }
+    .phase-step.done .ps-num { color:var(--green); }
+    .ps-title { font-size:15px; font-weight:500; margin-bottom:4px; }
+    .ps-desc { font-size:12px; color:var(--text2); margin-bottom:12px; line-height:1.4; }
+    .current-badge { display:inline-block; background:var(--text); color:var(--bg); font-size:11px; padding:3px 10px; border-radius:20px; font-weight:600; margin-bottom:8px; }
+    .done-badge { display:inline-block; background:var(--green-bg); color:var(--green); border:0.5px solid var(--green-brd); font-size:11px; padding:3px 10px; border-radius:20px; font-weight:600; margin-bottom:8px; }
+    .btn-phase { width:100%; padding:9px; border:0.5px solid var(--border2); background:transparent; border-radius:7px; font-size:13px; font-weight:500; cursor:pointer; font-family:inherit; transition:all .15s; color:var(--text); }
+    .btn-phase:hover { background:var(--bg2); }
+    .btn-phase-primary { background:var(--text); color:var(--bg); border-color:var(--text); }
+    .btn-phase-primary:hover { opacity:.85; background:var(--text); }
+    .btn-phase-green { background:var(--green); color:#fff; border-color:var(--green); }
+    .btn-phase-green:hover { opacity:.85; background:var(--green); }
+    .btn-phase-amber { background:var(--amber); color:#fff; border-color:var(--amber); }
+    .btn-phase-amber:hover { opacity:.85; background:var(--amber); }
+    .phase-arrow { display:flex; align-items:center; justify-content:center; font-size:20px; color:var(--text3); padding-top:2.5rem; }
+
+    /* Winner */
+    .winner-box { background:var(--amber-bg); border:0.5px solid var(--amber-brd); border-radius:var(--r); padding:1rem 1.25rem; display:flex; align-items:center; gap:14px; margin-bottom:1.5rem; }
+    .winner-photo { width:56px; height:56px; border-radius:8px; object-fit:cover; }
+    .winner-info { flex:1; }
+    .winner-info h3 { font-size:15px; font-weight:500; color:#633806; }
+    .winner-info p { font-size:13px; color:var(--amber); }
+    /* Buttons */
+    .btn { padding:6px 14px; font-size:12px; border-radius:7px; cursor:pointer; font-family:inherit; font-weight:500; border:0.5px solid var(--border2); background:transparent; color:var(--text); transition:all .15s; }
+    .btn:hover { background:var(--bg2); }
+    .btn-green { border-color:var(--green-brd); background:var(--green-bg); color:var(--green); }
+    .btn-dark { background:var(--text); color:var(--bg); border-color:var(--text); }
+    .btn-dark:hover { opacity:.85; background:var(--text); }
+    .btn-red { color:var(--red); border-color:var(--red-brd); }
+    /* Section */
+    .sec-title { font-size:11px; font-weight:600; color:var(--text2); letter-spacing:.5px; text-transform:uppercase; margin:1.75rem 0 10px; }
+    .entry-list { display:flex; flex-direction:column; gap:8px; }
+    .entry-row { background:var(--surface); border:0.5px solid var(--border); border-radius:var(--r); padding:10px 14px; display:flex; align-items:center; gap:12px; }
+    .e-photo { width:48px; height:48px; border-radius:8px; object-fit:cover; flex-shrink:0; }
+    .e-info { flex:1; min-width:0; }
+    .e-name { font-size:14px; font-weight:500; }
+    .e-email { font-size:12px; color:var(--text2); }
+    .e-note { font-size:12px; color:var(--text3); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .e-votes { font-size:13px; color:var(--text2); width:55px; text-align:right; flex-shrink:0; }
+    .pill { font-size:11px; padding:3px 9px; border-radius:20px; font-weight:500; flex-shrink:0; white-space:nowrap; }
+    .pill-pending { background:var(--amber-bg); color:var(--amber); }
+    .pill-approved { background:var(--green-bg); color:var(--green); }
+    .pill-rejected { background:var(--red-bg); color:var(--red); }
+    form.inline { display:inline; }
+    .empty-msg { color:var(--text3); font-size:14px; padding:12px 0; }
+    /* Settings */
+    .settings-card { background:var(--surface); border:0.5px solid var(--border); border-radius:var(--r); padding:1.5rem; }
+    .sg { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+    .sg label { font-size:12px; color:var(--text2); font-weight:500; display:block; margin-bottom:5px; }
+    input[type=text], input[type=date] { width:100%; padding:8px 12px; font-size:14px; border:0.5px solid var(--border2); border-radius:7px; background:var(--bg); color:var(--text); font-family:inherit; }
+    input:focus { outline:none; border-color:var(--text); }
+  </style>
+</head>
+<body>
+<nav>
+  <div class="nav-inner">
+    <span class="nav-logo">🔐 Admin – Soutěž portrétů</span>
+    <div class="nav-right">
+      <a href="/" target="_blank">← Zobrazit web</a>
+      <a href="/admin/export-csv" class="btn" style="font-size:12px;">⬇ CSV</a>
+      <a href="/admin/logout" style="color:var(--red)">Odhlásit</a>
+    </div>
+  </div>
+</nav>
+<div class="container">
+  <% if (success) { %><div class="alert alert-success">✓ <%- decodeURIComponent((success||'').replace(/\+/g,' ')) %></div><% } %>
+  <% if (error) { %><div class="alert alert-error">⚠ <%- decodeURIComponent((error||'').replace(/\+/g,' ')) %></div><% } %>
+
+  <h1>Admin panel</h1>
+
+  <!-- Stats -->
+  <div class="stats">
+    <div class="stat"><div class="stat-label">Přihlášených</div><div class="stat-val"><%= entries.length %></div></div>
+    <div class="stat"><div class="stat-label">Čeká na schválení</div><div class="stat-val"><%= pending.length %></div></div>
+    <div class="stat"><div class="stat-label">Hlasujících</div><div class="stat-val"><%= totalVoters %></div></div>
+    <div class="stat"><div class="stat-label">Hlasů celkem</div><div class="stat-val"><%= totalVotes %></div></div>
+  </div>
+
+  <!-- ═══ PHASE SWITCHER ═══ -->
+  <div class="phase-box">
+    <h2>Aktuální fáze soutěže</h2>
+    <p>Přepínáte fáze ručně – každá fáze trvá přibližně měsíc. Aktuální fáze: <strong>
+      <% if (settings.phase==='registration') { %>Přihlašování
+      <% } else if (settings.phase==='voting') { %>Hlasování
+      <% } else { %>Výsledky<% } %>
+    </strong></p>
+
+    <div style="display:grid;grid-template-columns:1fr 24px 1fr 24px 1fr;align-items:start;gap:0;">
+      <!-- Fáze 1: Přihlašování -->
+      <div class="phase-step <%= settings.phase==='registration'?'current':(settings.phase!=='registration'?'done':'') %>">
+        <div class="ps-num">Fáze 1</div>
+        <% if (settings.phase === 'registration') { %><div class="current-badge">◉ Právě teď</div><% } %>
+        <% if (settings.phase !== 'registration') { %><div class="done-badge">✓ Hotovo</div><% } %>
+        <div class="ps-title">📋 Přihlašování</div>
+        <div class="ps-desc">Účastníci odesílají přihlášky s fotografií. Ty je schvaluješ.</div>
+        <% if (settings.phase === 'registration') { %>
+          <form action="/admin/faze" method="POST">
+            <input type="hidden" name="phase" value="voting">
+            <button class="btn-phase btn-phase-green" type="submit" onclick="return confirm('Opravdu spustit hlasování? Přihlašování bude uzavřeno.')">
+              Spustit hlasování →
+            </button>
+          </form>
+        <% } %>
+      </div>
+
+      <div class="phase-arrow">→</div>
+
+      <!-- Fáze 2: Hlasování -->
+      <div class="phase-step <%= settings.phase==='voting'?'current':'' %> <%= settings.phase==='results'?'done':'' %>">
+        <div class="ps-num">Fáze 2</div>
+        <% if (settings.phase === 'voting') { %><div class="current-badge">◉ Právě teď</div><% } %>
+        <% if (settings.phase === 'results') { %><div class="done-badge">✓ Hotovo</div><% } %>
+        <div class="ps-title">🗳 Hlasování</div>
+        <div class="ps-desc">Veřejnost hlasuje e-mailem. Každý e-mail = 1 hlas.</div>
+        <% if (settings.phase === 'voting') { %>
+          <form action="/admin/faze" method="POST">
+            <input type="hidden" name="phase" value="results">
+            <button class="btn-phase btn-phase-amber" type="submit" onclick="return confirm('Opravdu ukončit hlasování a zobrazit výsledky?')">
+              Zveřejnit výsledky →
+            </button>
+          </form>
+        <% } else if (settings.phase === 'registration') { %>
+          <button class="btn-phase" disabled style="opacity:.35;cursor:not-allowed;">Čeká na spuštění</button>
+        <% } %>
+      </div>
+
+      <div class="phase-arrow">→</div>
+
+      <!-- Fáze 3: Výsledky -->
+      <div class="phase-step <%= settings.phase==='results'?'current':'' %>">
+        <div class="ps-num">Fáze 3</div>
+        <% if (settings.phase === 'results') { %><div class="current-badge">◉ Právě teď</div><% } %>
+        <div class="ps-title">🏆 Výsledky</div>
+        <div class="ps-desc">Výsledky jsou zveřejněny. Odešli výherní e-mail vítězi.</div>
+        <% if (settings.phase === 'results') { %>
+          <form action="/admin/email-vyherce" method="POST">
+            <button class="btn-phase btn-phase-primary" type="submit"
+              onclick="return confirm('Odeslat výherní e-mail výherci?')">
+              ✉ Odeslat výherní e-mail
+            </button>
+          </form>
+        <% } else { %>
+          <button class="btn-phase" disabled style="opacity:.35;cursor:not-allowed;">Čeká na spuštění</button>
+        <% } %>
+      </div>
+    </div>
+  </div>
+
+  <!-- Winner info (phase=results) -->
+  <% if (settings.phase === 'results' && approved.length > 0) { %>
+  <div class="winner-box">
+    <img src="/uploads/<%= approved[0].photo %>" class="winner-photo" alt="">
+    <div class="winner-info">
+      <h3>🏆 Vítěz: <%= approved[0].name %></h3>
+      <p><%= approved[0].votes %> hlasů &nbsp;·&nbsp; <%= approved[0].email %></p>
+    </div>
+  </div>
+  <% } %>
+
+  <!-- Moderace -->
+  <div id="moderace"></div>
+  <div class="sec-title">Čeká na moderaci (<%= pending.length %>)</div>
+  <div class="entry-list">
+    <% if (!pending.length) { %><p class="empty-msg">Žádné příspěvky nečekají na schválení.</p><% } %>
+    <% pending.forEach(e => { %>
+    <div class="entry-row">
+      <a href="/uploads/<%= e.photo %>" target="_blank"><img src="/uploads/<%= e.photo %>" class="e-photo" alt=""></a>
+      <div class="e-info">
+        <div class="e-name"><%= e.name %></div>
+        <div class="e-email"><%= e.email %></div>
+        <div class="e-note"><%= e.note || '–' %></div>
+      </div>
+      <span class="pill pill-pending">Čeká</span>
+      <form action="/admin/schvalit/<%= e.id %>" method="POST" class="inline"><button class="btn btn-green" type="submit">Schválit</button></form>
+      <form action="/admin/zamit/<%= e.id %>" method="POST" class="inline"><button class="btn btn-red btn" type="submit">Zamítnout</button></form>
+    </div>
+    <% }) %>
+  </div>
+
+  <!-- Schválené -->
+  <div class="sec-title" style="margin-top:1.75rem;">Schválené příspěvky (<%= approved.length %>)</div>
+  <div class="entry-list">
+    <% if (!approved.length) { %><p class="empty-msg">Žádné schválené příspěvky.</p><% } %>
+    <% approved.forEach(e => { %>
+    <div class="entry-row">
+      <a href="/uploads/<%= e.photo %>" target="_blank"><img src="/uploads/<%= e.photo %>" class="e-photo" alt=""></a>
+      <div class="e-info">
+        <div class="e-name"><%= e.name %></div>
+        <div class="e-email"><%= e.email %></div>
+      </div>
+      <span class="pill pill-approved">Schváleno</span>
+      <span class="e-votes"><%= e.votes %> hl.</span>
+      <form action="/admin/smazat/<%= e.id %>" method="POST" class="inline" onsubmit="return confirm('Opravdu smazat?')">
+        <button class="btn btn-red" type="submit">Smazat</button>
+      </form>
+    </div>
+    <% }) %>
+  </div>
+
+  <!-- Nastavení -->
+  <div class="sec-title" style="margin-top:2rem;">Nastavení soutěže</div>
+  <div class="settings-card">
+    <form action="/admin/nastaveni" method="POST">
+
+      <div class="sg" style="margin-bottom:1rem;">
+        <div><label>Název soutěže</label><input type="text" name="contest_title" value="<%= settings.contest_title %>"></div>
+        <div><label>Výhra (1. místo)</label><input type="text" name="prize_description" value="<%= settings.prize_description %>"></div>
+        <div><label>Uzávěrka přihlášek</label><input type="date" name="registration_end" value="<%= settings.registration_end %>"></div>
+        <div><label>Uzávěrka hlasování</label><input type="date" name="voting_end" value="<%= settings.voting_end %>"></div>
+      </div>
+
+      <div style="margin-bottom:1rem;">
+        <label style="font-size:12px;color:var(--text2);font-weight:500;display:block;margin-bottom:5px;">Popis soutěže (hlavní stránka)</label>
+        <textarea name="home_subtitle" rows="3" style="width:100%;padding:8px 12px;font-size:14px;border:0.5px solid var(--border2);border-radius:7px;background:var(--bg);color:var(--text);font-family:inherit;resize:vertical;"><%= settings.home_subtitle %></textarea>
+      </div>
+
+      <div style="margin-bottom:1.5rem;">
+        <label style="font-size:12px;color:var(--text2);font-weight:500;display:block;margin-bottom:5px;">Pravidla soutěže (zobrazí se na stránce /pravidla)</label>
+        <textarea name="rules_text" rows="10" style="width:100%;padding:8px 12px;font-size:13px;border:0.5px solid var(--border2);border-radius:7px;background:var(--bg);color:var(--text);font-family:inherit;resize:vertical;line-height:1.6;"><%= settings.rules_text %></textarea>
+      </div>
+
+      <div style="margin-bottom:1.25rem;">
+        <div style="font-size:12px;color:var(--text2);font-weight:500;margin-bottom:10px;">Barvy webu</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;">
+          <div>
+            <label style="font-size:12px;color:var(--text2);display:block;margin-bottom:5px;">Hlavní barva (text, tlačítka)</label>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <input type="color" name="color_primary" value="<%= settings.color_primary || '#1a1a18' %>" style="width:40px;height:36px;padding:2px;border:0.5px solid var(--border2);border-radius:7px;cursor:pointer;">
+              <input type="text" name="color_primary_hex" value="<%= settings.color_primary || '#1a1a18' %>" style="flex:1;padding:8px 10px;font-size:13px;border:0.5px solid var(--border2);border-radius:7px;background:var(--bg);color:var(--text);font-family:monospace;" oninput="document.querySelector('[name=color_primary]').value=this.value">
+            </div>
+          </div>
+          <div>
+            <label style="font-size:12px;color:var(--text2);display:block;margin-bottom:5px;">Akcentová barva (zelená)</label>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <input type="color" name="color_accent" value="<%= settings.color_accent || '#0F6E56' %>" style="width:40px;height:36px;padding:2px;border:0.5px solid var(--border2);border-radius:7px;cursor:pointer;">
+              <input type="text" name="color_accent_hex" value="<%= settings.color_accent || '#0F6E56' %>" style="flex:1;padding:8px 10px;font-size:13px;border:0.5px solid var(--border2);border-radius:7px;background:var(--bg);color:var(--text);font-family:monospace;" oninput="document.querySelector('[name=color_accent]').value=this.value">
+            </div>
+          </div>
+          <div>
+            <label style="font-size:12px;color:var(--text2);display:block;margin-bottom:5px;">Barva pozadí</label>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <input type="color" name="color_bg" value="<%= settings.color_bg || '#fafaf9' %>" style="width:40px;height:36px;padding:2px;border:0.5px solid var(--border2);border-radius:7px;cursor:pointer;">
+              <input type="text" name="color_bg_hex" value="<%= settings.color_bg || '#fafaf9' %>" style="flex:1;padding:8px 10px;font-size:13px;border:0.5px solid var(--border2);border-radius:7px;background:var(--bg);color:var(--text);font-family:monospace;" oninput="document.querySelector('[name=color_bg]').value=this.value">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <button class="btn btn-dark" type="submit">Uložit nastavení</button>
+        <a href="/" target="_blank" style="margin-left:12px;font-size:13px;color:var(--text2);">Zobrazit web →</a>
+      </div>
+    </form>
+  </div>
+</div>
+</body>
+</html>

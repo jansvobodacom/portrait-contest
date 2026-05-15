@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= settings.contest_title %></title>
+  <style>
+    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+    :root { --bg:#fafaf9; --bg2:#f1f0ec; --surface:#fff; --text:#1a1a18; --text2:#5a5955; --text3:#9a9893; --border:rgba(0,0,0,0.1); --border2:rgba(0,0,0,0.2); --green:#0F6E56; --green-bg:#E1F5EE; --amber:#854F0B; --amber-bg:#FAEEDA; --amber-brd:#FAC775; --red:#A32D2D; --red-bg:#FCEBEB; --r:10px; }
+    body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; }
+    a { color:inherit; text-decoration:none; }
+    nav { background:var(--surface); border-bottom:0.5px solid var(--border); position:sticky; top:0; z-index:50; }
+    .nav-inner { max-width:900px; margin:0 auto; padding:0 1.5rem; height:54px; display:flex; align-items:center; justify-content:space-between; }
+    .nav-logo { font-size:15px; font-weight:500; }
+    .nav-links { display:flex; gap:2px; }
+    .nav-links a { padding:6px 13px; border-radius:7px; font-size:13px; color:var(--text2); transition:all .15s; }
+    .nav-links a:hover, .nav-links a.active { background:var(--bg2); color:var(--text); }
+    .container { max-width:560px; margin:0 auto; padding:2rem 1.5rem; }
+    footer { text-align:center; padding:2rem; font-size:13px; color:var(--text3); border-top:0.5px solid var(--border); margin-top:3rem; }
+    .alert { padding:10px 16px; border-radius:7px; font-size:14px; margin-bottom:1.5rem; }
+    .alert-success { background:var(--green-bg); color:var(--green); }
+    .alert-error { background:var(--red-bg); color:var(--red); }
+    /* Hero */
+    .hero { text-align:center; padding:2.5rem 0 1.5rem; }
+    .hero h1 { font-size:26px; font-weight:500; letter-spacing:-.5px; margin-bottom:8px; }
+    .hero p { color:var(--text2); font-size:15px; line-height:1.6; }
+    .badge { display:inline-block; font-size:12px; padding:4px 13px; border-radius:20px; margin-bottom:14px; font-weight:500; }
+    .badge-amber { background:var(--amber-bg); color:var(--amber); border:0.5px solid var(--amber-brd); }
+    .badge-gray  { background:var(--bg2); color:var(--text2); border:0.5px solid var(--border2); }
+    .badge-green { background:var(--green-bg); color:var(--green); border:0.5px solid #5DCAA5; }
+    /* Upload zone */
+    .upload-zone { border:1.5px dashed var(--border2); border-radius:var(--r); padding:2rem; text-align:center; cursor:pointer; transition:border-color .2s; margin-bottom:1.5rem; }
+    .upload-zone:hover { border-color:var(--text3); }
+    .upload-zone.has-file { border-color:var(--green); border-style:solid; }
+    .upload-icon { font-size:34px; margin-bottom:10px; }
+    .upload-zone p { font-size:14px; color:var(--text2); }
+    #preview-img { max-height:200px; border-radius:8px; margin-top:14px; border:0.5px solid var(--border); display:none; }
+    /* Form */
+    .form-card { background:var(--surface); border:0.5px solid var(--border); border-radius:var(--r); padding:1.5rem; }
+    .form-row { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:12px; }
+    .form-row.single { grid-template-columns:1fr; }
+    label { font-size:12px; color:var(--text2); font-weight:500; display:block; margin-bottom:5px; }
+    input[type=text], input[type=email], textarea { width:100%; padding:9px 12px; font-size:14px; border:0.5px solid var(--border2); border-radius:7px; background:var(--bg); color:var(--text); font-family:inherit; transition:border-color .15s; }
+    input:focus, textarea:focus { outline:none; border-color:var(--text); }
+    textarea { resize:vertical; min-height:80px; }
+    .btn-dark { padding:11px 30px; background:var(--text); color:var(--bg); border:none; border-radius:7px; font-size:14px; font-weight:500; cursor:pointer; font-family:inherit; transition:opacity .15s; }
+    .btn-dark:hover { opacity:.85; }
+    /* Prizes */
+    .prizes { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-top:2.5rem; }
+    .prize-card { background:var(--surface); border:0.5px solid var(--border); border-radius:var(--r); padding:1rem; text-align:center; }
+    .prize-icon { font-size:22px; margin-bottom:6px; }
+    .prize-title { font-size:13px; font-weight:500; }
+    .prize-desc { font-size:12px; color:var(--text2); margin-top:3px; }
+    /* Phase banners */
+    .phase-banner { border-radius:var(--r); padding:2rem; text-align:center; margin-bottom:2rem; }
+    .phase-banner h2 { font-size:20px; font-weight:500; margin-bottom:8px; }
+    .phase-banner p { font-size:14px; line-height:1.6; }
+    .phase-banner .phase-btn { display:inline-block; margin-top:1.25rem; padding:10px 24px; border-radius:7px; font-size:14px; font-weight:500; text-decoration:none; }
+    .pb-voting { background:var(--green-bg); border:0.5px solid #5DCAA5; }
+    .pb-voting h2, .pb-voting .phase-btn { color:var(--green); }
+    .pb-voting .phase-btn { background:var(--green); color:#fff; }
+    .pb-results { background:var(--amber-bg); border:0.5px solid var(--amber-brd); }
+    .pb-results h2 { color:var(--amber); }
+    .pb-results .phase-btn { background:var(--amber); color:#fff; }
+  </style>
+</head>
+<body>
+<nav>
+  <div class="nav-inner">
+    <a href="/" class="nav-logo">📸 <%= settings.contest_title %></a>
+    <div class="nav-links">
+      <a href="/" class="active">Domů</a>
+      <a href="/galerie">Galerie</a>
+      <a href="/vysledky">Výsledky</a>
+      <a href="/pravidla">Pravidla</a>
+      <% if (typeof isAdmin !== 'undefined' && isAdmin) { %><a href="/admin">Admin</a><% } %>
+    </div>
+  </div>
+</nav>
+<div class="container">
+  <% if (success) { %><div class="alert alert-success">✓ <%- decodeURIComponent((success||'').replace(/\+/g,' ')) %></div><% } %>
+  <% if (error) { %><div class="alert alert-error">⚠ <%- decodeURIComponent((error||'').replace(/\+/g,' ')) %></div><% } %>
+
+  <div class="hero">
+    <% if (settings.phase === 'registration') { %>
+      <span class="badge badge-amber">📅 Přihlášky otevřeny do <%= settings.registration_end %></span>
+    <% } else if (settings.phase === 'voting') { %>
+      <span class="badge badge-green">🗳 Hlasování probíhá do <%= settings.voting_end %></span>
+    <% } else { %>
+      <span class="badge badge-gray">🏁 Soutěž ukončena</span>
+    <% } %>
+    <h1><%= settings.contest_title %></h1>
+    <p><%= settings.home_subtitle || 'Pošlete svůj nejlepší portrétní snímek. Veřejnost hlasuje.' %></p>
+  </div>
+
+  <% if (settings.phase === 'registration') { %>
+    <!-- ── Přihlašovací formulář ── -->
+    <div class="upload-zone" id="upload-zone" onclick="document.getElementById('photo').click()">
+      <div class="upload-icon">📸</div>
+      <p>Klikněte nebo přetáhněte fotografii sem<br><span style="font-size:12px;color:var(--text3)">JPG, PNG, WebP – max. 15 MB</span></p>
+      <img id="preview-img" alt="Náhled">
+    </div>
+    <form action="/prihlasit" method="POST" enctype="multipart/form-data">
+      <input type="file" name="photo" id="photo" accept="image/jpeg,image/png,image/webp" style="display:none" required onchange="handleFile(this)">
+      <div class="form-card">
+        <div class="form-row">
+          <div><label>Jméno a příjmení *</label><input type="text" name="name" required placeholder="Jana Nováková"></div>
+          <div><label>E-mail *</label><input type="email" name="email" required placeholder="jana@email.cz"></div>
+        </div>
+        <div class="form-row single">
+          <div><label>Krátké představení (nepovinné)</label><textarea name="note" placeholder="Pár slov o sobě..." maxlength="300"></textarea></div>
+        </div>
+        <div style="text-align:center;margin-top:4px;">
+          <button type="submit" class="btn-dark">Odeslat přihlášku →</button>
+        </div>
+        <p style="text-align:center;font-size:12px;color:var(--text3);margin-top:12px;">Odesláním souhlasíte se zveřejněním fotografie v galerii soutěže.</p>
+      </div>
+    </form>
+
+  <% } else if (settings.phase === 'voting') { %>
+    <div class="phase-banner pb-voting">
+      <h2>🗳 Hlasování je otevřeno!</h2>
+      <p>Prohlédněte si fotografie v galerii a hlasujte pro svého favorita.<br>K hlasování potřebujete platný e-mail – každý e-mail = 1 hlas.</p>
+      <a href="/galerie" class="phase-btn">Přejít do galerie →</a>
+    </div>
+
+  <% } else { %>
+    <div class="phase-banner pb-results">
+      <h2>🏁 Hlasování skončilo</h2>
+      <p>Děkujeme všem účastníkům i hlasujícím.<br>Podívejte se na výsledky a zjistěte, kdo zvítězil!</p>
+      <a href="/vysledky" class="phase-btn" style="background:var(--amber);color:#fff;">Zobrazit výsledky →</a>
+    </div>
+  <% } %>
+
+  <div class="prizes">
+    <div class="prize-card"><div class="prize-icon">🏆</div><div class="prize-title">1. místo</div><div class="prize-desc"><%= settings.prize_description %></div></div>
+    <div class="prize-card"><div class="prize-icon">📷</div><div class="prize-title">Hlasování</div><div class="prize-desc">Každý e-mail = 1 hlas</div></div>
+    <div class="prize-card"><div class="prize-icon">📅</div><div class="prize-title">Termín přihlášek</div><div class="prize-desc"><%= settings.registration_end %></div></div>
+  </div>
+</div>
+<footer>© 2026 Jan Svoboda Photography &nbsp;·&nbsp; <a href="/admin/login">Admin</a></footer>
+<script>
+  const zone = document.getElementById('upload-zone');
+  if (zone) {
+    zone.addEventListener('dragover', e => e.preventDefault());
+    zone.addEventListener('drop', e => {
+      e.preventDefault();
+      const dt = new DataTransfer(); dt.items.add(e.dataTransfer.files[0]);
+      document.getElementById('photo').files = dt.files;
+      handleFile(document.getElementById('photo'));
+    });
+  }
+  function handleFile(input) {
+    if (!input.files[0]) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+      const img = document.getElementById('preview-img');
+      img.src = e.target.result; img.style.display = 'block';
+      document.getElementById('upload-zone').classList.add('has-file');
+    };
+    reader.readAsDataURL(input.files[0]);
+  }
+</script>
+</body>
+</html>

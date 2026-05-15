@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Výsledky – <%= settings.contest_title %></title>
+  <style>
+    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+    :root { --bg:#fafaf9; --bg2:#f1f0ec; --surface:#fff; --text:#1a1a18; --text2:#5a5955; --text3:#9a9893; --border:rgba(0,0,0,0.1); --amber:#854F0B; --amber-bg:#FAEEDA; --amber-brd:#FAC775; --green:#0F6E56; --green-bg:#E1F5EE; --r:10px; }
+    body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; background:var(--bg); color:var(--text); }
+    a { color:inherit; text-decoration:none; }
+    nav { background:var(--surface); border-bottom:0.5px solid var(--border); position:sticky; top:0; z-index:50; }
+    .nav-inner { max-width:700px; margin:0 auto; padding:0 1.5rem; height:54px; display:flex; align-items:center; justify-content:space-between; }
+    .nav-logo { font-size:15px; font-weight:500; }
+    .nav-links { display:flex; gap:2px; }
+    .nav-links a { padding:6px 13px; border-radius:7px; font-size:13px; color:var(--text2); transition:all .15s; }
+    .nav-links a:hover, .nav-links a.active { background:var(--bg2); color:var(--text); }
+    .container { max-width:700px; margin:0 auto; padding:2rem 1.5rem; }
+    footer { text-align:center; padding:2rem; font-size:13px; color:var(--text3); border-top:0.5px solid var(--border); margin-top:3rem; }
+    h1 { font-size:22px; font-weight:500; margin-bottom:6px; }
+    .subtitle { font-size:14px; color:var(--text2); margin-bottom:2rem; }
+    .voting-note { background:var(--green-bg); border:0.5px solid #5DCAA5; border-radius:7px; padding:10px 16px; font-size:14px; color:var(--green); margin-bottom:1.5rem; }
+    /* Winner highlight */
+    .winner-card { background:var(--amber-bg); border:0.5px solid var(--amber-brd); border-radius:var(--r); padding:1.5rem; display:flex; gap:1rem; align-items:center; margin-bottom:2rem; }
+    .winner-photo { width:90px; height:90px; object-fit:cover; border-radius:8px; flex-shrink:0; }
+    .winner-info h2 { font-size:18px; font-weight:500; color:#633806; margin-bottom:4px; }
+    .winner-info p { font-size:14px; color:var(--amber); }
+    .winner-prize { margin-top:8px; font-size:13px; background:var(--amber); color:#fff; display:inline-block; padding:4px 12px; border-radius:20px; }
+    /* Podium */
+    .podium { display:flex; align-items:flex-end; justify-content:center; gap:12px; margin-bottom:2.5rem; }
+    .p-item { text-align:center; flex:1; max-width:160px; }
+    .p-photo { width:72px; height:72px; border-radius:50%; object-fit:cover; margin:0 auto 8px; border:2px solid var(--border); display:block; }
+    .p-photo.gold { width:88px; height:88px; border-color:var(--amber-brd); }
+    .p-block { border-radius:8px 8px 0 0; display:flex; align-items:center; justify-content:center; font-size:20px; font-weight:500; }
+    .p-gold .p-block { height:80px; background:var(--amber-bg); color:var(--amber); }
+    .p-silver .p-block, .p-bronze .p-block { background:var(--bg2); color:var(--text2); }
+    .p-silver .p-block { height:58px; }
+    .p-bronze .p-block { height:42px; }
+    .p-name { font-size:13px; font-weight:500; margin-top:6px; }
+    .p-votes { font-size:12px; color:var(--text2); }
+    /* List */
+    .result-row { display:flex; align-items:center; gap:14px; padding:12px 0; border-top:0.5px solid var(--border); }
+    .rank { font-size:14px; color:var(--text3); width:24px; text-align:right; flex-shrink:0; }
+    .r-photo { width:44px; height:44px; border-radius:8px; object-fit:cover; flex-shrink:0; }
+    .r-info { flex:1; }
+    .r-name { font-size:14px; font-weight:500; }
+    .bar-wrap { height:5px; background:var(--bg2); border-radius:3px; margin-top:5px; }
+    .bar { height:5px; border-radius:3px; background:var(--text2); }
+    .r-votes { font-size:13px; color:var(--text2); flex-shrink:0; }
+    .empty { text-align:center; padding:4rem; color:var(--text2); }
+  </style>
+</head>
+<body>
+<nav>
+  <div class="nav-inner">
+    <a href="/" class="nav-logo">📸 <%= settings.contest_title %></a>
+    <div class="nav-links">
+      <a href="/">Domů</a>
+      <a href="/galerie">Galerie</a>
+      <a href="/vysledky" class="active">Výsledky</a>
+      <% if (typeof isAdmin !== 'undefined' && isAdmin) { %><a href="/admin">Admin</a><% } %>
+    </div>
+  </div>
+</nav>
+<div class="container">
+  <h1><% if (settings.phase === 'results') { %>🏆 Konečné výsledky<% } else { %>Průběžné výsledky<% } %></h1>
+  <p class="subtitle">
+    <% if (settings.phase === 'voting') { %>Hlasování stále probíhá – výsledky se aktualizují živě.
+    <% } else if (settings.phase === 'results') { %>Hlasování bylo ukončeno. Gratulujeme vítězi!
+    <% } else { %>Přehled přihlášených fotografií.<% } %>
+  </p>
+
+  <% if (settings.phase === 'voting') { %>
+    <div class="voting-note">🗳 Ještě jste nehlasoval/a? <a href="/galerie" style="color:var(--green);font-weight:500;text-decoration:underline;">Přejít do galerie →</a></div>
+  <% } %>
+
+  <% if (entries.length === 0) { %>
+    <div class="empty">Zatím žádné výsledky.</div>
+  <% } else {
+    const maxVotes = Math.max(entries[0].votes, 1);
+    const top3 = entries.slice(0, 3);
+    const rest = entries.slice(3);
+  %>
+
+  <% if (settings.phase === 'results' && top3.length > 0 && top3[0].votes > 0) { %>
+  <div class="winner-card">
+    <img src="/uploads/<%= top3[0].photo %>" class="winner-photo" alt="">
+    <div class="winner-info">
+      <h2>🏆 Vítěz: <%= top3[0].name %></h2>
+      <p><%= top3[0].votes %> hlasů</p>
+      <span class="winner-prize"><%= settings.prize_description %></span>
+    </div>
+  </div>
+  <% } %>
+
+  <div class="podium">
+    <%
+      const podiumOrder = top3.length >= 2 ? [top3[1], top3[0], top3[2]].filter(Boolean) : top3;
+      const pClass = ['p-silver','p-gold','p-bronze'];
+      const pNum = ['2','1','3'];
+    %>
+    <% podiumOrder.forEach((e, i) => { %>
+    <div class="p-item <%= pClass[i] %>">
+      <img src="/uploads/<%= e.photo %>" class="p-photo <%= i===1?'gold':'' %>" alt="">
+      <div class="p-block"><%= pNum[i] %></div>
+      <div class="p-name"><%= e.name.split(' ')[0] %></div>
+      <div class="p-votes"><%= e.votes %> hlasů</div>
+    </div>
+    <% }) %>
+  </div>
+
+  <% rest.forEach((e, i) => { %>
+  <div class="result-row">
+    <span class="rank"><%= i+4 %></span>
+    <img src="/uploads/<%= e.photo %>" class="r-photo" alt="">
+    <div class="r-info">
+      <div class="r-name"><%= e.name %></div>
+      <div class="bar-wrap"><div class="bar" style="width:<%= Math.round(e.votes/maxVotes*100) %>%"></div></div>
+    </div>
+    <span class="r-votes"><%= e.votes %> hlasů</span>
+  </div>
+  <% }) %>
+  <% } %>
+</div>
+<footer>© 2026 Jan Svoboda Photography</footer>
+</body>
+</html>
