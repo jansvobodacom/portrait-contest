@@ -50,7 +50,10 @@ insertSetting.run('voting_end', '2026-07-15');
 insertSetting.run('prize_description', 'Profesionální focení zdarma');
 insertSetting.run('winner_email_sent', '0');
 
-module.exports = db;
+// Migrace – přidej anon_number pokud sloupec chybí (pro existující DB)
+try {
+  db.prepare('ALTER TABLE entries ADD COLUMN anon_number INTEGER').run();
+} catch (e) { /* sloupec už existuje, ok */ }
 
 // Nová nastavení pro texty, pravidla a barvy
 insertSetting.run('home_subtitle', 'Pošlete svůj nejlepší portrétní snímek. Veřejnost hlasuje – vítěz získá profesionální focení zdarma.');
@@ -58,3 +61,5 @@ insertSetting.run('rules_text', 'Pravidla soutěže:\n\n1. Soutěž je otevřena
 insertSetting.run('color_primary', '#1a1a18');
 insertSetting.run('color_accent', '#0F6E56');
 insertSetting.run('color_bg', '#fafaf9');
+
+module.exports = db;
