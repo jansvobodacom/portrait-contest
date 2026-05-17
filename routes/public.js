@@ -71,7 +71,7 @@ router.post('/prihlasit', upload.single('photo'), async (req, res) => {
 router.get('/galerie', (req, res) => {
   const settings = getSettings();
   const entries = db.prepare(
-    "SELECT id, name, note, photo, votes FROM entries WHERE status = 'approved' ORDER BY votes DESC, created_at ASC"
+    "SELECT id, name, note, photo, votes, anon_number FROM entries WHERE status = 'approved' ORDER BY votes DESC, created_at ASC"
   ).all();
   res.render('gallery', {
     settings, entries,
@@ -113,7 +113,7 @@ router.post('/hlasovat', (req, res) => {
 // ── Výsledky ─────────────────────────────────────────────────────────────────
 router.get('/vysledky', (req, res) => {
   const settings = getSettings();
-  const entries = db.prepare("SELECT id, name, note, photo, votes FROM entries WHERE status = 'approved' ORDER BY votes DESC").all();
+  const entries = db.prepare("SELECT id, name, note, photo, votes, anon_number FROM entries WHERE status = 'approved' ORDER BY votes DESC").all();
   res.render('results', { settings, entries });
 });
 

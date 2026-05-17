@@ -19,6 +19,7 @@ db.exec(`
     photo       TEXT NOT NULL,
     status      TEXT DEFAULT 'pending',
     votes       INTEGER DEFAULT 0,
+    anon_number INTEGER,
     ip          TEXT,
     created_at  DATETIME DEFAULT CURRENT_TIMESTAMP
   );

@@ -3,162 +3,215 @@
 <head>
   <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title><%= settings.contest_title %></title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
-    :root { --bg:#fafaf9; --bg2:#f1f0ec; --surface:#fff; --text:#1a1a18; --text2:#5a5955; --text3:#9a9893; --border:rgba(0,0,0,0.1); --border2:rgba(0,0,0,0.2); --green:#0F6E56; --green-bg:#E1F5EE; --amber:#854F0B; --amber-bg:#FAEEDA; --amber-brd:#FAC775; --red:#A32D2D; --red-bg:#FCEBEB; --r:10px; }
-    body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; }
+    :root {
+      --bg:<%= settings.color_bg||'#fafaf8' %>;
+      --surface:#fff;
+      --text:<%= settings.color_primary||'#1a1a18' %>;
+      --text2:#5a5955; --text3:#9a9893;
+      --border:rgba(0,0,0,0.1); --border2:rgba(0,0,0,0.18);
+      --accent:<%= settings.color_accent||'#0F6E56' %>;
+      --accent-bg:#E1F5EE;
+      --amber:#854F0B; --amber-bg:#FAEEDA; --amber-brd:#FAC775;
+      --red:#A32D2D; --red-bg:#FCEBEB;
+      --r:4px;
+    }
+    body { font-family:'Inter',sans-serif; background:var(--bg); color:var(--text); line-height:1.6; min-height:100vh; }
     a { color:inherit; text-decoration:none; }
-    nav { background:var(--surface); border-bottom:0.5px solid var(--border); position:sticky; top:0; z-index:50; }
-    .nav-inner { max-width:900px; margin:0 auto; padding:0 1.5rem; height:54px; display:flex; align-items:center; justify-content:space-between; }
-    .nav-logo { font-size:15px; font-weight:500; }
-    .nav-links { display:flex; gap:2px; }
-    .nav-links a { padding:6px 13px; border-radius:7px; font-size:13px; color:var(--text2); transition:all .15s; }
-    .nav-links a:hover, .nav-links a.active { background:var(--bg2); color:var(--text); }
-    .container { max-width:560px; margin:0 auto; padding:2rem 1.5rem; }
-    footer { text-align:center; padding:2rem; font-size:13px; color:var(--text3); border-top:0.5px solid var(--border); margin-top:3rem; }
-    .alert { padding:10px 16px; border-radius:7px; font-size:14px; margin-bottom:1.5rem; }
-    .alert-success { background:var(--green-bg); color:var(--green); }
-    .alert-error { background:var(--red-bg); color:var(--red); }
-    /* Hero */
-    .hero { text-align:center; padding:2.5rem 0 1.5rem; }
-    .hero h1 { font-size:26px; font-weight:500; letter-spacing:-.5px; margin-bottom:8px; }
-    .hero p { color:var(--text2); font-size:15px; line-height:1.6; }
-    .badge { display:inline-block; font-size:12px; padding:4px 13px; border-radius:20px; margin-bottom:14px; font-weight:500; }
-    .badge-amber { background:var(--amber-bg); color:var(--amber); border:0.5px solid var(--amber-brd); }
-    .badge-gray  { background:var(--bg2); color:var(--text2); border:0.5px solid var(--border2); }
-    .badge-green { background:var(--green-bg); color:var(--green); border:0.5px solid #5DCAA5; }
-    /* Upload zone */
-    .upload-zone { border:1.5px dashed var(--border2); border-radius:var(--r); padding:2rem; text-align:center; cursor:pointer; transition:border-color .2s; margin-bottom:1.5rem; }
-    .upload-zone:hover { border-color:var(--text3); }
-    .upload-zone.has-file { border-color:var(--green); border-style:solid; }
-    .upload-icon { font-size:34px; margin-bottom:10px; }
+    .serif { font-family:'Playfair Display',serif; }
+
+    nav { display:flex; align-items:center; justify-content:space-between; padding:1.25rem 2.5rem; border-bottom:0.5px solid var(--border); background:var(--surface); position:sticky; top:0; z-index:100; }
+    .nav-logo { font-family:'Playfair Display',serif; font-size:17px; }
+    .nav-logo em { font-style:italic; font-weight:400; color:var(--text2); }
+    .nav-links { display:flex; gap:2rem; align-items:center; }
+    .nav-links a { font-size:12px; color:var(--text2); letter-spacing:0.6px; text-transform:uppercase; font-weight:400; transition:color .2s; }
+    .nav-links a:hover, .nav-links a.active { color:var(--text); }
+
+    .hero { display:grid; grid-template-columns:1fr 1fr; min-height:500px; border-bottom:0.5px solid var(--border); }
+    .hero-left { padding:3.5rem 2.5rem; display:flex; flex-direction:column; justify-content:center; border-right:0.5px solid var(--border); }
+    .hero-eyebrow { font-size:11px; letter-spacing:2px; text-transform:uppercase; color:var(--text2); margin-bottom:1.5rem; }
+    .hero-title { font-family:'Playfair Display',serif; font-size:52px; line-height:1.05; letter-spacing:-1.5px; margin-bottom:1.5rem; font-weight:400; }
+    .hero-title em { font-style:italic; color:var(--text2); }
+    .hero-desc { font-size:15px; color:var(--text2); line-height:1.75; margin-bottom:2rem; max-width:360px; }
+    .hero-cta { display:flex; gap:14px; align-items:center; }
+    .btn-dark { background:var(--text); color:var(--bg); padding:12px 26px; border-radius:var(--r); font-size:13px; font-weight:500; letter-spacing:0.3px; cursor:pointer; border:none; font-family:'Inter',sans-serif; transition:opacity .15s; }
+    .btn-dark:hover { opacity:.85; }
+    .btn-ghost { font-size:13px; color:var(--text2); cursor:pointer; display:flex; align-items:center; gap:6px; transition:color .2s; }
+    .btn-ghost:hover { color:var(--text); }
+    .hero-right { background:var(--surface); display:grid; grid-template-columns:1.2fr 1fr; grid-template-rows:1fr 1fr; gap:2px; background:var(--border); }
+    .photo-cell { background:var(--bg); display:flex; align-items:center; justify-content:center; position:relative; overflow:hidden; }
+    .photo-cell.featured { grid-row:1/3; }
+    .photo-cell span { font-size:64px; opacity:.15; }
+    .photo-label { position:absolute; bottom:12px; left:12px; font-size:11px; color:var(--text2); letter-spacing:0.3px; }
+
+    .stats-bar { display:grid; grid-template-columns:repeat(3,1fr); border-bottom:0.5px solid var(--border); background:var(--surface); }
+    .stat { padding:1.5rem 2.5rem; border-right:0.5px solid var(--border); }
+    .stat:last-child { border-right:none; }
+    .stat-num { font-family:'Playfair Display',serif; font-size:36px; font-weight:400; letter-spacing:-1px; line-height:1; }
+    .stat-label { font-size:11px; color:var(--text2); margin-top:6px; letter-spacing:0.6px; text-transform:uppercase; }
+
+    .phase-banner { padding:1.25rem 2.5rem; font-size:13px; display:flex; align-items:center; gap:10px; border-bottom:0.5px solid var(--border); }
+    .pb-reg { background:var(--amber-bg); color:var(--amber); }
+    .pb-vote { background:var(--accent-bg); color:var(--accent); }
+    .pb-done { background:#f1f0ec; color:var(--text2); }
+    .pb-link { font-weight:500; text-decoration:underline; cursor:pointer; }
+
+    .upload-section { max-width:600px; margin:0 auto; padding:3rem 2rem; }
+    .upload-title { font-family:'Playfair Display',serif; font-size:28px; font-weight:400; margin-bottom:6px; }
+    .upload-sub { font-size:14px; color:var(--text2); margin-bottom:2rem; }
+    .upload-zone { border:1px dashed var(--border2); border-radius:var(--r); padding:2.5rem; text-align:center; cursor:pointer; transition:border-color .2s,background .2s; margin-bottom:1.5rem; }
+    .upload-zone:hover { border-color:var(--text3); background:var(--surface); }
+    .upload-zone.has-file { border-color:var(--accent); border-style:solid; }
+    .upload-icon { font-size:32px; margin-bottom:12px; opacity:.4; }
     .upload-zone p { font-size:14px; color:var(--text2); }
-    #preview-img { max-height:200px; border-radius:8px; margin-top:14px; border:0.5px solid var(--border); display:none; }
-    /* Form */
-    .form-card { background:var(--surface); border:0.5px solid var(--border); border-radius:var(--r); padding:1.5rem; }
-    .form-row { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:12px; }
-    .form-row.single { grid-template-columns:1fr; }
-    label { font-size:12px; color:var(--text2); font-weight:500; display:block; margin-bottom:5px; }
-    input[type=text], input[type=email], textarea { width:100%; padding:9px 12px; font-size:14px; border:0.5px solid var(--border2); border-radius:7px; background:var(--bg); color:var(--text); font-family:inherit; transition:border-color .15s; }
+    .upload-zone small { font-size:12px; color:var(--text3); }
+    #preview-img { max-height:200px; border-radius:var(--r); margin-top:1rem; border:0.5px solid var(--border); display:none; }
+    .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:14px; }
+    label { font-size:11px; color:var(--text2); font-weight:500; display:block; margin-bottom:6px; letter-spacing:0.5px; text-transform:uppercase; }
+    input[type=text], input[type=email], textarea { width:100%; padding:10px 14px; font-size:14px; border:0.5px solid var(--border2); border-radius:var(--r); background:var(--surface); color:var(--text); font-family:'Inter',sans-serif; transition:border-color .15s; }
     input:focus, textarea:focus { outline:none; border-color:var(--text); }
     textarea { resize:vertical; min-height:80px; }
-    .btn-dark { padding:11px 30px; background:var(--text); color:var(--bg); border:none; border-radius:7px; font-size:14px; font-weight:500; cursor:pointer; font-family:inherit; transition:opacity .15s; }
-    .btn-dark:hover { opacity:.85; }
-    /* Prizes */
-    .prizes { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-top:2.5rem; }
-    .prize-card { background:var(--surface); border:0.5px solid var(--border); border-radius:var(--r); padding:1rem; text-align:center; }
-    .prize-icon { font-size:22px; margin-bottom:6px; }
-    .prize-title { font-size:13px; font-weight:500; }
-    .prize-desc { font-size:12px; color:var(--text2); margin-top:3px; }
-    /* Phase banners */
-    .phase-banner { border-radius:var(--r); padding:2rem; text-align:center; margin-bottom:2rem; }
-    .phase-banner h2 { font-size:20px; font-weight:500; margin-bottom:8px; }
-    .phase-banner p { font-size:14px; line-height:1.6; }
-    .phase-banner .phase-btn { display:inline-block; margin-top:1.25rem; padding:10px 24px; border-radius:7px; font-size:14px; font-weight:500; text-decoration:none; }
-    .pb-voting { background:var(--green-bg); border:0.5px solid #5DCAA5; }
-    .pb-voting h2, .pb-voting .phase-btn { color:var(--green); }
-    .pb-voting .phase-btn { background:var(--green); color:#fff; }
-    .pb-results { background:var(--amber-bg); border:0.5px solid var(--amber-brd); }
-    .pb-results h2 { color:var(--amber); }
-    .pb-results .phase-btn { background:var(--amber); color:#fff; }
+    .form-footer { display:flex; align-items:center; justify-content:space-between; margin-top:4px; }
+    .form-note { font-size:12px; color:var(--text3); }
+
+    .prizes { display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:var(--border); margin-top:3rem; border-top:0.5px solid var(--border); }
+    .prize-cell { background:var(--surface); padding:1.5rem 2rem; }
+    .prize-icon { font-size:20px; margin-bottom:8px; opacity:.6; }
+    .prize-title { font-family:'Playfair Display',serif; font-size:16px; font-weight:400; margin-bottom:4px; }
+    .prize-desc { font-size:13px; color:var(--text2); }
+
+    .alert { padding:12px 16px; border-radius:var(--r); font-size:14px; margin:1rem 2rem 0; }
+    .alert-success { background:var(--accent-bg); color:var(--accent); }
+    .alert-error { background:var(--red-bg); color:var(--red); }
+
+    footer { display:flex; align-items:center; justify-content:space-between; padding:1.5rem 2.5rem; border-top:0.5px solid var(--border); background:var(--surface); }
+    .footer-logo { font-family:'Playfair Display',serif; font-size:14px; }
+    .footer-links { display:flex; gap:1.5rem; }
+    .footer-links a { font-size:12px; color:var(--text2); letter-spacing:0.3px; }
+    .footer-links a:hover { color:var(--text); }
   </style>
 </head>
 <body>
 <nav>
-  <div class="nav-inner">
-    <a href="/" class="nav-logo">📸 <%= settings.contest_title %></a>
-    <div class="nav-links">
-      <a href="/" class="active">Domů</a>
-      <a href="/galerie">Galerie</a>
-      <a href="/vysledky">Výsledky</a>
-      <a href="/pravidla">Pravidla</a>
-      <% if (typeof isAdmin !== 'undefined' && isAdmin) { %><a href="/admin">Admin</a><% } %>
-    </div>
+  <a href="/" class="nav-logo">Jan Svoboda <em>Photography</em></a>
+  <div class="nav-links">
+    <a href="/" class="active">Přihlásit se</a>
+    <a href="/galerie">Galerie</a>
+    <a href="/vysledky">Výsledky</a>
+    <a href="/pravidla">Pravidla</a>
+    <% if (typeof isAdmin !== 'undefined' && isAdmin) { %><a href="/admin">Admin</a><% } %>
   </div>
 </nav>
-<div class="container">
-  <% if (success) { %><div class="alert alert-success">✓ <%- decodeURIComponent((success||'').replace(/\+/g,' ')) %></div><% } %>
-  <% if (error) { %><div class="alert alert-error">⚠ <%- decodeURIComponent((error||'').replace(/\+/g,' ')) %></div><% } %>
 
-  <div class="hero">
-    <% if (settings.phase === 'registration') { %>
-      <span class="badge badge-amber">📅 Přihlášky otevřeny do <%= settings.registration_end %></span>
-    <% } else if (settings.phase === 'voting') { %>
-      <span class="badge badge-green">🗳 Hlasování probíhá do <%= settings.voting_end %></span>
-    <% } else { %>
-      <span class="badge badge-gray">🏁 Soutěž ukončena</span>
-    <% } %>
-    <h1><%= settings.contest_title %></h1>
-    <p><%= settings.home_subtitle || 'Pošlete svůj nejlepší portrétní snímek. Veřejnost hlasuje.' %></p>
+<% if (success) { %><div class="alert alert-success">✓ <%- decodeURIComponent((success||'').replace(/\+/g,' ')) %></div><% } %>
+<% if (error) { %><div class="alert alert-error">⚠ <%- decodeURIComponent((error||'').replace(/\+/g,' ')) %></div><% } %>
+
+<div class="hero">
+  <div class="hero-left">
+    <div class="hero-eyebrow">Ročník 2026 &nbsp;·&nbsp;
+      <% if(settings.phase==='registration') { %>Přihlášky do <%= settings.registration_end %>
+      <% } else if(settings.phase==='voting') { %>Hlasování do <%= settings.voting_end %>
+      <% } else { %>Soutěž ukončena<% } %>
+    </div>
+    <h1 class="hero-title">Soutěž<br>o nejhezčí<br><em>portrét</em></h1>
+    <p class="hero-desc"><%= settings.home_subtitle || 'Pošlete svůj nejlepší portrétní snímek. Veřejnost hlasuje – vítěz získá profesionální focení zdarma.' %></p>
+    <div class="hero-cta">
+      <% if(settings.phase==='registration') { %>
+        <button class="btn-dark" onclick="document.getElementById('upload-zone').scrollIntoView({behavior:'smooth'})">Přihlásit fotografii</button>
+        <a href="/galerie" class="btn-ghost">Zobrazit galerii →</a>
+      <% } else if(settings.phase==='voting') { %>
+        <a href="/galerie" class="btn-dark" style="display:inline-block">Hlasovat v galerii</a>
+        <a href="/vysledky" class="btn-ghost">Průběžné výsledky →</a>
+      <% } else { %>
+        <a href="/vysledky" class="btn-dark" style="display:inline-block">Zobrazit výsledky</a>
+      <% } %>
+    </div>
   </div>
-
-  <% if (settings.phase === 'registration') { %>
-    <!-- ── Přihlašovací formulář ── -->
-    <div class="upload-zone" id="upload-zone" onclick="document.getElementById('photo').click()">
-      <div class="upload-icon">📸</div>
-      <p>Klikněte nebo přetáhněte fotografii sem<br><span style="font-size:12px;color:var(--text3)">JPG, PNG, WebP – max. 15 MB</span></p>
-      <img id="preview-img" alt="Náhled">
-    </div>
-    <form action="/prihlasit" method="POST" enctype="multipart/form-data">
-      <input type="file" name="photo" id="photo" accept="image/jpeg,image/png,image/webp" style="display:none" required onchange="handleFile(this)">
-      <div class="form-card">
-        <div class="form-row">
-          <div><label>Jméno a příjmení *</label><input type="text" name="name" required placeholder="Jana Nováková"></div>
-          <div><label>E-mail *</label><input type="email" name="email" required placeholder="jana@email.cz"></div>
-        </div>
-        <div class="form-row single">
-          <div><label>Krátké představení (nepovinné)</label><textarea name="note" placeholder="Pár slov o sobě..." maxlength="300"></textarea></div>
-        </div>
-        <div style="text-align:center;margin-top:4px;">
-          <button type="submit" class="btn-dark">Odeslat přihlášku →</button>
-        </div>
-        <p style="text-align:center;font-size:12px;color:var(--text3);margin-top:12px;">Odesláním souhlasíte se zveřejněním fotografie v galerii soutěže.</p>
-      </div>
-    </form>
-
-  <% } else if (settings.phase === 'voting') { %>
-    <div class="phase-banner pb-voting">
-      <h2>🗳 Hlasování je otevřeno!</h2>
-      <p>Prohlédněte si fotografie v galerii a hlasujte pro svého favorita.<br>K hlasování potřebujete platný e-mail – každý e-mail = 1 hlas.</p>
-      <a href="/galerie" class="phase-btn">Přejít do galerie →</a>
-    </div>
-
-  <% } else { %>
-    <div class="phase-banner pb-results">
-      <h2>🏁 Hlasování skončilo</h2>
-      <p>Děkujeme všem účastníkům i hlasujícím.<br>Podívejte se na výsledky a zjistěte, kdo zvítězil!</p>
-      <a href="/vysledky" class="phase-btn" style="background:var(--amber);color:#fff;">Zobrazit výsledky →</a>
-    </div>
-  <% } %>
-
-  <div class="prizes">
-    <div class="prize-card"><div class="prize-icon">🏆</div><div class="prize-title">1. místo</div><div class="prize-desc"><%= settings.prize_description %></div></div>
-    <div class="prize-card"><div class="prize-icon">📷</div><div class="prize-title">Hlasování</div><div class="prize-desc">Každý e-mail = 1 hlas</div></div>
-    <div class="prize-card"><div class="prize-icon">📅</div><div class="prize-title">Termín přihlášek</div><div class="prize-desc"><%= settings.registration_end %></div></div>
+  <div class="hero-right">
+    <div class="photo-cell featured"><span>🧑</span></div>
+    <div class="photo-cell"><span>👩</span></div>
+    <div class="photo-cell"><span>🧔</span></div>
   </div>
 </div>
-<footer>© 2026 Jan Svoboda Photography &nbsp;·&nbsp; <a href="/admin/login">Admin</a></footer>
+
+<div class="stats-bar">
+  <div class="stat"><div class="stat-num">—</div><div class="stat-label">Přihlášených</div></div>
+  <div class="stat"><div class="stat-num">—</div><div class="stat-label">Hlasů</div></div>
+  <div class="stat"><div class="stat-num"><%= settings.registration_end %></div><div class="stat-label">Uzávěrka přihlášek</div></div>
+</div>
+
+<% if (settings.phase === 'registration') { %>
+<div class="upload-section">
+  <h2 class="upload-title">Přihlásit fotografii</h2>
+  <p class="upload-sub">Nahrajte svůj nejlepší portrétní snímek a zapojte se do soutěže.</p>
+
+  <div class="upload-zone" id="upload-zone" onclick="document.getElementById('photo').click()">
+    <div class="upload-icon">↑</div>
+    <p>Klikněte nebo přetáhněte fotografii sem</p>
+    <small>JPG, PNG, WebP – max. 15 MB</small>
+    <img id="preview-img" alt="Náhled">
+  </div>
+
+  <form action="/prihlasit" method="POST" enctype="multipart/form-data">
+    <input type="file" name="photo" id="photo" accept="image/jpeg,image/png,image/webp" style="display:none" required onchange="handleFile(this)">
+    <div class="form-grid">
+      <div><label>Jméno a příjmení *</label><input type="text" name="name" required placeholder="Jana Nováková"></div>
+      <div><label>E-mail *</label><input type="email" name="email" required placeholder="jana@email.cz"></div>
+    </div>
+    <div style="margin-bottom:1.25rem;"><label>Krátké představení</label><textarea name="note" placeholder="Pár slov o sobě..." maxlength="300"></textarea></div>
+    <div class="form-footer">
+      <span class="form-note">Odesláním souhlasíte se zveřejněním fotografie v galerii.</span>
+      <button type="submit" class="btn-dark">Odeslat přihlášku →</button>
+    </div>
+  </form>
+</div>
+
+<% } else if (settings.phase === 'voting') { %>
+<div style="text-align:center;padding:4rem 2rem;">
+  <p style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--text2);margin-bottom:1rem;">Hlasování probíhá</p>
+  <h2 style="font-family:'Playfair Display',serif;font-size:32px;font-weight:400;margin-bottom:1rem;">Vyberte svého favorita</h2>
+  <p style="font-size:15px;color:var(--text2);margin-bottom:2rem;">K hlasování stačí váš e-mail. Každý e-mail = jeden hlas.</p>
+  <a href="/galerie" class="btn-dark" style="display:inline-block">Přejít do galerie →</a>
+</div>
+
+<% } else { %>
+<div style="text-align:center;padding:4rem 2rem;">
+  <p style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--text2);margin-bottom:1rem;">Soutěž ukončena</p>
+  <h2 style="font-family:'Playfair Display',serif;font-size:32px;font-weight:400;margin-bottom:1rem;">Děkujeme všem účastníkům</h2>
+  <a href="/vysledky" class="btn-dark" style="display:inline-block">Zobrazit výsledky →</a>
+</div>
+<% } %>
+
+<div class="prizes">
+  <div class="prize-cell"><div class="prize-icon">🏆</div><div class="prize-title">1. místo</div><div class="prize-desc"><%= settings.prize_description %></div></div>
+  <div class="prize-cell"><div class="prize-icon">✉</div><div class="prize-title">Hlasování</div><div class="prize-desc">Každý e-mail = jeden hlas</div></div>
+  <div class="prize-cell"><div class="prize-icon">📅</div><div class="prize-title">Uzávěrka</div><div class="prize-desc"><%= settings.registration_end %></div></div>
+</div>
+
+<footer>
+  <div class="footer-logo">Jan Svoboda Photography</div>
+  <div class="footer-links">
+    <a href="/pravidla">Pravidla</a>
+    <a href="/galerie">Galerie</a>
+    <a href="/admin/login">Admin</a>
+  </div>
+</footer>
+
 <script>
-  const zone = document.getElementById('upload-zone');
-  if (zone) {
-    zone.addEventListener('dragover', e => e.preventDefault());
-    zone.addEventListener('drop', e => {
-      e.preventDefault();
-      const dt = new DataTransfer(); dt.items.add(e.dataTransfer.files[0]);
-      document.getElementById('photo').files = dt.files;
-      handleFile(document.getElementById('photo'));
-    });
-  }
-  function handleFile(input) {
-    if (!input.files[0]) return;
-    const reader = new FileReader();
-    reader.onload = e => {
-      const img = document.getElementById('preview-img');
-      img.src = e.target.result; img.style.display = 'block';
-      document.getElementById('upload-zone').classList.add('has-file');
-    };
-    reader.readAsDataURL(input.files[0]);
-  }
+const zone = document.getElementById('upload-zone');
+if(zone){
+  zone.addEventListener('dragover',e=>e.preventDefault());
+  zone.addEventListener('drop',e=>{e.preventDefault();const dt=new DataTransfer();dt.items.add(e.dataTransfer.files[0]);document.getElementById('photo').files=dt.files;handleFile(document.getElementById('photo'));});
+}
+function handleFile(input){
+  if(!input.files[0])return;
+  const reader=new FileReader();
+  reader.onload=e=>{const img=document.getElementById('preview-img');img.src=e.target.result;img.style.display='block';document.getElementById('upload-zone').classList.add('has-file');};
+  reader.readAsDataURL(input.files[0]);
+}
 </script>
 </body>
 </html>

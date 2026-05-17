@@ -57,7 +57,16 @@ router.post('/faze', requireAdmin, (req, res) => {
 
 // ── Moderace ──────────────────────────────────────────────────────────────────
 router.post('/schvalit/:id', requireAdmin, (req, res) => {
-  db.prepare("UPDATE entries SET status = 'approved' WHERE id = ?").run(req.params.id);
+  const entry = db.prepare('SELECT anon_number FROM entries WHERE id = ?').get(req.params.id);
+  if (entry && !entry.anon_number) {
+    // Náhodné číslo 100-999, unikátní
+    let num;
+    const used = db.prepare('SELECT anon_number FROM entries WHERE anon_number IS NOT NULL').all().map(r => r.anon_number);
+    do { num = Math.floor(Math.random() * 900) + 100; } while (used.includes(num));
+    db.prepare("UPDATE entries SET status = 'approved', anon_number = ? WHERE id = ?").run(num, req.params.id);
+  } else {
+    db.prepare("UPDATE entries SET status = 'approved' WHERE id = ?").run(req.params.id);
+  }
   res.redirect('/admin#moderace');
 });
 router.post('/zamit/:id', requireAdmin, (req, res) => {
