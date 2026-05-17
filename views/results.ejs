@@ -6,38 +6,40 @@
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-    :root{--bg:<%= settings.color_bg||'#fafaf8' %>;--surface:#fff;--text:<%= settings.color_primary||'#1a1a18' %>;--text2:#5a5955;--text3:#9a9893;--border:rgba(0,0,0,0.1);--accent:<%= settings.color_accent||'#0F6E56' %>;--accent-bg:#E1F5EE;--amber:#854F0B;--amber-bg:#FAEEDA;--amber-brd:#FAC775;--r:4px}
+    :root{--bg:<%= settings.color_bg||'#fafaf8' %>;--surface:#fff;--text:<%= settings.color_primary||'#1a1a18' %>;--text2:#5a5955;--text3:#9a9893;--border:rgba(0,0,0,0.09);--accent:<%= settings.color_accent||'#0F6E56' %>;--accent-bg:#E1F5EE;--amber:#854F0B;--amber-bg:#FAEEDA;--amber-brd:#FAC775;--r:6px}
     body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
     a{color:inherit;text-decoration:none}
-    nav{display:flex;align-items:center;justify-content:space-between;padding:1.25rem 2.5rem;border-bottom:0.5px solid var(--border);background:var(--surface);position:sticky;top:0;z-index:100}
-    .nav-logo{font-family:'Playfair Display',serif;font-size:17px}
-    .nav-logo em{font-style:italic;font-weight:400;color:var(--text2)}
-    .nav-links{display:flex;gap:2rem}
-    .nav-links a{font-size:12px;color:var(--text2);letter-spacing:.6px;text-transform:uppercase;transition:color .2s}
+    nav{background:var(--surface);border-bottom:0.5px solid var(--border);position:sticky;top:0;z-index:100}
+    .nav-inner{max-width:720px;margin:0 auto;padding:0 2rem;height:56px;display:flex;align-items:center;justify-content:space-between}
+    .nav-logo{font-family:'Playfair Display',serif;font-size:16px}
+    .nav-logo em{font-style:italic;color:var(--text2)}
+    .nav-links{display:flex;gap:1.5rem}
+    .nav-links a{font-size:12px;color:var(--text2);letter-spacing:.5px;text-transform:uppercase;transition:color .2s}
     .nav-links a:hover,.nav-links a.active{color:var(--text)}
-    .page-header{padding:2rem 2.5rem;border-bottom:0.5px solid var(--border);background:var(--surface)}
-    .page-title{font-family:'Playfair Display',serif;font-size:32px;font-weight:400;letter-spacing:-1px;margin-bottom:4px}
+    .wrap{max-width:720px;margin:0 auto;padding:0 2rem}
+    .page-header{padding:2rem 0 1.5rem}
+    .page-title{font-family:'Playfair Display',serif;font-size:30px;font-weight:400;letter-spacing:-.8px;margin-bottom:4px}
     .page-sub{font-size:13px;color:var(--text2)}
-    .winner-banner{display:flex;align-items:center;gap:1.5rem;padding:2rem 2.5rem;border-bottom:0.5px solid var(--amber-brd);background:var(--amber-bg)}
-    .winner-img{width:80px;height:80px;object-fit:cover;border-radius:4px;flex-shrink:0}
-    .winner-label{font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--amber);margin-bottom:6px}
-    .winner-name{font-family:'Playfair Display',serif;font-size:22px;font-weight:400;color:#633806;margin-bottom:4px}
+    .voting-note{background:var(--accent-bg);border:0.5px solid #5DCAA5;border-radius:var(--r);padding:10px 14px;font-size:13px;color:var(--accent);margin-bottom:1.5rem}
+    .winner-box{background:var(--amber-bg);border:0.5px solid var(--amber-brd);border-radius:var(--r);padding:1.5rem;display:flex;align-items:center;gap:1.25rem;margin-bottom:2rem}
+    .winner-img{width:72px;height:72px;object-fit:cover;border-radius:var(--r);flex-shrink:0}
+    .winner-label{font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--amber);margin-bottom:5px}
+    .winner-name{font-family:'Playfair Display',serif;font-size:20px;font-weight:400;color:#633806;margin-bottom:3px}
     .winner-votes{font-size:13px;color:var(--amber)}
-    .results-list{max-width:700px;margin:0 auto;padding:2rem 2.5rem}
     .result-row{display:flex;align-items:center;gap:1rem;padding:1rem 0;border-bottom:0.5px solid var(--border)}
     .result-row:last-child{border-bottom:none}
-    .rank{font-family:'Playfair Display',serif;font-size:22px;font-weight:400;width:36px;flex-shrink:0;color:var(--text3)}
+    .rank{font-family:'Playfair Display',serif;font-size:20px;width:32px;flex-shrink:0;color:var(--text3);font-weight:400}
     .rank.top{color:var(--text)}
-    .result-img{width:52px;height:52px;object-fit:cover;border-radius:var(--r);flex-shrink:0}
-    .result-info{flex:1}
-    .result-num{font-size:11px;color:var(--text3);letter-spacing:.5px;text-transform:uppercase;margin-bottom:2px}
-    .bar-wrap{height:4px;background:var(--border);border-radius:2px;margin-top:6px}
-    .bar{height:4px;border-radius:2px;background:var(--text);transition:width .8s ease}
-    .result-votes{font-size:14px;font-weight:500;flex-shrink:0;min-width:60px;text-align:right}
-    .vote-note{font-size:12px;color:var(--text3);font-weight:400}
-    .empty{text-align:center;padding:6rem;color:var(--text2)}
-    .voting-note{background:var(--accent-bg);border-bottom:0.5px solid #5DCAA5;padding:10px 2.5rem;font-size:13px;color:var(--accent)}
-    footer{display:flex;align-items:center;justify-content:space-between;padding:1.5rem 2.5rem;border-top:0.5px solid var(--border);background:var(--surface);margin-top:2rem}
+    .result-img{width:48px;height:48px;object-fit:cover;border-radius:var(--r);flex-shrink:0}
+    .result-info{flex:1;min-width:0}
+    .result-num{font-size:11px;color:var(--text3);letter-spacing:.5px;text-transform:uppercase;margin-bottom:5px}
+    .bar-wrap{height:3px;background:var(--border);border-radius:2px}
+    .bar{height:3px;border-radius:2px;background:var(--text)}
+    .result-votes{font-size:14px;font-weight:500;flex-shrink:0;text-align:right;min-width:55px}
+    .result-votes span{font-size:11px;font-weight:400;color:var(--text3);margin-left:2px}
+    .empty{text-align:center;padding:5rem;color:var(--text2)}
+    footer{background:var(--surface);border-top:0.5px solid var(--border);margin-top:3rem}
+    .footer-inner{max-width:720px;margin:0 auto;padding:1.5rem 2rem;display:flex;align-items:center;justify-content:space-between}
     .footer-logo{font-family:'Playfair Display',serif;font-size:14px}
     .footer-links{display:flex;gap:1.5rem}
     .footer-links a{font-size:12px;color:var(--text2)}
@@ -45,58 +47,60 @@
 </head>
 <body>
 <nav>
-  <a href="/" class="nav-logo">Jan Svoboda <em>Photography</em></a>
-  <div class="nav-links">
-    <a href="/">Přihlásit se</a>
-    <a href="/galerie">Galerie</a>
-    <a href="/vysledky" class="active">Výsledky</a>
-    <a href="/pravidla">Pravidla</a>
-    <% if (typeof isAdmin !== 'undefined' && isAdmin) { %><a href="/admin">Admin</a><% } %>
+  <div class="nav-inner">
+    <a href="/" class="nav-logo">Jan Svoboda <em>Photography</em></a>
+    <div class="nav-links">
+      <a href="/">Domů</a>
+      <a href="/galerie">Galerie</a>
+      <a href="/vysledky" class="active">Výsledky</a>
+      <a href="/pravidla">Pravidla</a>
+      <% if(typeof isAdmin!=='undefined'&&isAdmin){%><a href="/admin">Admin</a><%}%>
+    </div>
   </div>
 </nav>
-
-<div class="page-header">
-  <h1 class="page-title"><%= settings.phase === 'results' ? 'Výsledky' : 'Průběžné výsledky' %></h1>
-  <p class="page-sub"><%= settings.phase === 'voting' ? 'Hlasování stále probíhá.' : settings.phase === 'results' ? 'Hlasování ukončeno.' : 'Přehled přihlášených.' %></p>
-</div>
-
-<% if (settings.phase === 'voting') { %>
-  <div class="voting-note">Ještě jste nehlasoval/a? <a href="/galerie" style="font-weight:500;text-decoration:underline;color:var(--accent)">Přejít do galerie →</a></div>
-<% } %>
-
-<% if (settings.phase === 'results' && entries.length > 0 && entries[0].votes > 0) { %>
-<div class="winner-banner">
-  <img src="/uploads/<%= entries[0].photo %>" class="winner-img" alt="">
-  <div>
-    <div class="winner-label">🏆 Vítěz soutěže</div>
-    <div class="winner-name">Účastník č. <%= entries[0].anon_number %></div>
-    <div class="winner-votes"><%= entries[0].votes %> hlasů · <%= settings.prize_description %></div>
+<div class="wrap">
+  <div class="page-header">
+    <h1 class="page-title"><%= settings.phase==='results'?'Výsledky':'Průběžné výsledky' %></h1>
+    <p class="page-sub"><%= settings.phase==='voting'?'Hlasování stále probíhá.':settings.phase==='results'?'Hlasování ukončeno.':'Přehled přihlášených.' %></p>
   </div>
-</div>
-<% } %>
 
-<% if (entries.length === 0) { %>
-  <div class="empty">Zatím žádné výsledky.</div>
-<% } else { %>
-  <% const maxVotes = Math.max(entries[0].votes, 1); %>
-  <div class="results-list">
-    <% entries.forEach((e, i) => { %>
+  <% if(settings.phase==='voting'){%>
+    <div class="voting-note">Ještě jste nehlasoval/a? <a href="/galerie" style="font-weight:500;text-decoration:underline;color:var(--accent)">Přejít do galerie →</a></div>
+  <%}%>
+
+  <% if(settings.phase==='results'&&entries.length>0&&entries[0].votes>0){%>
+  <div class="winner-box">
+    <img src="/uploads/<%= entries[0].photo %>" class="winner-img" alt="">
+    <div>
+      <div class="winner-label">🏆 Vítěz</div>
+      <div class="winner-name">Účastník č. <%= entries[0].anon_number %></div>
+      <div class="winner-votes"><%= entries[0].votes %> hlasů · <%= settings.prize_description %></div>
+    </div>
+  </div>
+  <%}%>
+
+  <%if(entries.length===0){%>
+    <div class="empty">Zatím žádné výsledky.</div>
+  <%}else{%>
+    <% const maxV=Math.max(entries[0].votes,1); %>
+    <%entries.forEach((e,i)=>{%>
     <div class="result-row">
-      <span class="rank <%= i < 3 ? 'top' : '' %>"><%= i+1 %></span>
+      <span class="rank <%=i<3?'top':''%>"><%=i+1%></span>
       <img src="/uploads/<%= e.photo %>" class="result-img" alt="">
       <div class="result-info">
         <div class="result-num">Účastník č. <%= e.anon_number %></div>
-        <div class="bar-wrap"><div class="bar" style="width:<%= Math.round(e.votes/maxVotes*100) %>%"></div></div>
+        <div class="bar-wrap"><div class="bar" style="width:<%=Math.round(e.votes/maxV*100)%>%"></div></div>
       </div>
-      <div class="result-votes"><%= e.votes %> <span class="vote-note">hl.</span></div>
+      <div class="result-votes"><%= e.votes %><span>hl.</span></div>
     </div>
-    <% }) %>
-  </div>
-<% } %>
-
+    <%})%>
+  <%}%>
+</div>
 <footer>
-  <div class="footer-logo">Jan Svoboda Photography</div>
-  <div class="footer-links"><a href="/pravidla">Pravidla</a><a href="/admin/login">Admin</a></div>
+  <div class="footer-inner">
+    <div class="footer-logo">Jan Svoboda Photography</div>
+    <div class="footer-links"><a href="/pravidla">Pravidla</a><a href="/admin/login">Admin</a></div>
+  </div>
 </footer>
 </body>
 </html>
