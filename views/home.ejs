@@ -86,7 +86,7 @@
     .gallery-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;margin-top:1.5rem}
     .card{background:var(--surface);border:0.5px solid var(--border);border-radius:var(--r);overflow:hidden;transition:transform .2s}
     .card:hover{transform:translateY(-2px)}
-    .thumb{aspect-ratio:3/4;overflow:hidden;background:var(--bg);position:relative}
+    .thumb{aspect-ratio:3/4;overflow:hidden;background:var(--bg);position:relative;cursor:zoom-in}
     .thumb img{width:100%;height:100%;object-fit:cover;transition:transform .4s}
     .card:hover .thumb img{transform:scale(1.03)}
     .voted-tag{position:absolute;top:8px;right:8px;background:var(--accent);color:#fff;font-size:10px;padding:3px 8px;border-radius:20px}
@@ -128,6 +128,9 @@
     .footer-links{display:flex;gap:1.5rem}
     .footer-links a{font-size:12px;color:var(--text2)}
     .footer-links a:hover{color:var(--text)}
+    /* Lightbox */
+    .lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:300;align-items:center;justify-content:center;padding:1rem}
+    .lightbox.open{display:flex}
     /* Modal */
     .modal-wrap{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;align-items:center;justify-content:center;padding:1rem}
     .modal-wrap.open{display:flex}
@@ -249,30 +252,32 @@
 </div>
 
 <% } else if(settings.phase==='voting'){ %>
-<!-- ── Inline galerie s hlasováním ── -->
+<!-- ── Plná galerie s hlasováním na homepage ── -->
 <div class="inline-gallery">
-  <% const voterEmail = typeof votedFor !== 'undefined' ? null : null; %>
-  <% if(typeof votedFor !== 'undefined' && votedFor){ %>
-    <div style="background:var(--accent-bg);border-radius:var(--r);padding:10px 14px;font-size:13px;color:var(--accent);margin-top:1.5rem">
+  <% if(votedFor){ %>
+    <div style="background:var(--accent-bg);border-radius:var(--r);padding:10px 14px;font-size:13px;color:var(--accent);margin-top:1.5rem;margin-bottom:.5rem">
       ✓ Váš hlas byl odevzdán
     </div>
   <% }else{ %>
-    <div style="font-size:13px;color:var(--text2);margin-top:1.5rem">Klikněte na fotografii a zadejte e-mail pro hlasování.</div>
+    <div style="font-size:13px;color:var(--text2);margin-top:1.5rem;margin-bottom:.5rem"><%= settings.gallery_subtitle||'Klikněte na fotografii a zadejte e-mail pro hlasování.' %></div>
   <% } %>
   <div class="gallery-grid">
     <% (typeof entries !== 'undefined' ? entries : []).forEach(e=>{ const isVoted=votedFor===e.id; %>
     <div class="card" id="card-<%= e.id %>">
-      <div class="thumb">
-        <img src="/uploads/<%= e.photo %>" alt="" loading="lazy">
+      <div class="thumb" onclick="openLightbox('/uploads/<%= e.photo %>','Účastník č. <%= e.anon_number %>')">
+        <img src="/uploads/<%= e.photo %>" alt="Účastník č. <%= e.anon_number %>" loading="lazy">
         <% if(isVoted){%><span class="voted-tag">✓ Váš hlas</span><%}%>
       </div>
       <div class="card-info">
         <div class="card-num">Účastník č. <%= e.anon_number %></div>
         <div class="card-footer">
           <span class="card-votes" id="vc-<%= e.id %>"><b><%= e.votes %></b> hl.</span>
-          <button class="btn-vote <%=isVoted?'voted':''%>" id="vbtn-<%= e.id %>" onclick="openModal(<%= e.id %>,<%= e.anon_number %>)">
-            <%=isVoted?'♥':'♡'%>
-          </button>
+          <div style="display:flex;gap:6px;align-items:center">
+            <a href="/ucastnik/<%= e.id %>" style="font-size:13px;color:var(--text3);padding:5px 8px;border:0.5px solid var(--border2);border-radius:var(--r);text-decoration:none;transition:color .15s" title="Sdílet">↗</a>
+            <button class="btn-vote <%=isVoted?'voted':''%>" id="vbtn-<%= e.id %>" onclick="openModal(<%= e.id %>,<%= e.anon_number %>)">
+              <%=isVoted?'♥ Hlasováno':'♡ Hlasovat'%>
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -311,6 +316,13 @@
   <div class="prize"><div class="prize-icon">🏆</div><div class="prize-title">1. místo</div><div class="prize-desc"><%= settings.prize_description %></div></div>
   <div class="prize"><div class="prize-icon">✉</div><div class="prize-title">Hlasování</div><div class="prize-desc">Každý e-mail = 1 hlas</div></div>
   <div class="prize"><div class="prize-icon">🔒</div><div class="prize-title">Anonymita</div><div class="prize-desc">Účastníci jsou anonymní</div></div>
+</div>
+
+<!-- Lightbox -->
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+  <span style="position:absolute;top:1.25rem;right:1.5rem;color:#fff;font-size:28px;cursor:pointer;opacity:.7;line-height:1" onclick="closeLightbox()">✕</span>
+  <img id="lb-img" src="" alt="" style="max-width:90vw;max-height:90vh;object-fit:contain;border-radius:var(--r)">
+  <div id="lb-cap" style="position:absolute;bottom:1.5rem;left:50%;transform:translateX(-50%);color:rgba(255,255,255,.6);font-size:13px;letter-spacing:.5px;text-transform:uppercase"></div>
 </div>
 
 <!-- Hlasovací modal -->
@@ -394,6 +406,15 @@ function handleFile(input) {
   reader.readAsDataURL(input.files[0]);
 }
 
+// Lightbox
+function openLightbox(src,caption){
+  document.getElementById('lb-img').src=src;
+  document.getElementById('lb-cap').textContent=caption;
+  document.getElementById('lightbox').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeLightbox(){document.getElementById('lightbox').classList.remove('open');document.body.style.overflow='';}
+
 // Voting modal
 let pendingId = null;
 function openModal(id, num) {
@@ -405,7 +426,7 @@ function openModal(id, num) {
 }
 function closeModal() { document.getElementById('modal-wrap').classList.remove('open'); pendingId = null; }
 function closeOnBg(e) { if (e.target === document.getElementById('modal-wrap')) closeModal(); }
-document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeModal(); closeLightbox(); } });
 
 async function submitVote() {
   const email = document.getElementById('modal-email').value.trim();

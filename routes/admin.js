@@ -66,9 +66,9 @@ router.post('/faze', requireAdmin, (req, res) => {
 router.post('/schvalit/:id', requireAdmin, (req, res) => {
   const entry = db.prepare('SELECT anon_number FROM entries WHERE id = ?').get(req.params.id);
   if (entry && !entry.anon_number) {
-    let num;
-    const used = db.prepare('SELECT anon_number FROM entries WHERE anon_number IS NOT NULL').all().map(r => r.anon_number);
-    do { num = Math.floor(Math.random() * 900) + 100; } while (used.includes(num));
+    // Pořadové číslo podle data přihlášení — kolikátý schválený účastník je
+    const approvedCount = db.prepare("SELECT COUNT(*) as c FROM entries WHERE status = 'approved' AND anon_number IS NOT NULL").get().c;
+    const num = approvedCount + 1;
     db.prepare("UPDATE entries SET status = 'approved', anon_number = ? WHERE id = ?").run(num, req.params.id);
   } else {
     db.prepare("UPDATE entries SET status = 'approved' WHERE id = ?").run(req.params.id);
@@ -158,6 +158,37 @@ router.get('/export-voters-csv', requireAdmin, (req, res) => {
   res.setHeader('Content-Type', 'text/csv; charset=utf-8');
   res.setHeader('Content-Disposition', 'attachment; filename="hlasujici-export.csv"');
   res.send('\uFEFF' + header + rows);
+});
+
+// ── QR kód pro účastníka ─────────────────────────────────────────────────────
+router.get('/qr/:id', requireAdmin, async (req, res) => {
+  const entry = db.prepare('SELECT id, anon_number FROM entries WHERE id = ?').get(req.params.id);
+  if (!entry) return res.redirect('/admin');
+  const appUrl = process.env.APP_URL || 'https://portrait-contest-production.up.railway.app';
+  const url = `${appUrl}/ucastnik/${entry.id}`;
+  try {
+    const qrcode = require('qrcode');
+    const qrDataUrl = await qrcode.toDataURL(url, { width: 400, margin: 2, color: { dark: '#1a1a18', light: '#fafaf8' } });
+    res.send(`<!DOCTYPE html><html lang="cs"><head><meta charset="UTF-8"><title>QR kód – Účastník č. ${entry.anon_number}</title>
+    <style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:sans-serif;background:#fafaf8;display:flex;align-items:center;justify-content:center;min-height:100vh;padding:2rem}
+    .card{background:#fff;border:0.5px solid rgba(0,0,0,0.1);border-radius:12px;padding:2rem;text-align:center;max-width:340px;width:100%}
+    h1{font-size:16px;font-weight:500;margin-bottom:4px}p{font-size:13px;color:#5a5955;margin-bottom:1.5rem}
+    img{width:200px;height:200px;border-radius:8px;margin-bottom:1.5rem}
+    .url{font-size:11px;color:#9a9893;word-break:break-all;margin-bottom:1.25rem}
+    .btn{display:inline-block;background:#1a1a18;color:#fff;padding:10px 20px;border-radius:6px;font-size:13px;font-weight:500;text-decoration:none;margin-right:8px}
+    .btn-ghost{display:inline-block;padding:10px 20px;border:0.5px solid rgba(0,0,0,0.2);border-radius:6px;font-size:13px;color:#5a5955;text-decoration:none}
+    </style></head><body><div class="card">
+    <h1>Účastník č. ${entry.anon_number}</h1>
+    <p>QR kód pro sdílení</p>
+    <img src="${qrDataUrl}" alt="QR kód">
+    <div class="url">${url}</div>
+    <a href="${qrDataUrl}" download="ucastnik-${entry.anon_number}-qr.png" class="btn">⬇ Stáhnout PNG</a>
+    <a href="/admin" class="btn-ghost">← Admin</a>
+    </div></body></html>`);
+  } catch (err) {
+    console.error(err);
+    res.redirect('/admin?error=Chyba+při+generování+QR+kódu');
+  }
 });
 
 // ── Poznámka k účastníkovi ───────────────────────────────────────────────────

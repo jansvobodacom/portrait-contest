@@ -233,6 +233,7 @@
       </div>
       <span class="pill pill-approved">Schváleno</span>
       <span class="e-votes"><%= e.votes %> hl.</span>
+      <a href="/admin/qr/<%= e.id %>" target="_blank" class="btn" title="QR kód" style="font-size:12px;">QR</a>
       <form action="/admin/poznamka/<%= e.id %>" method="POST" class="inline" style="flex:1">
         <input type="text" name="note_admin" value="<%= e.note_admin||'' %>" placeholder="Poznámka (jen admin)..." style="width:100%;padding:5px 8px;font-size:12px;border:0.5px solid var(--border2);border-radius:5px;background:var(--bg);color:var(--text);font-family:inherit">
         <button class="btn" type="submit" style="margin-top:4px;font-size:11px;">Uložit</button>
