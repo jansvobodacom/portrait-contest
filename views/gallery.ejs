@@ -108,11 +108,14 @@
         <div class="card-num">Účastník č. <%= e.anon_number %></div>
         <div class="card-footer">
           <span class="card-votes" id="vc-<%= e.id %>"><b><%= e.votes %></b> hlasů</span>
-          <% if(settings.phase==='voting'){ %>
-            <button class="btn-vote <%= isVoted?'voted':'' %>" id="vbtn-<%= e.id %>" onclick="openModal(<%= e.id %>,<%= e.anon_number %>)">
-              <%= isVoted?'♥ Hlasováno':'♡ Hlasovat' %>
-            </button>
-          <% } %>
+          <div style="display:flex;gap:6px;align-items:center">
+            <a href="/ucastnik/<%= e.id %>" title="Sdílet" style="font-size:14px;color:var(--text3);text-decoration:none;padding:6px 8px;border:0.5px solid var(--border2);border-radius:var(--r);transition:color .15s" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--text3)'">↗</a>
+            <% if(settings.phase==='voting'){ %>
+              <button class="btn-vote <%= isVoted?'voted':'' %>" id="vbtn-<%= e.id %>" onclick="openModal(<%= e.id %>,<%= e.anon_number %>)">
+                <%= isVoted?'♥ Hlasováno':'♡ Hlasovat' %>
+              </button>
+            <% } %>
+          </div>
         </div>
       </div>
     </div>

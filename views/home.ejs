@@ -3,13 +3,20 @@
 <head>
   <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title><%= settings.contest_title %></title>
+  <!-- OG tagy -->
+  <meta property="og:title" content="<%= settings.contest_title %>">
+  <meta property="og:description" content="<%= settings.home_subtitle || 'Hlasujte pro nejhezčí portrét!' %>">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="<%= process.env.APP_URL || '' %>/">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="<%= settings.contest_title %>">
+  <meta name="twitter:description" content="<%= settings.home_subtitle || 'Hlasujte pro nejhezčí portrét!' %>">
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     :root{--bg:<%= settings.color_bg||'#fafaf8' %>;--surface:#fff;--text:<%= settings.color_primary||'#1a1a18' %>;--text2:#5a5955;--text3:#9a9893;--border:rgba(0,0,0,0.09);--border2:rgba(0,0,0,0.18);--accent:<%= settings.color_accent||'#0F6E56' %>;--accent-bg:#E1F5EE;--accent-brd:#5DCAA5;--amber:#854F0B;--amber-bg:#FAEEDA;--amber-brd:#FAC775;--red:#A32D2D;--red-bg:#FCEBEB;--r:6px}
     body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
     a{color:inherit;text-decoration:none}
-
     nav{background:var(--surface);border-bottom:0.5px solid var(--border);position:sticky;top:0;z-index:100}
     .nav-inner{max-width:720px;margin:0 auto;padding:0 2rem;height:56px;display:flex;align-items:center;justify-content:space-between}
     .nav-logo{font-family:'Playfair Display',serif;font-size:16px}
@@ -17,68 +24,119 @@
     .nav-links{display:flex;gap:1.5rem}
     .nav-links a{font-size:12px;color:var(--text2);letter-spacing:.5px;text-transform:uppercase;transition:color .2s}
     .nav-links a:hover,.nav-links a.active{color:var(--text)}
-
-    .wrap{max-width:720px;margin:0 auto;padding:0 2rem}
-
-    .alert{padding:10px 16px;border-radius:var(--r);font-size:14px;margin:1rem auto;max-width:720px;margin-left:auto;margin-right:auto}
-    .alert{padding:10px 2rem;font-size:14px;border-bottom:0.5px solid var(--border)}
+    .alert{font-size:14px;padding:10px 2rem;border-bottom:0.5px solid var(--border)}
     .alert-success{background:var(--accent-bg);color:var(--accent)}
     .alert-error{background:var(--red-bg);color:var(--red)}
-
-    .hero{padding:4rem 2rem 3rem;max-width:720px;margin:0 auto;border-bottom:0.5px solid var(--border)}
+    .hero{max-width:720px;margin:0 auto;padding:3.5rem 2rem 2.5rem;border-bottom:0.5px solid var(--border)}
     .hero-eyebrow{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--text2);margin-bottom:1.25rem}
     .hero-title{font-family:'Playfair Display',serif;font-size:48px;line-height:1.08;letter-spacing:-1.5px;margin-bottom:1.25rem;font-weight:400}
     .hero-title em{font-style:italic;color:var(--text2)}
-    .hero-desc{font-size:15px;color:var(--text2);line-height:1.75;max-width:480px;margin-bottom:2rem}
+    .hero-desc{font-size:15px;color:var(--text2);line-height:1.75;max-width:480px;margin-bottom:1.5rem}
+    /* Countdown */
+    .countdown{display:flex;gap:1.5rem;margin-bottom:2rem;align-items:flex-end}
+    .cd-unit{text-align:center}
+    .cd-num{font-family:'Playfair Display',serif;font-size:36px;font-weight:400;line-height:1;letter-spacing:-1px}
+    .cd-label{font-size:10px;color:var(--text3);letter-spacing:1px;text-transform:uppercase;margin-top:3px}
+    .cd-sep{font-family:'Playfair Display',serif;font-size:28px;color:var(--text3);margin-bottom:6px}
     .hero-cta{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
     .btn-dark{background:var(--text);color:var(--bg);padding:11px 24px;border-radius:var(--r);font-size:13px;font-weight:500;cursor:pointer;border:none;font-family:'Inter',sans-serif;transition:opacity .15s;display:inline-block}
     .btn-dark:hover{opacity:.85}
     .btn-ghost{font-size:13px;color:var(--text2);cursor:pointer;transition:color .2s}
     .btn-ghost:hover{color:var(--text)}
-
-    .phase-banner{max-width:720px;margin:0 auto;padding:1rem 2rem;border-bottom:0.5px solid var(--border)}
-    .pb-vote{background:var(--accent-bg);color:var(--accent)}
-    .pb-done{background:#f1f0ec;color:var(--text2)}
-    .pb-vote a,.pb-done a{font-weight:500;text-decoration:underline}
-
+    /* Stats */
+    .stats{display:grid;grid-template-columns:repeat(3,1fr);border-top:0.5px solid var(--border);border-bottom:0.5px solid var(--border);background:var(--surface);max-width:720px;margin:0 auto}
+    .stat{padding:1.25rem 2rem;border-right:0.5px solid var(--border)}
+    .stat:last-child{border-right:none}
+    .stat-num{font-family:'Playfair Display',serif;font-size:26px;font-weight:400;letter-spacing:-.5px;line-height:1}
+    .stat-label{font-size:11px;color:var(--text2);margin-top:4px;letter-spacing:.5px;text-transform:uppercase}
+    /* Upload form */
     .form-section{max-width:720px;margin:0 auto;padding:2.5rem 2rem}
     .section-label{font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text2);margin-bottom:1.5rem;font-weight:500}
-    .upload-zone{border:1px dashed var(--border2);border-radius:var(--r);padding:2.5rem 2rem;text-align:center;cursor:pointer;transition:all .2s;margin-bottom:1.5rem;background:var(--surface)}
-    .upload-zone:hover{border-color:var(--text3);background:#f7f6f2}
-    .upload-zone.has-file{border-color:var(--accent);border-style:solid;background:var(--accent-bg)}
-    .upload-icon{font-size:28px;margin-bottom:10px;opacity:.35}
-    .upload-zone p{font-size:14px;color:var(--text2);margin-bottom:4px}
+    .upload-zone{border:1px dashed var(--border2);border-radius:var(--r);padding:2rem;text-align:center;cursor:pointer;transition:all .2s;margin-bottom:1.5rem;background:var(--surface)}
+    .upload-zone:hover{border-color:var(--text3)}
+    .upload-zone.has-file{border-color:var(--accent);border-style:solid}
+    .upload-icon{font-size:24px;margin-bottom:8px;opacity:.3}
+    .upload-zone p{font-size:14px;color:var(--text2);margin-bottom:3px}
     .upload-zone small{font-size:12px;color:var(--text3)}
     #preview-img{max-height:220px;border-radius:var(--r);margin-top:1rem;border:0.5px solid var(--border);display:none}
-    .mobile-hint{font-size:12px;color:var(--accent);margin-top:6px;display:none}
+    /* Preview card */
+    .preview-card{display:none;background:var(--bg);border:0.5px solid var(--border);border-radius:var(--r);padding:1rem;margin-bottom:1.5rem;flex-direction:row;gap:1rem;align-items:flex-start}
+    .preview-card.visible{display:flex}
+    .preview-thumb{width:80px;height:80px;object-fit:cover;border-radius:var(--r);flex-shrink:0}
+    .preview-info{font-size:13px;color:var(--text2)}
+    .preview-label{font-size:11px;letter-spacing:.5px;text-transform:uppercase;color:var(--text3);margin-bottom:4px}
+    .preview-num{font-family:'Playfair Display',serif;font-size:18px;color:var(--text)}
     .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
-    @media(max-width:520px){.form-grid{grid-template-columns:1fr}.mobile-hint{display:block}}
+    @media(max-width:520px){.form-grid{grid-template-columns:1fr}}
     label{font-size:11px;color:var(--text2);font-weight:500;display:block;margin-bottom:6px;letter-spacing:.4px;text-transform:uppercase}
     input[type=text],input[type=email],textarea{width:100%;padding:10px 14px;font-size:14px;border:0.5px solid var(--border2);border-radius:var(--r);background:var(--surface);color:var(--text);font-family:'Inter',sans-serif;transition:border-color .15s}
     input:focus,textarea:focus{outline:none;border-color:var(--text)}
     textarea{resize:vertical;min-height:80px}
     .form-footer{display:flex;align-items:center;justify-content:space-between;margin-top:6px;flex-wrap:wrap;gap:10px}
     .form-note{font-size:12px;color:var(--text3)}
-
-    .stats{display:grid;grid-template-columns:repeat(3,1fr);border-top:0.5px solid var(--border);border-bottom:0.5px solid var(--border);background:var(--surface);max-width:720px;margin:0 auto}
-    .stat{padding:1.25rem 2rem;border-right:0.5px solid var(--border)}
-    .stat:last-child{border-right:none}
-    .stat-num{font-family:'Playfair Display',serif;font-size:28px;font-weight:400;letter-spacing:-.5px;line-height:1}
-    .stat-label{font-size:11px;color:var(--text2);margin-top:4px;letter-spacing:.5px;text-transform:uppercase}
-
+    /* Gallery inline (voting phase) */
+    .inline-gallery{max-width:720px;margin:0 auto;padding:0 2rem 3rem}
+    .gallery-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;margin-top:1.5rem}
+    .card{background:var(--surface);border:0.5px solid var(--border);border-radius:var(--r);overflow:hidden;transition:transform .2s}
+    .card:hover{transform:translateY(-2px)}
+    .thumb{aspect-ratio:3/4;overflow:hidden;background:var(--bg);position:relative}
+    .thumb img{width:100%;height:100%;object-fit:cover;transition:transform .4s}
+    .card:hover .thumb img{transform:scale(1.03)}
+    .voted-tag{position:absolute;top:8px;right:8px;background:var(--accent);color:#fff;font-size:10px;padding:3px 8px;border-radius:20px}
+    .card-info{padding:10px 12px}
+    .card-num{font-size:11px;color:var(--text3);letter-spacing:.5px;text-transform:uppercase;margin-bottom:6px}
+    .card-footer{display:flex;align-items:center;justify-content:space-between}
+    .card-votes{font-size:13px;color:var(--text2)}
+    .card-votes b{color:var(--text)}
+    .btn-vote{padding:5px 12px;font-size:12px;border-radius:var(--r);cursor:pointer;border:0.5px solid var(--border2);background:transparent;color:var(--text);font-family:'Inter',sans-serif;transition:all .15s}
+    .btn-vote:hover{background:var(--bg)}
+    .btn-vote.voted{background:var(--red-bg);border-color:#F09595;color:var(--red)}
+    /* Results inline */
+    .inline-results{max-width:720px;margin:0 auto;padding:0 2rem 3rem}
+    .result-row{display:flex;align-items:center;gap:1rem;padding:.875rem 0;border-bottom:0.5px solid var(--border)}
+    .rank{font-family:'Playfair Display',serif;font-size:20px;width:28px;flex-shrink:0;color:var(--text3)}
+    .rank.top{color:var(--text)}
+    .result-img{width:44px;height:44px;object-fit:cover;border-radius:var(--r);flex-shrink:0}
+    .result-info{flex:1}
+    .result-num{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+    .bar-wrap{height:3px;background:var(--border);border-radius:2px}
+    .bar{height:3px;border-radius:2px;background:var(--text)}
+    .result-votes{font-size:13px;font-weight:500;flex-shrink:0}
+    /* Winner */
+    .winner-box{background:var(--amber-bg);border:0.5px solid var(--amber-brd);border-radius:var(--r);padding:1.25rem;display:flex;align-items:center;gap:1rem;margin-bottom:1.5rem}
+    .winner-img{width:64px;height:64px;object-fit:cover;border-radius:var(--r);flex-shrink:0}
+    .winner-label{font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--amber);margin-bottom:4px}
+    .winner-name{font-family:'Playfair Display',serif;font-size:18px;color:#633806;margin-bottom:2px}
+    .winner-votes{font-size:13px;color:var(--amber)}
+    /* Prizes */
     .prizes{display:grid;grid-template-columns:repeat(3,1fr);border-top:0.5px solid var(--border);max-width:720px;margin:0 auto;background:var(--surface)}
-    .prize{padding:1.5rem 2rem;border-right:0.5px solid var(--border)}
+    .prize{padding:1.25rem 2rem;border-right:0.5px solid var(--border)}
     .prize:last-child{border-right:none}
-    .prize-icon{font-size:18px;margin-bottom:8px;opacity:.5}
-    .prize-title{font-size:14px;font-weight:500;margin-bottom:3px}
-    .prize-desc{font-size:13px;color:var(--text2)}
-
-    footer{background:var(--surface);border-top:0.5px solid var(--border);margin-top:3rem}
+    .prize-icon{font-size:16px;margin-bottom:6px;opacity:.5}
+    .prize-title{font-size:13px;font-weight:500;margin-bottom:2px}
+    .prize-desc{font-size:12px;color:var(--text2)}
+    footer{background:var(--surface);border-top:0.5px solid var(--border);margin-top:auto}
     .footer-inner{max-width:720px;margin:0 auto;padding:1.5rem 2rem;display:flex;align-items:center;justify-content:space-between}
     .footer-logo{font-family:'Playfair Display',serif;font-size:14px}
     .footer-links{display:flex;gap:1.5rem}
     .footer-links a{font-size:12px;color:var(--text2)}
     .footer-links a:hover{color:var(--text)}
+    /* Modal */
+    .modal-wrap{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;align-items:center;justify-content:center;padding:1rem}
+    .modal-wrap.open{display:flex}
+    .modal{background:var(--surface);border-radius:10px;padding:1.75rem;width:100%;max-width:380px}
+    .modal h3{font-family:'Playfair Display',serif;font-size:20px;font-weight:400;margin-bottom:6px}
+    .modal p{font-size:14px;color:var(--text2);margin-bottom:1rem;line-height:1.6}
+    .modal-subject{background:var(--bg);border-radius:var(--r);padding:9px 14px;margin-bottom:1rem;font-size:14px;font-weight:500;border:0.5px solid var(--border)}
+    .modal label{font-size:11px;color:var(--text2);font-weight:500;display:block;margin-bottom:5px;letter-spacing:.4px;text-transform:uppercase}
+    .modal input{width:100%;padding:10px 14px;font-size:14px;border:0.5px solid var(--border2);border-radius:var(--r);background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;margin-bottom:6px}
+    .modal input:focus{outline:none;border-color:var(--text)}
+    .modal-hint{font-size:12px;color:var(--text3);margin-bottom:1rem}
+    .modal-err{font-size:13px;color:var(--red);margin-bottom:10px;display:none}
+    .modal-actions{display:flex;gap:8px}
+    .btn-modal{flex:1;padding:10px;background:var(--text);color:var(--bg);border:none;border-radius:var(--r);font-size:13px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif}
+    .btn-modal:disabled{opacity:.5;cursor:wait}
+    .btn-cancel{padding:10px 18px;background:transparent;border:0.5px solid var(--border2);border-radius:var(--r);font-size:13px;cursor:pointer;font-family:'Inter',sans-serif;color:var(--text)}
   </style>
 </head>
 <body>
@@ -107,16 +165,30 @@
   </div>
   <h1 class="hero-title">Soutěž<br>o nejhezčí<br><em>portrét</em></h1>
   <p class="hero-desc"><%= settings.home_subtitle || 'Pošlete svůj nejlepší portrétní snímek. Veřejnost hlasuje – vítěz získá profesionální focení zdarma.' %></p>
+
+  <!-- Countdown -->
+  <% const endDate = settings.phase==='registration' ? settings.registration_end : settings.voting_end; %>
+  <% if (endDate && settings.phase !== 'results') { %>
+  <div class="countdown" id="countdown" data-end="<%= endDate %>">
+    <div class="cd-unit"><div class="cd-num" id="cd-d">--</div><div class="cd-label">Dní</div></div>
+    <div class="cd-sep">:</div>
+    <div class="cd-unit"><div class="cd-num" id="cd-h">--</div><div class="cd-label">Hodin</div></div>
+    <div class="cd-sep">:</div>
+    <div class="cd-unit"><div class="cd-num" id="cd-m">--</div><div class="cd-label">Minut</div></div>
+    <div class="cd-sep">:</div>
+    <div class="cd-unit"><div class="cd-num" id="cd-s">--</div><div class="cd-label">Sekund</div></div>
+  </div>
+  <% } %>
+
   <div class="hero-cta">
-    <% if(settings.phase==='registration'){ %>
+    <% if(settings.phase==='registration'){%>
       <button class="btn-dark" onclick="document.getElementById('upload-zone').scrollIntoView({behavior:'smooth'})">Přihlásit fotografii</button>
-      <a href="/galerie" class="btn-ghost">Zobrazit galerii →</a>
-    <% }else if(settings.phase==='voting'){ %>
-      <a href="/galerie" class="btn-dark">Hlasovat v galerii</a>
-      <a href="/vysledky" class="btn-ghost">Průběžné výsledky →</a>
-    <% }else{ %>
+      <a href="/galerie" class="btn-ghost">Galerie →</a>
+    <%}else if(settings.phase==='voting'){%>
+      <span style="font-size:13px;color:var(--text2)">Hlasujte pro svého favorita níže</span>
+    <%}else{%>
       <a href="/vysledky" class="btn-dark">Zobrazit výsledky</a>
-    <% } %>
+    <%}%>
   </div>
 </div>
 
@@ -127,14 +199,23 @@
 </div>
 
 <% if(settings.phase==='registration'){ %>
+<!-- ── Přihlašovací formulář ── -->
 <div class="form-section">
   <div class="section-label">Přihlásit fotografii</div>
   <div class="upload-zone" id="upload-zone" onclick="document.getElementById('photo').click()">
     <div class="upload-icon">↑</div>
     <p>Klikněte nebo přetáhněte fotografii</p>
     <small>JPG, PNG, WebP – max. 15 MB · Funguje i z mobilu 📱</small>
-    <div class="mobile-hint">📱 Na mobilu můžete vyfotit přímo nebo vybrat z galerie</div>
     <img id="preview-img" alt="Náhled">
+  </div>
+  <!-- Náhled jak bude vypadat v galerii -->
+  <div class="preview-card" id="preview-card">
+    <img class="preview-thumb" id="preview-thumb" src="" alt="">
+    <div class="preview-info">
+      <div class="preview-label">Takto vypadáte v galerii</div>
+      <div class="preview-num">Účastník č. ???</div>
+      <div style="font-size:12px;color:var(--text3);margin-top:4px">Číslo bude přiděleno po schválení</div>
+    </div>
   </div>
   <form action="/prihlasit" method="POST" enctype="multipart/form-data">
     <input type="file" name="photo" id="photo" accept="image/*" style="display:none" required onchange="handleFile(this)">
@@ -144,18 +225,68 @@
     </div>
     <div style="margin-bottom:1.25rem"><label>Krátké představení</label><textarea name="note" placeholder="Pár slov o sobě..." maxlength="300"></textarea></div>
     <div class="form-footer">
-      <span class="form-note">Odesláním souhlasíte se zveřejněním fotografie v galerii. Každý může přihlásit pouze jednu fotografii.</span>
+      <span class="form-note">Každý účastník může přihlásit pouze jednu fotografii.</span>
       <button type="submit" class="btn-dark">Odeslat →</button>
     </div>
   </form>
 </div>
-<% }else if(settings.phase==='voting'){ %>
-<div class="phase-banner pb-vote">
-  🗳 Hlasování je otevřeno. <a href="/galerie">Přejít do galerie →</a>
+
+<% } else if(settings.phase==='voting'){ %>
+<!-- ── Inline galerie s hlasováním ── -->
+<div class="inline-gallery">
+  <% const voterEmail = typeof votedFor !== 'undefined' ? null : null; %>
+  <% if(typeof votedFor !== 'undefined' && votedFor){ %>
+    <div style="background:var(--accent-bg);border-radius:var(--r);padding:10px 14px;font-size:13px;color:var(--accent);margin-top:1.5rem">
+      ✓ Váš hlas byl odevzdán
+    </div>
+  <% }else{ %>
+    <div style="font-size:13px;color:var(--text2);margin-top:1.5rem">Klikněte na fotografii a zadejte e-mail pro hlasování.</div>
+  <% } %>
+  <div class="gallery-grid">
+    <% (typeof entries !== 'undefined' ? entries : []).forEach(e=>{ const isVoted=votedFor===e.id; %>
+    <div class="card" id="card-<%= e.id %>">
+      <div class="thumb">
+        <img src="/uploads/<%= e.photo %>" alt="" loading="lazy">
+        <% if(isVoted){%><span class="voted-tag">✓ Váš hlas</span><%}%>
+      </div>
+      <div class="card-info">
+        <div class="card-num">Účastník č. <%= e.anon_number %></div>
+        <div class="card-footer">
+          <span class="card-votes" id="vc-<%= e.id %>"><b><%= e.votes %></b> hl.</span>
+          <button class="btn-vote <%=isVoted?'voted':''%>" id="vbtn-<%= e.id %>" onclick="openModal(<%= e.id %>,<%= e.anon_number %>)">
+            <%=isVoted?'♥':'♡'%>
+          </button>
+        </div>
+      </div>
+    </div>
+    <%})%>
+  </div>
 </div>
-<% }else{ %>
-<div class="phase-banner pb-done">
-  🏁 Hlasování ukončeno. <a href="/vysledky">Zobrazit výsledky →</a>
+
+<% } else { %>
+<!-- ── Inline výsledky ── -->
+<div class="inline-results">
+  <% if(typeof entries!=='undefined'&&entries.length>0&&entries[0].votes>0){ %>
+  <div class="winner-box" style="margin-top:1.5rem">
+    <img src="/uploads/<%= entries[0].photo %>" class="winner-img" alt="">
+    <div>
+      <div class="winner-label">🏆 Vítěz</div>
+      <div class="winner-name">Účastník č. <%= entries[0].anon_number %></div>
+      <div class="winner-votes"><%= entries[0].votes %> hlasů · <%= settings.prize_description %></div>
+    </div>
+  </div>
+  <% } %>
+  <% if(typeof entries!=='undefined'){ const maxV=Math.max((entries[0]||{votes:1}).votes,1); entries.forEach((e,i)=>{ %>
+  <div class="result-row">
+    <span class="rank <%=i<3?'top':''%>"><%=i+1%></span>
+    <img src="/uploads/<%= e.photo %>" class="result-img" alt="">
+    <div class="result-info">
+      <div class="result-num">Účastník č. <%= e.anon_number %></div>
+      <div class="bar-wrap"><div class="bar" style="width:<%=Math.round(e.votes/maxV*100)%>%"></div></div>
+    </div>
+    <div class="result-votes"><%= e.votes %> hl.</div>
+  </div>
+  <%})} %>
 </div>
 <% } %>
 
@@ -163,6 +294,23 @@
   <div class="prize"><div class="prize-icon">🏆</div><div class="prize-title">1. místo</div><div class="prize-desc"><%= settings.prize_description %></div></div>
   <div class="prize"><div class="prize-icon">✉</div><div class="prize-title">Hlasování</div><div class="prize-desc">Každý e-mail = 1 hlas</div></div>
   <div class="prize"><div class="prize-icon">🔒</div><div class="prize-title">Anonymita</div><div class="prize-desc">Účastníci jsou anonymní</div></div>
+</div>
+
+<!-- Hlasovací modal -->
+<div class="modal-wrap" id="modal-wrap" onclick="closeOnBg(event)">
+  <div class="modal">
+    <h3>Potvrdit hlas</h3>
+    <p>Hlasujete pro:</p>
+    <div class="modal-subject" id="modal-subject"></div>
+    <label>Váš e-mail</label>
+    <input type="email" id="modal-email" placeholder="vas@email.cz">
+    <div class="modal-hint">Každý e-mail může hlasovat jednou. E-mail nebude zveřejněn.</div>
+    <div class="modal-err" id="modal-err"></div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal()">Zrušit</button>
+      <button class="btn-modal" id="modal-submit" onclick="submitVote()">Hlasovat →</button>
+    </div>
+  </div>
 </div>
 
 <footer>
@@ -177,16 +325,91 @@
 </footer>
 
 <script>
-const zone = document.getElementById('upload-zone');
-if(zone){
-  zone.addEventListener('dragover',e=>e.preventDefault());
-  zone.addEventListener('drop',e=>{e.preventDefault();const f=e.dataTransfer.files[0];if(f){const dt=new DataTransfer();dt.items.add(f);document.getElementById('photo').files=dt.files;handleFile(document.getElementById('photo'));}});
+// Countdown
+const cdEl = document.getElementById('countdown');
+if (cdEl) {
+  const endStr = cdEl.dataset.end;
+  const end = new Date(endStr + 'T23:59:59');
+  function tick() {
+    const diff = end - Date.now();
+    if (diff <= 0) { cdEl.innerHTML = '<span style="font-size:14px;color:var(--text3)">Čas vypršel</span>'; return; }
+    const d = Math.floor(diff/86400000);
+    const h = Math.floor((diff%86400000)/3600000);
+    const m = Math.floor((diff%3600000)/60000);
+    const s = Math.floor((diff%60000)/1000);
+    document.getElementById('cd-d').textContent = String(d).padStart(2,'0');
+    document.getElementById('cd-h').textContent = String(h).padStart(2,'0');
+    document.getElementById('cd-m').textContent = String(m).padStart(2,'0');
+    document.getElementById('cd-s').textContent = String(s).padStart(2,'0');
+  }
+  tick(); setInterval(tick, 1000);
 }
-function handleFile(input){
-  if(!input.files[0])return;
-  const reader=new FileReader();
-  reader.onload=e=>{const img=document.getElementById('preview-img');img.src=e.target.result;img.style.display='block';document.getElementById('upload-zone').classList.add('has-file');};
+
+// Upload preview
+const zone = document.getElementById('upload-zone');
+if (zone) {
+  zone.addEventListener('dragover', e => e.preventDefault());
+  zone.addEventListener('drop', e => {
+    e.preventDefault();
+    const dt = new DataTransfer(); dt.items.add(e.dataTransfer.files[0]);
+    document.getElementById('photo').files = dt.files;
+    handleFile(document.getElementById('photo'));
+  });
+}
+function handleFile(input) {
+  if (!input.files[0]) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    // Upload zone preview
+    const img = document.getElementById('preview-img');
+    img.src = e.target.result; img.style.display = 'block';
+    zone.classList.add('has-file');
+    // Gallery preview card
+    const card = document.getElementById('preview-card');
+    const thumb = document.getElementById('preview-thumb');
+    thumb.src = e.target.result;
+    card.classList.add('visible');
+  };
   reader.readAsDataURL(input.files[0]);
+}
+
+// Voting modal
+let pendingId = null;
+function openModal(id, num) {
+  pendingId = id;
+  document.getElementById('modal-subject').textContent = 'Účastník č. ' + num;
+  document.getElementById('modal-err').style.display = 'none';
+  document.getElementById('modal-wrap').classList.add('open');
+  setTimeout(() => document.getElementById('modal-email').focus(), 50);
+}
+function closeModal() { document.getElementById('modal-wrap').classList.remove('open'); pendingId = null; }
+function closeOnBg(e) { if (e.target === document.getElementById('modal-wrap')) closeModal(); }
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+async function submitVote() {
+  const email = document.getElementById('modal-email').value.trim();
+  const errEl = document.getElementById('modal-err');
+  const btn = document.getElementById('modal-submit');
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { errEl.textContent = 'Zadejte platný e-mail.'; errEl.style.display = 'block'; return; }
+  btn.disabled = true; btn.textContent = 'Odesílám...';
+  try {
+    const r = await fetch('/hlasovat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ entry_id: pendingId, voter_email: email }) });
+    const data = await r.json();
+    if (!data.ok) { errEl.textContent = data.error; errEl.style.display = 'block'; btn.disabled = false; btn.textContent = 'Hlasovat →'; return; }
+    if (data.oldEntryId) {
+      const pb = document.getElementById('vbtn-' + data.oldEntryId);
+      if (pb) { pb.className = 'btn-vote'; pb.textContent = '♡'; }
+      const pt = document.querySelector('#card-' + data.oldEntryId + ' .voted-tag');
+      if (pt) pt.remove();
+    }
+    const btn2 = document.getElementById('vbtn-' + pendingId);
+    const vc = document.getElementById('vc-' + pendingId);
+    if (btn2) { btn2.className = 'btn-vote voted'; btn2.textContent = '♥'; }
+    if (vc) vc.innerHTML = '<b>' + data.votes + '</b> hl.';
+    const thumb2 = document.querySelector('#card-' + pendingId + ' .thumb');
+    if (thumb2 && !thumb2.querySelector('.voted-tag')) { const t = document.createElement('span'); t.className = 'voted-tag'; t.textContent = '✓ Váš hlas'; thumb2.appendChild(t); }
+    closeModal();
+  } catch { errEl.textContent = 'Chyba připojení.'; errEl.style.display = 'block'; btn.disabled = false; btn.textContent = 'Hlasovat →'; }
 }
 </script>
 </body>

@@ -119,6 +119,15 @@
       <% } else { %>Výsledky<% } %>
     </strong></p>
 
+    <!-- Volný výběr fáze -->
+    <form action="/admin/faze" method="POST" style="display:flex;gap:8px;margin-bottom:1.5rem;flex-wrap:wrap">
+      <button name="phase" value="registration" class="btn-phase <%= settings.phase==='registration'?'btn-phase-primary':'' %>"
+        type="submit" onclick="return confirm('Přepnout na Přihlašování?')">📋 Přihlašování</button>
+      <button name="phase" value="voting" class="btn-phase <%= settings.phase==='voting'?'btn-phase-green':'' %>"
+        type="submit" onclick="return confirm('Přepnout na Hlasování?')">🗳 Hlasování</button>
+      <button name="phase" value="results" class="btn-phase <%= settings.phase==='results'?'btn-phase-amber':'' %>"
+        type="submit" onclick="return confirm('Přepnout na Výsledky?')">🏆 Výsledky</button>
+    </form>
     <div style="display:grid;grid-template-columns:1fr 24px 1fr 24px 1fr;align-items:start;gap:0;">
       <!-- Fáze 1: Přihlašování -->
       <div class="phase-step <%= settings.phase==='registration'?'current':(settings.phase!=='registration'?'done':'') %>">
@@ -229,6 +238,25 @@
       </form>
     </div>
     <% }) %>
+  </div>
+
+  <!-- Hlasující -->
+  <div class="sec-title" style="margin-top:1.75rem">E-maily hlasujících (<%= totalVoters %>)
+    <a href="/admin/export-voters-csv" class="btn" style="margin-left:10px;font-size:11px;">⬇ Export CSV</a>
+  </div>
+  <div style="background:var(--surface);border:0.5px solid var(--border);border-radius:var(--r);overflow:hidden;margin-bottom:0.5rem">
+    <% if(!voters||voters.length===0){ %>
+      <p class="empty-msg" style="padding:1rem">Zatím nikdo nehlasoval.</p>
+    <% }else{ %>
+      <div style="max-height:280px;overflow-y:auto">
+        <% voters.forEach((v,i)=>{ %>
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 14px;border-bottom:0.5px solid var(--border);font-size:13px;<%= i%2===0?'background:var(--bg)':'' %>">
+          <span style="color:var(--text)"><%= v.voter_email %></span>
+          <span style="color:var(--text2);font-size:12px">Účastník č. <%= v.anon_number||'?' %> &nbsp;·&nbsp; <%= v.created_at.slice(0,16).replace('T',' ') %></span>
+        </div>
+        <%})%>
+      </div>
+    <% } %>
   </div>
 
   <!-- Nastavení -->

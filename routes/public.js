@@ -24,7 +24,19 @@ function getSettings() {
 // ── Domovská stránka ─────────────────────────────────────────────────────────
 router.get('/', (req, res) => {
   const settings = getSettings();
-  res.render('home', { settings, success: req.query.success || null, error: req.query.error || null });
+  // Pro voting/results fázi potřebujeme entries na homepage
+  let entries = [];
+  if (settings.phase === 'voting' || settings.phase === 'results') {
+    entries = db.prepare(
+      "SELECT id, name, note, photo, votes, anon_number FROM entries WHERE status = 'approved' ORDER BY votes DESC, created_at ASC"
+    ).all();
+  }
+  res.render('home', {
+    settings, entries,
+    votedFor: req.session.votedFor || null,
+    success: req.query.success || null,
+    error: req.query.error || null
+  });
 });
 
 // ── Odeslání přihlášky ───────────────────────────────────────────────────────
@@ -123,4 +135,12 @@ module.exports = router;
 router.get('/pravidla', (req, res) => {
   const settings = getSettings();
   res.render('rules', { settings });
+});
+
+// ── Sdílení – stránka konkrétního účastníka ────────────────────────────────
+router.get('/ucastnik/:id', (req, res) => {
+  const settings = getSettings();
+  const entry = db.prepare("SELECT id, photo, votes, anon_number FROM entries WHERE id = ? AND status = 'approved'").get(req.params.id);
+  if (!entry) return res.redirect('/galerie');
+  res.render('share', { settings, entry, appUrl: process.env.APP_URL || '' });
 });

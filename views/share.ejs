@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Účastník č. <%= entry.anon_number %> – <%= settings.contest_title %></title>
+  <meta property="og:title" content="Účastník č. <%= entry.anon_number %> – <%= settings.contest_title %>">
+  <meta property="og:description" content="Hlasujte pro Účastníka č. <%= entry.anon_number %> v soutěži o nejhezčí portrét!">
+  <meta property="og:image" content="<%= appUrl %>/uploads/<%= entry.photo %>">
+  <meta property="og:url" content="<%= appUrl %>/ucastnik/<%= entry.id %>">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="<%= appUrl %>/uploads/<%= entry.photo %>">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;1,400&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    :root{--bg:#fafaf8;--surface:#fff;--text:#1a1a18;--text2:#5a5955;--border:rgba(0,0,0,0.09);--accent:#0F6E56;--r:6px}
+    body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2rem}
+    .card{background:var(--surface);border:0.5px solid var(--border);border-radius:10px;overflow:hidden;max-width:400px;width:100%;text-align:center}
+    .photo{width:100%;aspect-ratio:3/4;object-fit:cover}
+    .info{padding:1.5rem}
+    .label{font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text2);margin-bottom:8px}
+    .num{font-family:'Playfair Display',serif;font-size:28px;font-weight:400;margin-bottom:6px}
+    .votes{font-size:14px;color:var(--text2);margin-bottom:1.25rem}
+    .btn{display:inline-block;background:var(--text);color:var(--bg);padding:11px 24px;border-radius:var(--r);font-size:13px;font-weight:500;text-decoration:none;margin-bottom:8px}
+    .back{font-size:13px;color:var(--text2)}
+    .back a{color:var(--text);text-decoration:underline}
+  </style>
+</head>
+<body>
+  <div class="card">
+    <img src="/uploads/<%= entry.photo %>" class="photo" alt="">
+    <div class="info">
+      <div class="label"><%= settings.contest_title %></div>
+      <div class="num">Účastník č. <%= entry.anon_number %></div>
+      <div class="votes"><%= entry.votes %> hlasů</div>
+      <a href="/galerie" class="btn">Hlasovat v galerii →</a><br>
+      <span class="back"><a href="/">Zpět na hlavní stránku</a></span>
+    </div>
+  </div>
+</body>
+</html>

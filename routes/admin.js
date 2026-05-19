@@ -40,13 +40,20 @@ router.get('/', requireAdmin, (req, res) => {
   const pending = entries.filter(e => e.status === 'pending');
   const approved = entries.filter(e => e.status === 'approved').sort((a, b) => b.votes - a.votes);
   const rejected = entries.filter(e => e.status === 'rejected');
+  // Hlasující s detaily
+  const voters = db.prepare(`
+    SELECT v.voter_email, v.created_at, e.anon_number
+    FROM votes v
+    LEFT JOIN entries e ON v.entry_id = e.id
+    ORDER BY v.created_at DESC
+  `).all();
   res.render('admin', {
-    settings, entries, pending, approved, rejected, totalVotes, totalVoters,
+    settings, entries, pending, approved, rejected, totalVotes, totalVoters, voters,
     success: req.query.success || null, error: req.query.error || null
   });
 });
 
-// ── Přepnutí fáze ─────────────────────────────────────────────────────────────
+// ── Přepnutí fáze (volný výběr) ───────────────────────────────────────────────
 router.post('/faze', requireAdmin, (req, res) => {
   const { phase } = req.body;
   if (!['registration', 'voting', 'results'].includes(phase)) return res.redirect('/admin');
@@ -59,7 +66,6 @@ router.post('/faze', requireAdmin, (req, res) => {
 router.post('/schvalit/:id', requireAdmin, (req, res) => {
   const entry = db.prepare('SELECT anon_number FROM entries WHERE id = ?').get(req.params.id);
   if (entry && !entry.anon_number) {
-    // Náhodné číslo 100-999, unikátní
     let num;
     const used = db.prepare('SELECT anon_number FROM entries WHERE anon_number IS NOT NULL').all().map(r => r.anon_number);
     do { num = Math.floor(Math.random() * 900) + 100; } while (used.includes(num));
@@ -120,13 +126,27 @@ router.post('/nastaveni', requireAdmin, (req, res) => {
   res.redirect('/admin?success=Nastavení+uloženo');
 });
 
-// ── Export CSV ────────────────────────────────────────────────────────────────
+// ── Export CSV účastníků ───────────────────────────────────────────────────────
 router.get('/export-csv', requireAdmin, (req, res) => {
-  const entries = db.prepare('SELECT name, email, status, votes, created_at FROM entries ORDER BY votes DESC').all();
-  const header = 'Jméno,E-mail,Status,Hlasy,Přihlášeno\n';
-  const rows = entries.map(e => `"${e.name}","${e.email}","${e.status}",${e.votes},"${e.created_at}"`).join('\n');
+  const entries = db.prepare('SELECT name, email, status, votes, anon_number, created_at FROM entries ORDER BY votes DESC').all();
+  const header = 'Jméno,E-mail,Status,Číslo účastníka,Hlasy,Přihlášeno\n';
+  const rows = entries.map(e => `"${e.name}","${e.email}","${e.status}",${e.anon_number||''},${e.votes},"${e.created_at}"`).join('\n');
   res.setHeader('Content-Type', 'text/csv; charset=utf-8');
-  res.setHeader('Content-Disposition', 'attachment; filename="soutez-export.csv"');
+  res.setHeader('Content-Disposition', 'attachment; filename="ucastnici-export.csv"');
+  res.send('\uFEFF' + header + rows);
+});
+
+// ── Export CSV hlasujících ────────────────────────────────────────────────────
+router.get('/export-voters-csv', requireAdmin, (req, res) => {
+  const voters = db.prepare(`
+    SELECT v.voter_email, v.created_at, e.anon_number
+    FROM votes v LEFT JOIN entries e ON v.entry_id = e.id
+    ORDER BY v.created_at DESC
+  `).all();
+  const header = 'E-mail hlasujícího,Hlasoval pro účastníka č.,Čas hlasu\n';
+  const rows = voters.map(v => `"${v.voter_email}",${v.anon_number||'?'},"${v.created_at}"`).join('\n');
+  res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+  res.setHeader('Content-Disposition', 'attachment; filename="hlasujici-export.csv"');
   res.send('\uFEFF' + header + rows);
 });
 
