@@ -3,47 +3,63 @@
 <head>
   <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Galerie – <%= settings.contest_title %></title>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     :root{--bg:<%= settings.color_bg||'#fafaf8' %>;--surface:#fff;--text:<%= settings.color_primary||'#1a1a18' %>;--text2:#5a5955;--text3:#9a9893;--border:rgba(0,0,0,0.09);--border2:rgba(0,0,0,0.18);--accent:<%= settings.color_accent||'#0F6E56' %>;--accent-bg:#E1F5EE;--accent-brd:#5DCAA5;--red:#A32D2D;--red-bg:#FCEBEB;--r:6px}
     body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
     a{color:inherit;text-decoration:none}
+    /* NAV */
     nav{background:var(--surface);border-bottom:0.5px solid var(--border);position:sticky;top:0;z-index:100}
-    .nav-inner{max-width:900px;margin:0 auto;padding:0 2rem;height:56px;display:flex;align-items:center;justify-content:space-between}
+    .nav-inner{max-width:960px;margin:0 auto;padding:0 2rem;height:56px;display:flex;align-items:center;justify-content:space-between}
     .nav-logo{font-family:'Playfair Display',serif;font-size:16px}
     .nav-logo em{font-style:italic;color:var(--text2)}
     .nav-links{display:flex;gap:1.5rem}
     .nav-links a{font-size:12px;color:var(--text2);letter-spacing:.5px;text-transform:uppercase;transition:color .2s}
     .nav-links a:hover,.nav-links a.active{color:var(--text)}
-    .page-header{max-width:900px;margin:0 auto;padding:2rem 2rem 1.5rem;display:flex;align-items:flex-end;justify-content:space-between}
-    .page-title{font-family:'Playfair Display',serif;font-size:30px;font-weight:400;letter-spacing:-.8px}
+    /* Hamburger */
+    .hamburger{display:none;flex-direction:column;gap:4px;cursor:pointer;padding:4px}
+    .hamburger span{width:20px;height:1.5px;background:var(--text);display:block;transition:all .3s}
+    .mobile-menu{display:none;position:fixed;inset:0;background:var(--surface);z-index:99;padding:5rem 2rem 2rem;flex-direction:column;gap:1.5rem}
+    .mobile-menu.open{display:flex}
+    .mobile-menu a{font-size:22px;font-family:'Playfair Display',serif;color:var(--text);font-weight:400}
+    .mobile-close{position:absolute;top:1.25rem;right:2rem;font-size:24px;cursor:pointer;color:var(--text2)}
+    @media(max-width:600px){.nav-links{display:none}.hamburger{display:flex}}
+    /* Header */
+    .page-header{max-width:960px;margin:0 auto;padding:2rem 2rem 1rem;display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:10px}
+    .page-title{font-family:'Playfair Display',serif;font-size:28px;font-weight:400;letter-spacing:-.8px}
     .page-meta{font-size:13px;color:var(--text2)}
-    .voter-bar{background:var(--accent-bg);border-top:0.5px solid var(--accent-brd);border-bottom:0.5px solid var(--accent-brd);padding:9px 2rem;font-size:13px;color:var(--accent);max-width:100%}
+    .voter-bar{background:var(--accent-bg);border-bottom:0.5px solid var(--accent-brd);padding:9px 2rem;font-size:13px;color:var(--accent)}
     .phase-note{background:#f5f4f0;border-bottom:0.5px solid var(--border);padding:9px 2rem;font-size:13px;color:var(--text2)}
-    .gallery-wrap{max-width:900px;margin:0 auto;padding:0 2rem 3rem}
-    .gallery-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;margin-top:1.5rem}
+    /* Gallery */
+    .gallery-wrap{max-width:960px;margin:0 auto;padding:0 2rem 3rem}
+    .gallery-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;margin-top:1.25rem}
     .card{background:var(--surface);border:0.5px solid var(--border);border-radius:var(--r);overflow:hidden;transition:transform .2s,box-shadow .2s}
-    .card:hover{transform:translateY(-2px);box-shadow:0 4px 20px rgba(0,0,0,.07)}
-    .thumb{aspect-ratio:3/4;overflow:hidden;background:var(--bg);display:flex;align-items:center;justify-content:center;position:relative}
-    .thumb img{width:100%;height:100%;object-fit:cover;transition:transform .4s ease}
+    .card:hover{transform:translateY(-2px);box-shadow:0 4px 16px rgba(0,0,0,.07)}
+    .thumb{aspect-ratio:3/4;overflow:hidden;background:var(--bg);display:flex;align-items:center;justify-content:center;position:relative;cursor:zoom-in}
+    .thumb img{width:100%;height:100%;object-fit:cover;transition:transform .4s}
     .card:hover .thumb img{transform:scale(1.03)}
-    .voted-tag{position:absolute;top:10px;right:10px;background:var(--accent);color:#fff;font-size:10px;font-weight:500;padding:3px 9px;border-radius:20px}
-    .card-info{padding:12px 14px}
-    .card-num{font-size:11px;color:var(--text3);letter-spacing:.5px;text-transform:uppercase;margin-bottom:8px}
+    .voted-tag{position:absolute;top:8px;right:8px;background:var(--accent);color:#fff;font-size:10px;padding:3px 8px;border-radius:20px}
+    .card-info{padding:10px 12px;border-top:0.5px solid var(--border)}
+    .card-num{font-size:11px;color:var(--text3);letter-spacing:.5px;text-transform:uppercase;margin-bottom:7px}
     .card-footer{display:flex;align-items:center;justify-content:space-between}
     .card-votes{font-size:13px;color:var(--text2)}
     .card-votes b{color:var(--text)}
-    .btn-vote{display:flex;align-items:center;gap:4px;padding:6px 14px;font-size:12px;border-radius:var(--r);cursor:pointer;border:0.5px solid var(--border2);background:transparent;color:var(--text);transition:all .15s;font-family:'Inter',sans-serif}
+    .card-actions{display:flex;gap:6px;align-items:center}
+    .btn-share{font-size:13px;color:var(--text3);padding:5px 8px;border:0.5px solid var(--border2);border-radius:var(--r);transition:color .15s;text-decoration:none}
+    .btn-share:hover{color:var(--text)}
+    .btn-vote{padding:6px 13px;font-size:12px;border-radius:var(--r);cursor:pointer;border:0.5px solid var(--border2);background:transparent;color:var(--text);transition:all .15s;font-family:'Inter',sans-serif}
     .btn-vote:hover{background:var(--bg)}
     .btn-vote.voted{background:var(--red-bg);border-color:#F09595;color:var(--red)}
     .empty{text-align:center;padding:5rem 2rem;color:var(--text2)}
-    footer{background:var(--surface);border-top:0.5px solid var(--border);margin-top:2rem}
-    .footer-inner{max-width:900px;margin:0 auto;padding:1.5rem 2rem;display:flex;align-items:center;justify-content:space-between}
-    .footer-logo{font-family:'Playfair Display',serif;font-size:14px}
-    .footer-links{display:flex;gap:1.5rem}
-    .footer-links a{font-size:12px;color:var(--text2)}
-    .footer-links a:hover{color:var(--text)}
+    /* Lightbox */
+    .lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:300;align-items:center;justify-content:center;padding:1rem}
+    .lightbox.open{display:flex}
+    .lightbox img{max-width:90vw;max-height:90vh;object-fit:contain;border-radius:var(--r)}
+    .lb-close{position:absolute;top:1.25rem;right:1.5rem;color:#fff;font-size:28px;cursor:pointer;opacity:.7;transition:opacity .15s;line-height:1}
+    .lb-close:hover{opacity:1}
+    .lb-caption{position:absolute;bottom:1.5rem;left:50%;transform:translateX(-50%);color:rgba(255,255,255,.6);font-size:13px;letter-spacing:.5px;text-transform:uppercase}
+    /* Modal */
     .modal-wrap{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;align-items:center;justify-content:center;padding:1rem}
     .modal-wrap.open{display:flex}
     .modal{background:var(--surface);border-radius:10px;padding:1.75rem;width:100%;max-width:380px}
@@ -53,77 +69,95 @@
     .modal label{font-size:11px;color:var(--text2);font-weight:500;display:block;margin-bottom:5px;letter-spacing:.4px;text-transform:uppercase}
     .modal input{width:100%;padding:10px 14px;font-size:14px;border:0.5px solid var(--border2);border-radius:var(--r);background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;margin-bottom:6px}
     .modal input:focus{outline:none;border-color:var(--text)}
-    .modal-hint{font-size:12px;color:var(--text3);margin-bottom:1rem;line-height:1.5}
+    .modal-hint{font-size:12px;color:var(--text3);margin-bottom:1rem}
     .modal-err{font-size:13px;color:var(--red);margin-bottom:10px;display:none}
     .modal-actions{display:flex;gap:8px}
     .btn-dark{flex:1;padding:10px;background:var(--text);color:var(--bg);border:none;border-radius:var(--r);font-size:13px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif;transition:opacity .15s}
     .btn-dark:hover{opacity:.85}
     .btn-dark:disabled{opacity:.5;cursor:wait}
     .btn-cancel{padding:10px 18px;background:transparent;border:0.5px solid var(--border2);border-radius:var(--r);font-size:13px;cursor:pointer;font-family:'Inter',sans-serif;color:var(--text)}
+    footer{background:var(--surface);border-top:0.5px solid var(--border);margin-top:2rem}
+    .footer-inner{max-width:960px;margin:0 auto;padding:1.5rem 2rem;display:flex;align-items:center;justify-content:space-between}
+    .footer-logo{font-family:'Playfair Display',serif;font-size:14px}
+    .footer-links{display:flex;gap:1.5rem}
+    .footer-links a{font-size:12px;color:var(--text2)}
+    .footer-links a:hover{color:var(--text)}
   </style>
 </head>
 <body>
 <nav>
   <div class="nav-inner">
-    <a href="/" class="nav-logo">Jan Svoboda <em>Photography</em></a>
+    <a href="/" class="nav-logo"><%= settings.footer_text||'Jan Svoboda Photography' %></a>
     <div class="nav-links">
       <a href="/">Domů</a>
       <a href="/galerie" class="active">Galerie</a>
-      <a href="/vysledky">Výsledky</a>
       <a href="/pravidla">Pravidla</a>
-      <% if (typeof isAdmin !== 'undefined' && isAdmin) { %><a href="/admin">Admin</a><% } %>
+      <% if(typeof isAdmin!=='undefined'&&isAdmin){%><a href="/admin">Admin</a><%}%>
     </div>
+    <div class="hamburger" onclick="openMenu()"><span></span><span></span><span></span></div>
   </div>
 </nav>
+<div class="mobile-menu" id="mobile-menu">
+  <span class="mobile-close" onclick="closeMenu()">✕</span>
+  <a href="/" onclick="closeMenu()">Domů</a>
+  <a href="/galerie" onclick="closeMenu()">Galerie</a>
+  <a href="/pravidla" onclick="closeMenu()">Pravidla</a>
+  <% if(typeof isAdmin!=='undefined'&&isAdmin){%><a href="/admin" onclick="closeMenu()">Admin</a><%}%>
+</div>
 
 <% if(settings.phase==='voting'){ %>
   <% if(voterEmail){ %>
-    <div class="voter-bar">✓ Hlasujete jako <strong style="margin:0 3px"><%= voterEmail %></strong><% if(votedFor){ %> — hlas odevzdán<% } %></div>
+    <div class="voter-bar">✓ Hlasujete jako <strong style="margin:0 3px"><%= voterEmail %></strong><% if(votedFor){%> — hlas odevzdán<%}%></div>
   <% }else{ %>
-    <div class="voter-bar" style="background:var(--accent-bg);color:var(--accent)">🗳 Hlasování je otevřeno — klikněte na fotografii a zadejte e-mail.</div>
+    <div class="voter-bar">🗳 <%= settings.gallery_subtitle||'Klikněte na fotografii a zadejte e-mail pro hlasování.' %></div>
   <% } %>
-<% }else if(settings.phase==='registration'){ %>
-  <div class="phase-note">Přihlašování stále probíhá. Hlasování bude spuštěno brzy.</div>
 <% }else{ %>
   <div class="phase-note">Hlasování ukončeno. <a href="/vysledky" style="color:var(--text);font-weight:500;text-decoration:underline">Výsledky →</a></div>
 <% } %>
 
 <div class="gallery-wrap">
   <div class="page-header" style="padding-left:0;padding-right:0">
-    <h1 class="page-title">Galerie fotografií</h1>
+    <h1 class="page-title"><%= settings.gallery_title||'Galerie fotografií' %></h1>
     <span class="page-meta"><%= entries.length %> snímků</span>
   </div>
-
   <% if(entries.length===0){ %>
     <div class="empty">Zatím žádné schválené fotografie.</div>
   <% }else{ %>
   <div class="gallery-grid">
     <% entries.forEach(e=>{ const isVoted=votedFor===e.id; %>
     <div class="card" id="card-<%= e.id %>">
-      <div class="thumb">
+      <div class="thumb" onclick="openLightbox('/uploads/<%= e.photo %>','Účastník č. <%= e.anon_number %>')">
         <img src="/uploads/<%= e.photo %>" alt="Účastník č. <%= e.anon_number %>" loading="lazy">
-        <% if(isVoted){ %><span class="voted-tag">✓ Váš hlas</span><% } %>
+        <% if(isVoted){%><span class="voted-tag">✓ Váš hlas</span><%}%>
       </div>
       <div class="card-info">
         <div class="card-num">Účastník č. <%= e.anon_number %></div>
         <div class="card-footer">
           <span class="card-votes" id="vc-<%= e.id %>"><b><%= e.votes %></b> hlasů</span>
-          <div style="display:flex;gap:6px;align-items:center">
-            <a href="/ucastnik/<%= e.id %>" title="Sdílet" style="font-size:14px;color:var(--text3);text-decoration:none;padding:6px 8px;border:0.5px solid var(--border2);border-radius:var(--r);transition:color .15s" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--text3)'">↗</a>
-            <% if(settings.phase==='voting'){ %>
-              <button class="btn-vote <%= isVoted?'voted':'' %>" id="vbtn-<%= e.id %>" onclick="openModal(<%= e.id %>,<%= e.anon_number %>)">
-                <%= isVoted?'♥ Hlasováno':'♡ Hlasovat' %>
+          <div class="card-actions">
+            <a href="/ucastnik/<%= e.id %>" class="btn-share" title="Sdílet">↗</a>
+            <% if(settings.phase==='voting'){%>
+              <button class="btn-vote <%=isVoted?'voted':''%>" id="vbtn-<%= e.id %>" onclick="openModal(<%= e.id %>,<%= e.anon_number %>)">
+                <%=isVoted?'♥ Hlasováno':'♡ Hlasovat'%>
               </button>
-            <% } %>
+            <%}%>
           </div>
         </div>
       </div>
     </div>
-    <% }) %>
+    <%})%>
   </div>
-  <% } %>
+  <%}%>
 </div>
 
+<!-- Lightbox -->
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+  <span class="lb-close" onclick="closeLightbox()">✕</span>
+  <img id="lb-img" src="" alt="">
+  <div class="lb-caption" id="lb-caption"></div>
+</div>
+
+<!-- Hlasovací modal -->
 <div class="modal-wrap" id="modal-wrap" onclick="closeOnBg(event)">
   <div class="modal">
     <h3>Potvrdit hlas</h3>
@@ -131,7 +165,7 @@
     <div class="modal-subject" id="modal-subject"></div>
     <label>Váš e-mail</label>
     <input type="email" id="modal-email" placeholder="vas@email.cz" value="<%= voterEmail||'' %>">
-    <div class="modal-hint">Každý e-mail může hlasovat jednou. Váš e-mail nebude zveřejněn.</div>
+    <div class="modal-hint">Každý e-mail může hlasovat jednou. E-mail nebude zveřejněn.</div>
     <div class="modal-err" id="modal-err"></div>
     <div class="modal-actions">
       <button class="btn-cancel" onclick="closeModal()">Zrušit</button>
@@ -142,18 +176,33 @@
 
 <footer>
   <div class="footer-inner">
-    <div class="footer-logo">Jan Svoboda Photography</div>
+    <div class="footer-logo"><%= settings.footer_text||'Jan Svoboda Photography' %></div>
     <div class="footer-links"><a href="/pravidla">Pravidla</a><a href="/admin/login">Admin</a></div>
   </div>
 </footer>
 
 <script>
+// Mobile menu
+function openMenu(){document.getElementById('mobile-menu').classList.add('open');document.body.style.overflow='hidden';}
+function closeMenu(){document.getElementById('mobile-menu').classList.remove('open');document.body.style.overflow='';}
+
+// Lightbox
+function openLightbox(src,caption){
+  document.getElementById('lb-img').src=src;
+  document.getElementById('lb-caption').textContent=caption;
+  document.getElementById('lightbox').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeLightbox(){document.getElementById('lightbox').classList.remove('open');document.body.style.overflow='';}
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeLightbox();closeModal();}});
+
+// Voting modal
 let pendingId=null;
 function openModal(id,num){pendingId=id;document.getElementById('modal-subject').textContent='Účastník č. '+num;document.getElementById('modal-err').style.display='none';document.getElementById('modal-wrap').classList.add('open');setTimeout(()=>document.getElementById('modal-email').focus(),50);}
 function closeModal(){document.getElementById('modal-wrap').classList.remove('open');pendingId=null;}
 function closeOnBg(e){if(e.target===document.getElementById('modal-wrap'))closeModal();}
-document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
 document.getElementById('modal-email').addEventListener('keydown',e=>{if(e.key==='Enter')submitVote();});
+
 async function submitVote(){
   const email=document.getElementById('modal-email').value.trim();
   const errEl=document.getElementById('modal-err');
@@ -172,7 +221,7 @@ async function submitVote(){
     if(thumb&&!thumb.querySelector('.voted-tag')){const t=document.createElement('span');t.className='voted-tag';t.textContent='✓ Váš hlas';thumb.appendChild(t);}
     closeModal();
     const vbar=document.querySelector('.voter-bar');
-    if(vbar&&!vbar.textContent.includes(email))vbar.innerHTML='✓ Hlasujete jako <strong style="margin:0 3px">'+email+'</strong> — hlas odevzdán';
+    if(vbar)vbar.innerHTML='✓ Hlasujete jako <strong style="margin:0 3px">'+email+'</strong> — hlas odevzdán';
   }catch{errEl.textContent='Chyba připojení.';errEl.style.display='block';btn.disabled=false;btn.textContent='Hlasovat →';}
 }
 </script>

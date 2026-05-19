@@ -6,7 +6,19 @@ const fs = require('fs');
 const db = require('../db');
 const mailer = require('../mailer');
 
-// Multer ukládá dočasně do tmp/
+// Rate limiting – max 5 přihlášek za hodinu z jedné IP
+const rateLimit = {};
+function checkRateLimit(ip) {
+  const now = Date.now();
+  const hour = 60 * 60 * 1000;
+  if (!rateLimit[ip]) rateLimit[ip] = [];
+  rateLimit[ip] = rateLimit[ip].filter(t => now - t < hour);
+  if (rateLimit[ip].length >= 5) return false;
+  rateLimit[ip].push(now);
+  return true;
+}
+
+// Multer
 const upload = multer({
   dest: 'tmp/',
   limits: { fileSize: 15 * 1024 * 1024 },
@@ -21,18 +33,29 @@ function getSettings() {
   return Object.fromEntries(rows.map(r => [r.key, r.value]));
 }
 
+// Formátování data: 2026-06-15 → 15. 6. 2026
+function formatDate(str) {
+  if (!str) return '';
+  const [y, m, d] = str.split('-');
+  if (!y || !m || !d) return str;
+  return `${parseInt(d)}. ${parseInt(m)}. ${y}`;
+}
+
 // ── Domovská stránka ─────────────────────────────────────────────────────────
 router.get('/', (req, res) => {
   const settings = getSettings();
-  // Pro voting/results fázi potřebujeme entries na homepage
   let entries = [];
   if (settings.phase === 'voting' || settings.phase === 'results') {
     entries = db.prepare(
-      "SELECT id, name, note, photo, votes, anon_number FROM entries WHERE status = 'approved' ORDER BY votes DESC, created_at ASC"
+      "SELECT id, photo, votes, anon_number FROM entries WHERE status = 'approved' ORDER BY votes DESC, created_at ASC"
     ).all();
+    // Náhodné pořadí pokud je zapnuto
+    if (settings.gallery_random === '1' && settings.phase === 'voting') {
+      entries = entries.sort(() => Math.random() - 0.5);
+    }
   }
   res.render('home', {
-    settings, entries,
+    settings, entries, formatDate,
     votedFor: req.session.votedFor || null,
     success: req.query.success || null,
     error: req.query.error || null
@@ -46,6 +69,12 @@ router.post('/prihlasit', upload.single('photo'), async (req, res) => {
     if (req.file && fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
     return res.redirect('/?error=Přihlašování+je+uzavřeno');
   }
+  // Rate limiting
+  const ip = req.ip || req.connection.remoteAddress;
+  if (!checkRateLimit(ip)) {
+    if (req.file && fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
+    return res.redirect('/?error=Příliš+mnoho+přihlášek+z+jedné+adresy.+Zkuste+to+za+hodinu.');
+  }
   const { name, email, note } = req.body;
   if (!name || !email || !req.file) {
     if (req.file && fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
@@ -54,7 +83,7 @@ router.post('/prihlasit', upload.single('photo'), async (req, res) => {
   const existing = db.prepare('SELECT id FROM entries WHERE email = ?').get(email.trim().toLowerCase());
   if (existing) {
     fs.unlinkSync(req.file.path);
-    return res.redirect('/?error=Tento+e-mail+je+již+přihlášen');
+    return res.redirect('/?error=Tento+e-mail+je+již+přihlášen.+Každý+může+přihlásit+pouze+jednu+fotografii.');
   }
   try {
     const UPLOADS_DIR = req.app.locals.UPLOADS_DIR;
@@ -64,12 +93,10 @@ router.post('/prihlasit', upload.single('photo'), async (req, res) => {
     try {
       const sharp = require('sharp');
       await sharp(req.file.path).resize(1200, 1200, { fit: 'inside', withoutEnlargement: true }).jpeg({ quality: 88 }).toFile(outPath);
-    } catch {
-      fs.copyFileSync(req.file.path, outPath);
-    }
+    } catch { fs.copyFileSync(req.file.path, outPath); }
     fs.unlinkSync(req.file.path);
     db.prepare('INSERT INTO entries (name, email, note, photo, ip) VALUES (?, ?, ?, ?, ?)')
-      .run(name.trim(), email.trim().toLowerCase(), note?.trim() || '', filename, req.ip || '');
+      .run(name.trim(), email.trim().toLowerCase(), note?.trim() || '', filename, ip);
     try { await mailer.sendConfirmation(email, name); } catch {}
     res.redirect('/?success=Přihláška+odeslána!+Čeká+na+schválení.');
   } catch (err) {
@@ -82,11 +109,18 @@ router.post('/prihlasit', upload.single('photo'), async (req, res) => {
 // ── Galerie ──────────────────────────────────────────────────────────────────
 router.get('/galerie', (req, res) => {
   const settings = getSettings();
-  const entries = db.prepare(
-    "SELECT id, name, note, photo, votes, anon_number FROM entries WHERE status = 'approved' ORDER BY votes DESC, created_at ASC"
+  // Blokovat galerii pokud není fáze hlasování nebo výsledků
+  if (settings.phase === 'registration') {
+    return res.render('blocked', { settings, formatDate, message: 'Galerie bude dostupná po spuštění hlasování.' });
+  }
+  let entries = db.prepare(
+    "SELECT id, photo, votes, anon_number FROM entries WHERE status = 'approved' ORDER BY votes DESC, created_at ASC"
   ).all();
+  if (settings.gallery_random === '1' && settings.phase === 'voting') {
+    entries = entries.sort(() => Math.random() - 0.5);
+  }
   res.render('gallery', {
-    settings, entries,
+    settings, entries, formatDate,
     voterEmail: req.session.voterEmail || null,
     votedFor: req.session.votedFor || null
   });
@@ -102,7 +136,6 @@ router.post('/hlasovat', (req, res) => {
   const id = parseInt(entry_id);
   const entry = db.prepare("SELECT id FROM entries WHERE id = ? AND status = 'approved'").get(id);
   if (!entry) return res.json({ ok: false, error: 'Příspěvek nenalezen.' });
-
   const existingVote = db.prepare('SELECT entry_id FROM votes WHERE voter_email = ?').get(email);
   if (existingVote) {
     if (existingVote.entry_id === id) return res.json({ ok: false, error: 'Z tohoto e-mailu již byl hlas odevzdán.' });
@@ -122,25 +155,28 @@ router.post('/hlasovat', (req, res) => {
   res.json({ ok: true, votes, oldEntryId: null });
 });
 
-// ── Výsledky ─────────────────────────────────────────────────────────────────
+// ── Výsledky (jen po skončení hlasování) ─────────────────────────────────────
 router.get('/vysledky', (req, res) => {
   const settings = getSettings();
-  const entries = db.prepare("SELECT id, name, note, photo, votes, anon_number FROM entries WHERE status = 'approved' ORDER BY votes DESC").all();
-  res.render('results', { settings, entries });
+  if (settings.phase !== 'results') {
+    return res.render('blocked', { settings, formatDate, message: 'Výsledky budou zveřejněny po ukončení hlasování.' });
+  }
+  const entries = db.prepare("SELECT id, photo, votes, anon_number FROM entries WHERE status = 'approved' ORDER BY votes DESC").all();
+  res.render('results', { settings, entries, formatDate });
 });
-
-module.exports = router;
 
 // ── Pravidla ──────────────────────────────────────────────────────────────────
 router.get('/pravidla', (req, res) => {
   const settings = getSettings();
-  res.render('rules', { settings });
+  res.render('rules', { settings, formatDate });
 });
 
-// ── Sdílení – stránka konkrétního účastníka ────────────────────────────────
+// ── Sdílení ───────────────────────────────────────────────────────────────────
 router.get('/ucastnik/:id', (req, res) => {
   const settings = getSettings();
   const entry = db.prepare("SELECT id, photo, votes, anon_number FROM entries WHERE id = ? AND status = 'approved'").get(req.params.id);
   if (!entry) return res.redirect('/galerie');
-  res.render('share', { settings, entry, appUrl: process.env.APP_URL || '' });
+  res.render('share', { settings, entry, formatDate, appUrl: process.env.APP_URL || '' });
 });
+
+module.exports = router;

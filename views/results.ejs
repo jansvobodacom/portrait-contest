@@ -16,6 +16,13 @@
     .nav-links{display:flex;gap:1.5rem}
     .nav-links a{font-size:12px;color:var(--text2);letter-spacing:.5px;text-transform:uppercase;transition:color .2s}
     .nav-links a:hover,.nav-links a.active{color:var(--text)}
+    .hamburger{display:none;flex-direction:column;gap:4px;cursor:pointer;padding:4px}
+    .hamburger span{width:20px;height:1.5px;background:var(--text);display:block}
+    .mobile-menu{display:none;position:fixed;inset:0;background:var(--surface);z-index:99;padding:5rem 2rem 2rem;flex-direction:column;gap:1.5rem}
+    .mobile-menu.open{display:flex}
+    .mobile-menu a{font-size:22px;font-family:"Playfair Display",serif;color:var(--text)}
+    .mobile-close{position:absolute;top:1.25rem;right:2rem;font-size:24px;cursor:pointer;color:var(--text2)}
+    @media(max-width:600px){.nav-links{display:none}.hamburger{display:flex}}
     .wrap{max-width:720px;margin:0 auto;padding:0 2rem}
     .page-header{padding:2rem 0 1.5rem}
     .page-title{font-family:'Playfair Display',serif;font-size:30px;font-weight:400;letter-spacing:-.8px;margin-bottom:4px}
@@ -56,6 +63,7 @@
       <a href="/pravidla">Pravidla</a>
       <% if(typeof isAdmin!=='undefined'&&isAdmin){%><a href="/admin">Admin</a><%}%>
     </div>
+    <div class="hamburger" onclick="document.getElementById('mm-results').classList.add('open');document.body.style.overflow='hidden'"><span></span><span></span><span></span></div>
   </div>
 </nav>
 <div class="wrap">

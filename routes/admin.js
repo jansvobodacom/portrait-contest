@@ -112,7 +112,9 @@ router.post('/email-vyherce', requireAdmin, async (req, res) => {
 // ── Nastavení ─────────────────────────────────────────────────────────────────
 router.post('/nastaveni', requireAdmin, (req, res) => {
   const { contest_title, registration_end, voting_end, prize_description,
-          home_subtitle, rules_text, color_primary, color_accent, color_bg } = req.body;
+          home_subtitle, rules_text, color_primary, color_accent, color_bg,
+          gallery_random, form_title, form_subtitle, form_anon_note,
+          gallery_title, gallery_subtitle, results_title, footer_text } = req.body;
   const u = db.prepare('UPDATE settings SET value = ? WHERE key = ?');
   u.run(contest_title || '', 'contest_title');
   u.run(registration_end || '', 'registration_end');
@@ -123,6 +125,14 @@ router.post('/nastaveni', requireAdmin, (req, res) => {
   u.run(color_primary || '#1a1a18', 'color_primary');
   u.run(color_accent || '#0F6E56', 'color_accent');
   u.run(color_bg || '#fafaf9', 'color_bg');
+  u.run(gallery_random === 'on' ? '1' : '0', 'gallery_random');
+  u.run(form_title || '', 'form_title');
+  u.run(form_subtitle || '', 'form_subtitle');
+  u.run(form_anon_note || '', 'form_anon_note');
+  u.run(gallery_title || '', 'gallery_title');
+  u.run(gallery_subtitle || '', 'gallery_subtitle');
+  u.run(results_title || '', 'results_title');
+  u.run(footer_text || '', 'footer_text');
   res.redirect('/admin?success=Nastavení+uloženo');
 });
 
@@ -148,6 +158,13 @@ router.get('/export-voters-csv', requireAdmin, (req, res) => {
   res.setHeader('Content-Type', 'text/csv; charset=utf-8');
   res.setHeader('Content-Disposition', 'attachment; filename="hlasujici-export.csv"');
   res.send('\uFEFF' + header + rows);
+});
+
+// ── Poznámka k účastníkovi ───────────────────────────────────────────────────
+router.post('/poznamka/:id', requireAdmin, (req, res) => {
+  const { note_admin } = req.body;
+  db.prepare('UPDATE entries SET note_admin = ? WHERE id = ?').run(note_admin || '', req.params.id);
+  res.redirect('/admin#moderace');
 });
 
 module.exports = router;

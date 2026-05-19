@@ -24,6 +24,13 @@
     .nav-links{display:flex;gap:1.5rem}
     .nav-links a{font-size:12px;color:var(--text2);letter-spacing:.5px;text-transform:uppercase;transition:color .2s}
     .nav-links a:hover,.nav-links a.active{color:var(--text)}
+    .hamburger{display:none;flex-direction:column;gap:4px;cursor:pointer;padding:4px}
+    .hamburger span{width:20px;height:1.5px;background:var(--text);display:block}
+    .mobile-menu{display:none;position:fixed;inset:0;background:var(--surface);z-index:99;padding:5rem 2rem 2rem;flex-direction:column;gap:1.5rem}
+    .mobile-menu.open{display:flex}
+    .mobile-menu a{font-size:22px;font-family:'Playfair Display',serif;color:var(--text)}
+    .mobile-close{position:absolute;top:1.25rem;right:2rem;font-size:24px;cursor:pointer;color:var(--text2)}
+    @media(max-width:600px){.nav-links{display:none}.hamburger{display:flex}}
     .alert{font-size:14px;padding:10px 2rem;border-bottom:0.5px solid var(--border)}
     .alert-success{background:var(--accent-bg);color:var(--accent)}
     .alert-error{background:var(--red-bg);color:var(--red)}
@@ -150,8 +157,17 @@
       <a href="/pravidla">Pravidla</a>
       <% if (typeof isAdmin !== 'undefined' && isAdmin) { %><a href="/admin">Admin</a><% } %>
     </div>
+    <div class="hamburger" onclick="openMenu()"><span></span><span></span><span></span></div>
   </div>
 </nav>
+<div class="mobile-menu" id="mobile-menu">
+  <span class="mobile-close" onclick="closeMenu()">✕</span>
+  <a href="/" onclick="closeMenu()">Domů</a>
+  <a href="/galerie" onclick="closeMenu()">Galerie</a>
+  <a href="/vysledky" onclick="closeMenu()">Výsledky</a>
+  <a href="/pravidla" onclick="closeMenu()">Pravidla</a>
+  <% if(typeof isAdmin!=='undefined'&&isAdmin){%><a href="/admin" onclick="closeMenu()">Admin</a><%}%>
+</div>
 
 <% if (success) { %><div class="alert alert-success">✓ <%- decodeURIComponent((success||'').replace(/\+/g,' ')) %></div><% } %>
 <% if (error) { %><div class="alert alert-error">⚠ <%- decodeURIComponent((error||'').replace(/\+/g,' ')) %></div><% } %>
@@ -193,19 +209,20 @@
 </div>
 
 <div class="stats">
-  <div class="stat"><div class="stat-num"><%= settings.registration_end %></div><div class="stat-label">Uzávěrka přihlášek</div></div>
-  <div class="stat"><div class="stat-num"><%= settings.voting_end %></div><div class="stat-label">Uzávěrka hlasování</div></div>
+  <div class="stat"><div class="stat-num"><%= formatDate(settings.registration_end) %></div><div class="stat-label">Uzávěrka přihlášek</div></div>
+  <div class="stat"><div class="stat-num"><%= formatDate(settings.voting_end) %></div><div class="stat-label">Uzávěrka hlasování</div></div>
   <div class="stat"><div class="stat-num">1×</div><div class="stat-label">Fotografie na účastníka</div></div>
 </div>
 
 <% if(settings.phase==='registration'){ %>
 <!-- ── Přihlašovací formulář ── -->
 <div class="form-section">
-  <div class="section-label">Přihlásit fotografii</div>
+  <div class="section-label"><%= settings.form_title||'Přihlásit fotografii' %></div>
   <div class="upload-zone" id="upload-zone" onclick="document.getElementById('photo').click()">
     <div class="upload-icon">↑</div>
     <p>Klikněte nebo přetáhněte fotografii</p>
     <small>JPG, PNG, WebP – max. 15 MB · Funguje i z mobilu 📱</small>
+    <small style="display:block;margin-top:4px;color:var(--accent)"><%= settings.form_anon_note||'Vaše údaje jsou anonymní.' %></small>
     <img id="preview-img" alt="Náhled">
   </div>
   <!-- Náhled jak bude vypadat v galerii -->
@@ -315,7 +332,7 @@
 
 <footer>
   <div class="footer-inner">
-    <div class="footer-logo">Jan Svoboda Photography</div>
+    <div class="footer-logo"><%= settings.footer_text||'Jan Svoboda Photography' %></div>
     <div class="footer-links">
       <a href="/pravidla">Pravidla</a>
       <a href="/galerie">Galerie</a>
@@ -325,6 +342,10 @@
 </footer>
 
 <script>
+// Mobile menu
+function openMenu(){document.getElementById('mobile-menu').classList.add('open');document.body.style.overflow='hidden';}
+function closeMenu(){document.getElementById('mobile-menu').classList.remove('open');document.body.style.overflow='';}
+
 // Countdown
 const cdEl = document.getElementById('countdown');
 if (cdEl) {
