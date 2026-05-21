@@ -194,6 +194,9 @@
   <!-- Countdown -->
   <% const endDate = settings.phase==='registration' ? settings.registration_end : settings.voting_end; %>
   <% if (endDate && settings.phase !== 'results') { %>
+  <div style="font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);margin-bottom:8px">
+    <% if(settings.phase==='registration'){%>Zbývá do uzávěrky přihlášek<%}else{%>Zbývá do konce hlasování<%}%>
+  </div>
   <div class="countdown" id="countdown" data-end="<%= endDate %>">
     <div class="cd-unit"><div class="cd-num" id="cd-d">--</div><div class="cd-label">Dní</div></div>
     <div class="cd-sep">:</div>
