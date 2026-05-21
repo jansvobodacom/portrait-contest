@@ -203,8 +203,6 @@ router.get('/qr/:id', requireAdmin, async (req, res) => {
 router.post('/header-foto', requireAdmin, uploadHeader.single('header_photo'), async (req, res) => {
   if (!req.file) return res.redirect('/admin?error=Vyberte+fotografii');
   try {
-    const path = require('path');
-    const fs = require('fs');
     const UPLOADS_DIR = req.app.locals.UPLOADS_DIR;
     const filename = 'header-' + Date.now() + '.jpg';
     const outPath = path.join(UPLOADS_DIR, filename);
@@ -214,9 +212,9 @@ router.post('/header-foto', requireAdmin, uploadHeader.single('header_photo'), a
     } catch { fs.copyFileSync(req.file.path, outPath); }
     fs.unlinkSync(req.file.path);
     // Smaž starou header fotku
-    const old = db.prepare("SELECT value FROM settings WHERE key = 'header_photo'").get();
-    if (old && old.value) {
-      const oldPath = path.join(UPLOADS_DIR, old.value);
+    const existing = db.prepare("SELECT value FROM settings WHERE key = 'header_photo'").get();
+    if (existing && existing.value) {
+      const oldPath = path.join(UPLOADS_DIR, existing.value);
       if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
     }
     db.prepare("UPDATE settings SET value = ? WHERE key = 'header_photo'").run(filename);
@@ -228,8 +226,6 @@ router.post('/header-foto', requireAdmin, uploadHeader.single('header_photo'), a
 });
 
 router.post('/header-foto-smazat', requireAdmin, (req, res) => {
-  const path = require('path');
-  const fs = require('fs');
   const current = db.prepare("SELECT value FROM settings WHERE key = 'header_photo'").get();
   if (current && current.value) {
     const f = path.join(req.app.locals.UPLOADS_DIR, current.value);
