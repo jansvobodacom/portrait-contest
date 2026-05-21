@@ -1,6 +1,14 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../db');
+const multer = require('multer');
+const uploadHeader = multer({
+  dest: 'tmp/',
+  limits: { fileSize: 10 * 1024 * 1024 },
+  fileFilter: (req, file, cb) => {
+    ['image/jpeg','image/png','image/webp'].includes(file.mimetype) ? cb(null,true) : cb(new Error('Pouze JPG/PNG/WebP'));
+  }
+});
 const mailer = require('../mailer');
 const fs = require('fs');
 const path = require('path');
@@ -189,6 +197,46 @@ router.get('/qr/:id', requireAdmin, async (req, res) => {
     console.error(err);
     res.redirect('/admin?error=Chyba+při+generování+QR+kódu');
   }
+});
+
+// ── Upload header fotky ──────────────────────────────────────────────────────
+router.post('/header-foto', requireAdmin, uploadHeader.single('header_photo'), async (req, res) => {
+  if (!req.file) return res.redirect('/admin?error=Vyberte+fotografii');
+  try {
+    const path = require('path');
+    const fs = require('fs');
+    const UPLOADS_DIR = req.app.locals.UPLOADS_DIR;
+    const filename = 'header-' + Date.now() + '.jpg';
+    const outPath = path.join(UPLOADS_DIR, filename);
+    try {
+      const sharp = require('sharp');
+      await sharp(req.file.path).resize(1600, 800, { fit: 'cover' }).jpeg({ quality: 90 }).toFile(outPath);
+    } catch { fs.copyFileSync(req.file.path, outPath); }
+    fs.unlinkSync(req.file.path);
+    // Smaž starou header fotku
+    const old = db.prepare("SELECT value FROM settings WHERE key = 'header_photo'").get();
+    if (old && old.value) {
+      const oldPath = path.join(UPLOADS_DIR, old.value);
+      if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
+    }
+    db.prepare("UPDATE settings SET value = ? WHERE key = 'header_photo'").run(filename);
+    res.redirect('/admin?success=Header+fotka+nahrána!');
+  } catch(err) {
+    console.error(err);
+    res.redirect('/admin?error=Chyba+při+nahrávání+fotky');
+  }
+});
+
+router.post('/header-foto-smazat', requireAdmin, (req, res) => {
+  const path = require('path');
+  const fs = require('fs');
+  const current = db.prepare("SELECT value FROM settings WHERE key = 'header_photo'").get();
+  if (current && current.value) {
+    const f = path.join(req.app.locals.UPLOADS_DIR, current.value);
+    if (fs.existsSync(f)) fs.unlinkSync(f);
+  }
+  db.prepare("UPDATE settings SET value = '' WHERE key = 'header_photo'").run();
+  res.redirect('/admin?success=Header+fotka+smazána');
 });
 
 // ── Poznámka k účastníkovi ───────────────────────────────────────────────────

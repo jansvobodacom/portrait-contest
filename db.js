@@ -65,6 +65,7 @@ insertSetting.run('color_bg', '#fafaf9');
 // Nová nastavení
 try { db.prepare('ALTER TABLE entries ADD COLUMN note_admin TEXT DEFAULT ""').run(); } catch {}
 
+insertSetting.run('header_photo', '');
 insertSetting.run('gallery_random', '0');
 insertSetting.run('form_title', 'Přihlásit fotografii');
 insertSetting.run('form_subtitle', 'Nahrajte svůj nejlepší portrétní snímek a zapojte se do soutěže.');

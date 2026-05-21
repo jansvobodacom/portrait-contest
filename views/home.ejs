@@ -50,6 +50,8 @@
     .btn-dark:hover{opacity:.85}
     .btn-ghost{font-size:13px;color:var(--text2);cursor:pointer;transition:color .2s}
     .btn-ghost:hover{color:var(--text)}
+    /* Header foto */
+    .header-photo{width:100%;max-height:400px;object-fit:cover;display:block;border-bottom:0.5px solid var(--border)}
     /* Stats */
     .stats{display:grid;grid-template-columns:repeat(3,1fr);border-top:0.5px solid var(--border);border-bottom:0.5px solid var(--border);background:var(--surface);max-width:720px;margin:0 auto}
     .stat{padding:1.25rem 2rem;border-right:0.5px solid var(--border)}
@@ -171,6 +173,10 @@
   <a href="/pravidla" onclick="closeMenu()">Pravidla</a>
   <% if(typeof isAdmin!=='undefined'&&isAdmin){%><a href="/admin" onclick="closeMenu()">Admin</a><%}%>
 </div>
+
+<% if(settings.header_photo){ %>
+<img src="/uploads/<%= settings.header_photo %>" class="header-photo" alt="<%= settings.contest_title %>">
+<% } %>
 
 <% if (success) { %><div class="alert alert-success">✓ <%- decodeURIComponent((success||'').replace(/\+/g,' ')) %></div><% } %>
 <% if (error) { %><div class="alert alert-error">⚠ <%- decodeURIComponent((error||'').replace(/\+/g,' ')) %></div><% } %>
