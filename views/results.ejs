@@ -82,7 +82,7 @@
     <div>
       <div class="winner-label">🏆 Vítěz</div>
       <div class="winner-name">Účastník č. <%= entries[0].anon_number %></div>
-      <div class="winner-votes"><%= entries[0].votes %> hlasů · <%= settings.prize_description %></div>
+      <div class="winner-votes"><%= settings.prize_description %></div>
     </div>
   </div>
   <%}%>
@@ -99,7 +99,7 @@
         <div class="result-num">Účastník č. <%= e.anon_number %></div>
         <div class="bar-wrap"><div class="bar" style="width:<%=Math.round(e.votes/maxV*100)%>%"></div></div>
       </div>
-      <div class="result-votes"><%= e.votes %><span>hl.</span></div>
+      <div class="result-votes" style="display:none"><%= e.votes %><span>hl.</span></div>
     </div>
     <%})%>
   <%}%>

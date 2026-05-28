@@ -133,7 +133,7 @@
       <div class="card-info">
         <div class="card-num">Účastník č. <%= e.anon_number %></div>
         <div class="card-footer">
-          <span class="card-votes" id="vc-<%= e.id %>"><b><%= e.votes %></b> hlasů</span>
+          <span class="card-votes" id="vc-<%= e.id %>" style="display:none"><b><%= e.votes %></b> hlasů</span>
           <div class="card-actions">
             <a href="/ucastnik/<%= e.id %>" class="btn-share" title="Sdílet">↗</a>
             <% if(settings.phase==='voting'){%>

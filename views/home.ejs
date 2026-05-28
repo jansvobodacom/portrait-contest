@@ -280,7 +280,7 @@
       <div class="card-info">
         <div class="card-num">Účastník č. <%= e.anon_number %></div>
         <div class="card-footer">
-          <span class="card-votes" id="vc-<%= e.id %>"><b><%= e.votes %></b> hl.</span>
+          <span class="card-votes" id="vc-<%= e.id %>" style="display:none"><b><%= e.votes %></b> hl.</span>
           <div style="display:flex;gap:6px;align-items:center">
             <a href="/ucastnik/<%= e.id %>" style="font-size:13px;color:var(--text3);padding:5px 8px;border:0.5px solid var(--border2);border-radius:var(--r);text-decoration:none;transition:color .15s" title="Sdílet">↗</a>
             <button class="btn-vote <%=isVoted?'voted':''%>" id="vbtn-<%= e.id %>" onclick="openModal(<%= e.id %>,<%= e.anon_number %>)">
