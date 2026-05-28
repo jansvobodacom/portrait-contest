@@ -154,7 +154,7 @@
 <body>
 <nav>
   <div class="nav-inner">
-    <a href="/" class="nav-logo">Jan Svoboda <em>Photography</em></a>
+    <a href="/" class="nav-logo"><%= settings.footer_text||'Jan Svoboda Photography' %></a>
     <div class="nav-links">
       <a href="/" class="active">Domů</a>
       <a href="/galerie">Galerie</a>
@@ -188,7 +188,7 @@
     <%}else if(settings.phase==='voting'){%>Hlasování do <%= settings.voting_end %>
     <%}else{%>Soutěž ukončena<%}%>
   </div>
-  <h1 class="hero-title">Soutěž<br>o nejhezčí<br><em>portrét</em></h1>
+  <h1 class="hero-title"><%= settings.contest_title %></h1>
   <p class="hero-desc"><%= settings.home_subtitle || 'Pošlete svůj nejlepší portrétní snímek. Veřejnost hlasuje – vítěz získá profesionální focení zdarma.' %></p>
 
   <!-- Countdown -->

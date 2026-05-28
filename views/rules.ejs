@@ -36,7 +36,7 @@
 <body>
 <nav>
   <div class="nav-inner">
-    <a href="/" class="nav-logo">Jan Svoboda <em>Photography</em></a>
+    <a href="/" class="nav-logo"><%= settings.footer_text||'Jan Svoboda Photography' %></a>
     <div class="nav-links">
       <a href="/">Domů</a>
       <a href="/galerie">Galerie</a>
@@ -53,7 +53,7 @@
 </div>
 <footer>
   <div class="footer-inner">
-    <div class="footer-logo">Jan Svoboda Photography</div>
+    <div class="footer-logo"><%= settings.footer_text||'Jan Svoboda Photography' %></div>
     <div class="footer-links"><a href="/galerie">Galerie</a><a href="/admin/login">Admin</a></div>
   </div>
 </footer>
