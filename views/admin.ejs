@@ -119,15 +119,6 @@
       <% } else { %>Výsledky<% } %>
     </strong></p>
 
-    <!-- Volný výběr fáze -->
-    <form action="/admin/faze" method="POST" style="display:flex;gap:8px;margin-bottom:1.5rem;flex-wrap:wrap">
-      <button name="phase" value="registration" class="btn-phase <%= settings.phase==='registration'?'btn-phase-primary':'' %>"
-        type="submit" onclick="return confirm('Přepnout na Přihlašování?')">📋 Přihlašování</button>
-      <button name="phase" value="voting" class="btn-phase <%= settings.phase==='voting'?'btn-phase-green':'' %>"
-        type="submit" onclick="return confirm('Přepnout na Hlasování?')">🗳 Hlasování</button>
-      <button name="phase" value="results" class="btn-phase <%= settings.phase==='results'?'btn-phase-amber':'' %>"
-        type="submit" onclick="return confirm('Přepnout na Výsledky?')">🏆 Výsledky</button>
-    </form>
     <div style="display:grid;grid-template-columns:1fr 24px 1fr 24px 1fr;align-items:start;gap:0;">
       <!-- Fáze 1: Přihlašování -->
       <div class="phase-step <%= settings.phase==='registration'?'current':(settings.phase!=='registration'?'done':'') %>">
@@ -233,56 +224,11 @@
       </div>
       <span class="pill pill-approved">Schváleno</span>
       <span class="e-votes"><%= e.votes %> hl.</span>
-      <a href="/admin/qr/<%= e.id %>" target="_blank" class="btn" title="QR kód" style="font-size:12px;">QR</a>
-      <form action="/admin/poznamka/<%= e.id %>" method="POST" class="inline" style="flex:1">
-        <input type="text" name="note_admin" value="<%= e.note_admin||'' %>" placeholder="Poznámka (jen admin)..." style="width:100%;padding:5px 8px;font-size:12px;border:0.5px solid var(--border2);border-radius:5px;background:var(--bg);color:var(--text);font-family:inherit">
-        <button class="btn" type="submit" style="margin-top:4px;font-size:11px;">Uložit</button>
-      </form>
       <form action="/admin/smazat/<%= e.id %>" method="POST" class="inline" onsubmit="return confirm('Opravdu smazat?')">
         <button class="btn btn-red" type="submit">Smazat</button>
       </form>
     </div>
     <% }) %>
-  </div>
-
-  <!-- Header fotka -->
-  <div class="sec-title" style="margin-top:1.75rem">Header fotka úvodní stránky</div>
-  <div style="background:var(--surface);border:0.5px solid var(--border);border-radius:var(--r);padding:1.25rem;display:flex;align-items:center;gap:1.25rem;flex-wrap:wrap;margin-bottom:.5rem">
-    <% if(settings.header_photo){ %>
-      <img src="/uploads/<%= settings.header_photo %>" style="width:160px;height:80px;object-fit:cover;border-radius:6px;border:0.5px solid var(--border);flex-shrink:0" alt="Header">
-      <div style="flex:1">
-        <div style="font-size:13px;font-weight:500;margin-bottom:6px">Aktuální header fotka</div>
-        <form action="/admin/header-foto-smazat" method="POST" class="inline">
-          <button class="btn btn-red" type="submit" onclick="return confirm('Smazat header fotku?')">Smazat</button>
-        </form>
-      </div>
-    <% }else{ %>
-      <div style="width:160px;height:80px;background:var(--bg);border-radius:6px;border:0.5px dashed var(--border2);display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--text3);flex-shrink:0">Žádná fotka</div>
-      <div style="flex:1;font-size:13px;color:var(--text2)">Nahrajte fotografii která se zobrazí jako banner na úvodní stránce.</div>
-    <% } %>
-    <form action="/admin/header-foto" method="POST" enctype="multipart/form-data" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-      <input type="file" name="header_photo" accept="image/*" required style="font-size:13px;color:var(--text2)">
-      <button class="btn btn-green" type="submit">Nahrát novou</button>
-    </form>
-  </div>
-
-  <!-- Hlasující -->
-  <div class="sec-title" style="margin-top:1.75rem">E-maily hlasujících (<%= totalVoters %>)
-    <a href="/admin/export-voters-csv" class="btn" style="margin-left:10px;font-size:11px;">⬇ Export CSV</a>
-  </div>
-  <div style="background:var(--surface);border:0.5px solid var(--border);border-radius:var(--r);overflow:hidden;margin-bottom:0.5rem">
-    <% if(!voters||voters.length===0){ %>
-      <p class="empty-msg" style="padding:1rem">Zatím nikdo nehlasoval.</p>
-    <% }else{ %>
-      <div style="max-height:280px;overflow-y:auto">
-        <% voters.forEach((v,i)=>{ %>
-        <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 14px;border-bottom:0.5px solid var(--border);font-size:13px;<%= i%2===0?'background:var(--bg)':'' %>">
-          <span style="color:var(--text)"><%= v.voter_email %></span>
-          <span style="color:var(--text2);font-size:12px">Účastník č. <%= v.anon_number||'?' %> &nbsp;·&nbsp; <%= v.created_at.slice(0,16).replace('T',' ') %></span>
-        </div>
-        <%})%>
-      </div>
-    <% } %>
   </div>
 
   <!-- Nastavení -->
@@ -293,7 +239,6 @@
       <div class="sg" style="margin-bottom:1rem;">
         <div><label>Název soutěže</label><input type="text" name="contest_title" value="<%= settings.contest_title %>"></div>
         <div><label>Výhra (1. místo)</label><input type="text" name="prize_description" value="<%= settings.prize_description %>"></div>
-        <div><label>Podpis / jméno webu</label><input type="text" name="footer_text" value="<%= settings.footer_text||'' %>"></div>
         <div><label>Uzávěrka přihlášek</label><input type="date" name="registration_end" value="<%= settings.registration_end %>"></div>
         <div><label>Uzávěrka hlasování</label><input type="date" name="voting_end" value="<%= settings.voting_end %>"></div>
       </div>
@@ -335,22 +280,6 @@
         </div>
       </div>
 
-      <div style="margin-bottom:1.25rem">
-        <div style="font-size:12px;color:var(--text2);font-weight:500;margin-bottom:10px;">Texty stránek</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-          <div><label class="lbl">Název formuláře přihlášky</label><input type="text" name="form_title" value="<%= settings.form_title||'' %>"></div>
-          <div><label class="lbl">Název galerie</label><input type="text" name="gallery_title" value="<%= settings.gallery_title||'' %>"></div>
-          <div style="grid-column:1/-1"><label class="lbl">Poznámka o anonymitě (pod upload zónou)</label><input type="text" name="form_anon_note" value="<%= settings.form_anon_note||'' %>"></div>
-          <div style="grid-column:1/-1"><label class="lbl">Popis galerie (v hlavičce hlasování)</label><input type="text" name="gallery_subtitle" value="<%= settings.gallery_subtitle||'' %>"></div>
-        </div>
-      </div>
-      <div style="margin-bottom:1.25rem">
-        <label class="lbl">Pořadí v galerii</label>
-        <div style="display:flex;align-items:center;gap:10px;margin-top:4px">
-          <input type="checkbox" name="gallery_random" id="gr" <%= settings.gallery_random==='1'?'checked':'' %>>
-          <label for="gr" style="font-size:14px;text-transform:none;letter-spacing:0;color:var(--text)">Náhodné pořadí (doporučeno pro hlasování)</label>
-        </div>
-      </div>
       <div>
         <button class="btn btn-dark" type="submit">Uložit nastavení</button>
         <a href="/" target="_blank" style="margin-left:12px;font-size:13px;color:var(--text2);">Zobrazit web →</a>

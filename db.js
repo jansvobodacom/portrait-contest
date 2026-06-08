@@ -62,17 +62,4 @@ insertSetting.run('color_primary', '#1a1a18');
 insertSetting.run('color_accent', '#0F6E56');
 insertSetting.run('color_bg', '#fafaf9');
 
-// Nová nastavení
-try { db.prepare('ALTER TABLE entries ADD COLUMN note_admin TEXT DEFAULT ""').run(); } catch {}
-
-insertSetting.run('header_photo', '');
-insertSetting.run('gallery_random', '0');
-insertSetting.run('form_title', 'Přihlásit fotografii');
-insertSetting.run('form_subtitle', 'Nahrajte svůj nejlepší portrétní snímek a zapojte se do soutěže.');
-insertSetting.run('form_anon_note', 'Vaše jméno a e-mail jsou určeny pouze pro administrátora. V galerii budete vystupovat anonymně pod přiděleným číslem.');
-insertSetting.run('gallery_title', 'Galerie fotografií');
-insertSetting.run('gallery_subtitle', 'Klikněte na fotografii a zadejte e-mail pro hlasování. Každý e-mail = 1 hlas.');
-insertSetting.run('results_title', 'Výsledky soutěže');
-insertSetting.run('footer_text', 'Jan Svoboda Photography');
-
 module.exports = db;

@@ -165,11 +165,11 @@
     <div class="modal-subject" id="modal-subject"></div>
     <label>Váš e-mail</label>
     <input type="email" id="modal-email" placeholder="vas@email.cz" value="<%= voterEmail||'' %>">
-    <div class="modal-hint">Každý e-mail může hlasovat jednou. E-mail nebude zveřejněn.</div>
+    <div class="modal-hint"><%= settings.vote_modal_hint||'Každý e-mail může hlasovat jednou. E-mail nebude zveřejněn.' %></div>
     <div class="modal-err" id="modal-err"></div>
     <div class="modal-actions">
       <button class="btn-cancel" onclick="closeModal()">Zrušit</button>
-      <button class="btn-dark" id="modal-submit" onclick="submitVote()">Hlasovat →</button>
+      <button class="btn-dark" id="modal-submit" onclick="submitVote()"><%= settings.vote_submit||'Hlasovat →' %></button>
     </div>
   </div>
 </div>

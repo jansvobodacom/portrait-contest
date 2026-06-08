@@ -141,6 +141,12 @@ router.post('/nastaveni', requireAdmin, (req, res) => {
   u.run(gallery_subtitle || '', 'gallery_subtitle');
   u.run(results_title || '', 'results_title');
   u.run(footer_text || '', 'footer_text');
+  // Texty formuláře
+  const fields = ['form_label_name','form_label_email','form_label_note',
+    'form_placeholder_name','form_placeholder_email','form_placeholder_note',
+    'form_upload_text','form_upload_hint','form_note','form_submit',
+    'vote_modal_hint','vote_submit'];
+  fields.forEach(f => { if (req.body[f] !== undefined) u.run(req.body[f], f); });
   res.redirect('/admin?success=Nastavení+uloženo');
 });
 

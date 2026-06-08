@@ -232,8 +232,8 @@
   <div class="section-label"><%= settings.form_title||'Přihlásit fotografii' %></div>
   <div class="upload-zone" id="upload-zone" onclick="document.getElementById('photo').click()">
     <div class="upload-icon">↑</div>
-    <p>Klikněte nebo přetáhněte fotografii</p>
-    <small>JPG, PNG, WebP – max. 15 MB · Funguje i z mobilu 📱</small>
+    <p><%= settings.form_upload_text||'Klikněte nebo přetáhněte fotografii' %></p>
+    <small><%= settings.form_upload_hint||'JPG, PNG, WebP – max. 15 MB · Funguje i z mobilu 📱' %></small>
     <small style="display:block;margin-top:4px;color:var(--accent)"><%= settings.form_anon_note||'Vaše údaje jsou anonymní.' %></small>
     <img id="preview-img" alt="Náhled">
   </div>
@@ -249,13 +249,13 @@
   <form action="/prihlasit" method="POST" enctype="multipart/form-data">
     <input type="file" name="photo" id="photo" accept="image/*" style="display:none" required onchange="handleFile(this)">
     <div class="form-grid">
-      <div><label>Jméno a příjmení *</label><input type="text" name="name" required placeholder="Jana Nováková"></div>
-      <div><label>E-mail *</label><input type="email" name="email" required placeholder="jana@email.cz"></div>
+      <div><label><%= settings.form_label_name||'Jméno a příjmení' %> *</label><input type="text" name="name" required placeholder="<%= settings.form_placeholder_name||'Jana Nováková' %>"></div>
+      <div><label><%= settings.form_label_email||'E-mail' %> *</label><input type="email" name="email" required placeholder="<%= settings.form_placeholder_email||'jana@email.cz' %>"></div>
     </div>
-    <div style="margin-bottom:1.25rem"><label>Krátké představení</label><textarea name="note" placeholder="Pár slov o sobě..." maxlength="300"></textarea></div>
+    <div style="margin-bottom:1.25rem"><label><%= settings.form_label_note||'Krátké představení' %></label><textarea name="note" placeholder="<%= settings.form_placeholder_note||'Pár slov o sobě...' %>" maxlength="300"></textarea></div>
     <div class="form-footer">
-      <span class="form-note">Každý účastník může přihlásit pouze jednu fotografii.</span>
-      <button type="submit" class="btn-dark">Odeslat →</button>
+      <span class="form-note"><%= settings.form_note||'Každý účastník může přihlásit pouze jednu fotografii.' %></span>
+      <button type="submit" class="btn-dark"><%= settings.form_submit||'Odeslat →' %></button>
     </div>
   </form>
 </div>
@@ -342,11 +342,11 @@
     <div class="modal-subject" id="modal-subject"></div>
     <label>Váš e-mail</label>
     <input type="email" id="modal-email" placeholder="vas@email.cz">
-    <div class="modal-hint">Každý e-mail může hlasovat jednou. E-mail nebude zveřejněn.</div>
+    <div class="modal-hint"><%= settings.vote_modal_hint||'Každý e-mail může hlasovat jednou. E-mail nebude zveřejněn.' %></div>
     <div class="modal-err" id="modal-err"></div>
     <div class="modal-actions">
       <button class="btn-cancel" onclick="closeModal()">Zrušit</button>
-      <button class="btn-modal" id="modal-submit" onclick="submitVote()">Hlasovat →</button>
+      <button class="btn-modal" id="modal-submit" onclick="submitVote()"><%= settings.vote_submit||'Hlasovat →' %></button>
     </div>
   </div>
 </div>
