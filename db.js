@@ -62,4 +62,30 @@ insertSetting.run('color_primary', '#1a1a18');
 insertSetting.run('color_accent', '#0F6E56');
 insertSetting.run('color_bg', '#fafaf9');
 
+// Migrace – přidej chybějící settings do existující DB
+const newSettings = [
+  ['header_photo', ''],
+  ['gallery_random', '0'],
+  ['form_title', 'Přihlásit fotografii'],
+  ['form_subtitle', 'Nahrajte svůj nejlepší portrétní snímek a zapojte se do soutěže.'],
+  ['form_anon_note', 'Vaše jméno a e-mail jsou určeny pouze pro administrátora. V galerii budete vystupovat anonymně pod přiděleným číslem.'],
+  ['gallery_title', 'Galerie fotografií'],
+  ['gallery_subtitle', 'Klikněte na fotografii a zadejte e-mail pro hlasování. Každý e-mail = 1 hlas.'],
+  ['results_title', 'Výsledky soutěže'],
+  ['footer_text', 'Jan Svoboda Photography'],
+  ['form_label_name', 'Jméno a příjmení'],
+  ['form_label_email', 'E-mail'],
+  ['form_label_note', 'Krátké představení'],
+  ['form_placeholder_name', 'Jana Nováková'],
+  ['form_placeholder_email', 'jana@email.cz'],
+  ['form_placeholder_note', 'Pár slov o sobě...'],
+  ['form_upload_text', 'Klikněte nebo přetáhněte fotografii'],
+  ['form_upload_hint', 'JPG, PNG, WebP – max. 15 MB · Funguje i z mobilu 📱'],
+  ['form_note', 'Každý účastník může přihlásit pouze jednu fotografii.'],
+  ['form_submit', 'Odeslat →'],
+  ['vote_modal_hint', 'Každý e-mail může hlasovat jednou. E-mail nebude zveřejněn.'],
+  ['vote_submit', 'Hlasovat →'],
+];
+newSettings.forEach(([key, val]) => insertSetting.run(key, val));
+
 module.exports = db;
