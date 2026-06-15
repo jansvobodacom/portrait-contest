@@ -253,13 +253,11 @@ router.post('/otocit/:id', requireAdmin, async (req, res) => {
   const entry = db.prepare('SELECT * FROM entries WHERE id = ?').get(req.params.id);
   if (!entry) return res.redirect('/admin?error=Příspěvek+nenalezen');
   try {
-    const path = require('path');
     const UPLOADS_DIR = req.app.locals.UPLOADS_DIR;
     const filePath = path.join(UPLOADS_DIR, entry.photo);
     const sharp = require('sharp');
-    // Přečti, otoč o 90° doprava a přepiš
     const rotated = await sharp(filePath).rotate(90).toBuffer();
-    require('fs').writeFileSync(filePath, rotated);
+    fs.writeFileSync(filePath, rotated);
     res.redirect('/admin?success=Fotka+otočena');
   } catch (err) {
     console.error(err);
