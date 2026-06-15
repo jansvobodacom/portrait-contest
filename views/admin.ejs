@@ -210,6 +210,9 @@
       <span style="font-size:12px;color:var(--text3)">č. <%= e.anon_number %></span>
       <span class="e-votes"><%= e.votes %> hl.</span>
       <a href="/admin/qr/<%= e.id %>" target="_blank" class="btn" style="font-size:11px">QR</a>
+      <form action="/admin/otocit/<%= e.id %>" method="POST" class="inline" onsubmit="return confirm('Otočit fotku o 90°?')">
+        <button class="btn" type="submit" style="font-size:11px" title="Otočit o 90° doprava">↻ Otočit</button>
+      </form>
       <form action="/admin/poznamka/<%= e.id %>" method="POST" class="inline" style="flex:1;min-width:150px">
         <input type="text" name="note_admin" value="<%= e.note_admin||'' %>" placeholder="Poznámka (jen admin)..." style="padding:5px 8px;font-size:12px">
         <button class="btn" type="submit" style="font-size:11px;margin-top:4px">Uložit</button>
