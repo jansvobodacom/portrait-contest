@@ -118,14 +118,14 @@
     .winner-name{font-family:'Playfair Display',serif;font-size:18px;color:#633806;margin-bottom:2px}
     .winner-votes{font-size:13px;color:var(--amber)}
     /* Lightbox */
-    .lb-wrap{display:none;position:fixed;inset:0;background:rgba(0,0,0,.94);z-index:300;align-items:stretch;justify-content:center}
+    .lb-wrap{display:none;position:fixed;inset:0;background:rgba(255,255,255,.92);z-index:300;flex-direction:column;align-items:center;justify-content:flex-start;overflow-y:auto}
     .lb-wrap.open{display:flex}
-    .lb-close{position:absolute;top:1rem;right:1.25rem;color:#fff;font-size:26px;cursor:pointer;opacity:.6;background:none;border:none;z-index:2;line-height:1}
+    .lb-close{position:fixed;top:1rem;right:1.25rem;color:var(--text);font-size:22px;cursor:pointer;opacity:.5;background:rgba(255,255,255,.8);border:0.5px solid var(--border);border-radius:50%;width:36px;height:36px;display:flex;align-items:center;justify-content:center;z-index:2;line-height:1}
     .lb-close:hover{opacity:1}
-    .lb-arrow{position:absolute;top:50%;transform:translateY(-50%);color:#fff;font-size:28px;cursor:pointer;opacity:.5;background:none;border:none;padding:1rem;z-index:2}
-    .lb-arrow:hover{opacity:1}
-    .lb-prev{left:0}.lb-next{right:0}
-    .lb-counter{position:absolute;top:1rem;left:50%;transform:translateX(-50%);color:rgba(255,255,255,.4);font-size:12px;letter-spacing:1px}
+    .lb-arrow{position:fixed;top:50%;transform:translateY(-50%);color:var(--text);font-size:28px;cursor:pointer;opacity:.3;background:rgba(255,255,255,.8);border:0.5px solid var(--border);border-radius:50%;width:44px;height:44px;display:flex;align-items:center;justify-content:center;z-index:2}
+    .lb-arrow:hover{opacity:.8}
+    .lb-prev{left:1rem}.lb-next{right:1rem}
+    .lb-counter{position:fixed;top:1rem;left:50%;transform:translateX(-50%);color:var(--text2);font-size:12px;letter-spacing:1px;background:rgba(255,255,255,.8);padding:4px 12px;border-radius:20px;border:0.5px solid var(--border)}
     .lb-inner{display:flex;align-items:center;justify-content:center;width:100%;padding:3rem 5rem;gap:3rem}
     @media(max-width:700px){.lb-inner{flex-direction:column;padding:3rem 1.5rem;gap:1.5rem}}
     .lb-photo{flex-shrink:0;max-width:min(420px,50vw);max-height:80vh}
@@ -363,35 +363,44 @@
   <button class="lb-arrow lb-prev" onclick="prevLB()">‹</button>
   <button class="lb-arrow lb-next" onclick="nextLB()">›</button>
   <div class="lb-counter" id="lb-counter"></div>
-  <div style="display:flex;align-items:center;justify-content:center;width:100%;padding:3rem 5rem;gap:2.5rem;flex-wrap:wrap">
-    <div style="flex-shrink:0;max-width:min(420px,50vw);max-height:80vh">
-      <img id="lb-img" src="" alt="" style="max-width:100%;max-height:80vh;object-fit:contain;border-radius:var(--r);display:block">
+
+  <!-- Velká fotka -->
+  <div style="width:100%;max-width:600px;padding:4rem 2rem 1.5rem">
+    <img id="lb-img" src="" alt="" style="width:100%;border-radius:var(--r);display:block;box-shadow:0 4px 40px rgba(0,0,0,.12)">
+  </div>
+
+  <!-- Panel pod fotkou -->
+  <div style="width:100%;max-width:600px;padding:0 2rem 3rem">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem">
+      <div id="lb-num" style="font-family:'Playfair Display',serif;font-size:20px;color:var(--text)"></div>
+      <div id="lb-voted-badge" style="display:none;align-items:center;gap:5px;background:var(--accent-bg);border:0.5px solid var(--accent-brd);color:var(--accent);font-size:12px;padding:4px 12px;border-radius:20px">✓ Váš hlas</div>
     </div>
-    <div style="width:260px;flex-shrink:0;display:flex;flex-direction:column;gap:1rem">
-      <div>
-        <div id="lb-num" style="font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:4px"></div>
-        <div id="lb-voted-badge" style="display:none;align-items:center;gap:5px;background:rgba(15,110,86,.25);border:0.5px solid rgba(93,202,165,.4);color:#5DCAA5;font-size:12px;padding:4px 12px;border-radius:20px;margin-bottom:8px">✓ Váš hlas</div>
+
+    <!-- Hlasování -->
+    <div style="background:var(--surface);border:0.5px solid var(--border);border-radius:var(--r);padding:1.25rem;margin-bottom:1rem">
+      <div style="font-size:11px;color:var(--text2);letter-spacing:.5px;text-transform:uppercase;margin-bottom:10px">Hlasovat</div>
+      <div style="display:flex;gap:8px">
+        <input type="email" id="lb-email" placeholder="vas@email.cz" style="flex:1;padding:9px 12px;font-size:14px;border:0.5px solid var(--border2);border-radius:var(--r);background:var(--bg);color:var(--text);font-family:'Inter',sans-serif">
+        <button id="lb-vote-btn" onclick="lbVote()" style="padding:9px 20px;background:var(--text);color:var(--bg);border:none;border-radius:var(--r);font-size:13px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif;white-space:nowrap">♡ Hlasovat</button>
       </div>
-      <div style="background:rgba(255,255,255,.07);border-radius:var(--r);padding:1rem">
-        <div style="font-size:12px;color:rgba(255,255,255,.5);letter-spacing:.5px;text-transform:uppercase;margin-bottom:8px">Hlasovat</div>
-        <input type="email" id="lb-email" placeholder="vas@email.cz" style="width:100%;padding:9px 12px;font-size:14px;border:0.5px solid rgba(255,255,255,.2);border-radius:var(--r);background:rgba(255,255,255,.08);color:#fff;font-family:'Inter',sans-serif;margin-bottom:8px">
-        <button id="lb-vote-btn" onclick="lbVote()" style="width:100%;padding:10px;background:#fff;color:#1a1a18;border:none;border-radius:var(--r);font-size:13px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif">♡ Hlasovat</button>
-        <div id="lb-err" style="font-size:12px;color:#f09595;margin-top:6px;display:none"></div>
-        <div id="lb-success" style="font-size:13px;color:#5DCAA5;margin-top:6px;display:none">✓ Hlas byl zaznamenán!</div>
-        <div id="lb-switch-box" style="background:rgba(255,200,0,.08);border:0.5px solid rgba(255,200,0,.3);border-radius:var(--r);padding:.875rem;margin-top:10px;display:none">
-          <div id="lb-switch-text" style="font-size:12px;color:rgba(255,255,255,.85);line-height:1.5;margin-bottom:8px"></div>
-          <div style="display:flex;gap:8px">
-            <button onclick="lbSwitchConfirm()" style="flex:1;padding:7px;background:#fff;color:#1a1a18;border:none;border-radius:var(--r);font-size:12px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif">Ano, změnit</button>
-            <button onclick="hideSwitchBox()" style="flex:1;padding:7px;background:transparent;color:rgba(255,255,255,.6);border:0.5px solid rgba(255,255,255,.2);border-radius:var(--r);font-size:12px;cursor:pointer;font-family:'Inter',sans-serif">Ne</button>
-          </div>
+      <div id="lb-err" style="font-size:12px;color:var(--red);margin-top:8px;display:none"></div>
+      <div id="lb-success" style="font-size:13px;color:var(--accent);margin-top:8px;display:none">✓ Hlas byl zaznamenán!</div>
+      <div id="lb-switch-box" style="background:var(--amber-bg);border:0.5px solid var(--amber-brd);border-radius:var(--r);padding:.875rem;margin-top:10px;display:none">
+        <div id="lb-switch-text" style="font-size:13px;color:var(--amber);line-height:1.5;margin-bottom:10px"></div>
+        <div style="display:flex;gap:8px">
+          <button onclick="lbSwitchConfirm()" style="flex:1;padding:8px;background:var(--text);color:var(--bg);border:none;border-radius:var(--r);font-size:13px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif">Ano, změnit hlas</button>
+          <button onclick="hideSwitchBox()" style="flex:1;padding:8px;background:transparent;color:var(--text2);border:0.5px solid var(--border2);border-radius:var(--r);font-size:13px;cursor:pointer;font-family:'Inter',sans-serif">Ne, ponechat</button>
         </div>
       </div>
-      <div style="border-top:0.5px solid rgba(255,255,255,.1);padding-top:1rem">
-        <div style="font-size:13px;color:rgba(255,255,255,.5);margin-bottom:8px">Líbí se ti tento zadeček? Sdílej ho!</div>
-        <div style="display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.07);border:0.5px solid rgba(255,255,255,.15);border-radius:var(--r);padding:8px 12px">
-          <span id="lb-share-url" style="font-size:11px;color:rgba(255,255,255,.4);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:monospace"></span>
-          <button onclick="copyLink()" style="font-size:11px;color:#fff;background:rgba(255,255,255,.15);border:none;border-radius:4px;padding:4px 10px;cursor:pointer;font-family:'Inter',sans-serif;white-space:nowrap">Kopírovat</button>
-        </div>
+    </div>
+
+    <!-- Sdílení -->
+    <div style="background:var(--surface);border:0.5px solid var(--border);border-radius:var(--r);padding:1.25rem">
+      <div style="font-size:11px;color:var(--text2);letter-spacing:.5px;text-transform:uppercase;margin-bottom:10px">Sdílet</div>
+      <div style="font-size:13px;color:var(--text2);margin-bottom:10px">Líbí se ti tento zadeček? Pošli odkaz přátelům!</div>
+      <div style="display:flex;align-items:center;gap:8px;background:var(--bg);border:0.5px solid var(--border2);border-radius:var(--r);padding:8px 12px">
+        <span id="lb-share-url" style="font-size:12px;color:var(--text2);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:monospace"></span>
+        <button onclick="copyLink()" style="font-size:12px;color:var(--text);background:transparent;border:0.5px solid var(--border2);border-radius:4px;padding:5px 12px;cursor:pointer;font-family:'Inter',sans-serif;white-space:nowrap;flex-shrink:0">Kopírovat</button>
       </div>
     </div>
   </div>
@@ -470,10 +479,10 @@ const lbSavedEmail = '<%= voterEmail||'' %>';
 let lbIdx = 0;
 let pendingSwitch = null;
 
-function openLB(idx){ lbIdx=idx; renderLB(); document.getElementById('lb-wrap').classList.add('open'); document.body.style.overflow='hidden'; }
-function closeLB(){ document.getElementById('lb-wrap').classList.remove('open'); document.body.style.overflow=''; }
-function prevLB(){ lbIdx=(lbIdx-1+lbEntries.length)%lbEntries.length; renderLB(); }
-function nextLB(){ lbIdx=(lbIdx+1)%lbEntries.length; renderLB(); }
+function openLB(idx){ lbIdx=idx; renderLB(); document.getElementById('lb-wrap').classList.add('open'); document.body.style.overflow='hidden'; history.pushState({lb:lbEntries[idx].id}, '', '/zadecek/'+lbEntries[idx].id); }
+function closeLB(){ document.getElementById('lb-wrap').classList.remove('open'); document.body.style.overflow=''; history.pushState(null, '', '/'); }
+function prevLB(){ lbIdx=(lbIdx-1+lbEntries.length)%lbEntries.length; renderLB(); history.replaceState({lb:lbEntries[lbIdx].id},'','/zadecek/'+lbEntries[lbIdx].id); }
+function nextLB(){ lbIdx=(lbIdx+1)%lbEntries.length; renderLB(); history.replaceState({lb:lbEntries[lbIdx].id},'','/zadecek/'+lbEntries[lbIdx].id); }
 
 function renderLB(){
   if(!lbEntries.length) return;
@@ -484,14 +493,14 @@ function renderLB(){
   if(g('lb-num')) g('lb-num').textContent='Zadeček č. '+e.anon;
   if(g('lb-counter')) g('lb-counter').textContent=(lbIdx+1)+' / '+lbEntries.length;
   if(g('lb-share-url')) g('lb-share-url').textContent=appUrl+'/zadecek/'+e.id;
-  if(g('lb-voted-badge')) g('lb-voted-badge').style.display=e.voted?'inline-flex':'none';
+  if(g('lb-voted-badge')) g('lb-voted-badge').style.display=e.voted?'flex':'none';
   const btn=g('lb-vote-btn');
   if(g('lb-err')) g('lb-err').style.display='none';
   if(g('lb-success')) g('lb-success').style.display='none';
   hideSwitchBox();
   if(btn){btn.disabled=false;if(e.voted){btn.className='lb-vote-btn voted';btn.textContent='♥ Hlasováno';}else{btn.className='lb-vote-btn';btn.textContent='♡ Hlasovat';}}
 }
-function hideSwitchBox(){ const sb=document.getElementById('lb-switch-box'); if(sb){sb.classList.remove('show');pendingSwitch=null;} }
+function hideSwitchBox(){ const sb=document.getElementById('lb-switch-box'); if(sb){sb.style.display='none';pendingSwitch=null;} }
 
 async function lbVote(){
   const email=(document.getElementById('lb-email').value||'').trim();
@@ -503,11 +512,11 @@ async function lbVote(){
     const r=await fetch('/hlasovat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({entry_id:e.id,voter_email:email})});
     const data=await r.json();
     if(!data.ok){
-      if(data.canSwitch){btn.disabled=false;btn.textContent='♡ Hlasovat';document.getElementById('lb-switch-text').textContent=data.error;pendingSwitch={email,newId:e.id,oldId:data.oldEntryId};document.getElementById('lb-switch-box').classList.add('show');}
+      if(data.canSwitch){btn.disabled=false;btn.textContent='♡ Hlasovat';document.getElementById('lb-switch-text').textContent=data.error;pendingSwitch={email,newId:e.id,oldId:data.oldEntryId};document.getElementById('lb-switch-box').style.display='block';}
       else{errEl.textContent=data.error;errEl.style.display='block';btn.disabled=false;btn.textContent='♡ Hlasovat';}
       return;
     }
-    e.voted=true;btn.className='lb-vote-btn voted';btn.textContent='♥ Hlasováno';btn.disabled=false;sucEl.style.display='flex';const vb1=document.getElementById('lb-voted-badge');if(vb1)vb1.style.display='inline-flex';
+    e.voted=true;btn.className='lb-vote-btn voted';btn.textContent='♥ Hlasováno';btn.disabled=false;sucEl.style.display='block';const vb1=document.getElementById('lb-voted-badge');if(vb1)vb1.style.display='inline-flex';
   }catch{errEl.textContent='Chyba připojení.';errEl.style.display='block';btn.disabled=false;btn.textContent='♡ Hlasovat';}
 }
 
@@ -528,6 +537,24 @@ async function lbSwitchConfirm(){
 
 function copyLink(){navigator.clipboard.writeText(appUrl+'/zadecek/'+lbEntries[lbIdx].id).then(()=>showToast('✓ Odkaz zkopírován!')).catch(()=>{});}
 
+
+window.addEventListener('popstate', e => {
+  if(e.state && e.state.lb){
+    const idx = lbEntries.findIndex(e=>e.id===e.state.lb);
+    if(idx>=0){ lbIdx=idx; renderLB(); document.getElementById('lb-wrap').classList.add('open'); document.body.style.overflow='hidden'; }
+  } else {
+    document.getElementById('lb-wrap').classList.remove('open'); document.body.style.overflow='';
+  }
+});
+
+// Auto-open lightbox if URL is /zadecek/ID
+(function(){
+  const m = window.location.pathname.match(/\/zadecek\/(\d+)/);
+  if(m && lbEntries.length){
+    const idx = lbEntries.findIndex(e=>e.id===parseInt(m[1]));
+    if(idx>=0) openLB(idx);
+  }
+})();
 
 document.addEventListener('keydown', e => {
   if(document.getElementById('lb-wrap').classList.contains('open')){
