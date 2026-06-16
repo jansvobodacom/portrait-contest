@@ -358,41 +358,45 @@
 </div>
 
 <!-- Lightbox -->
-<div class="lightbox" id="lightbox">
-  <span style="position:absolute;top:1.25rem;right:1.5rem;color:#fff;font-size:28px;cursor:pointer;opacity:.7;line-height:1;z-index:2" onclick="closeLightbox()">✕</span>
-  <div style="display:flex;flex-direction:column;align-items:center;gap:1rem;max-width:min(600px,90vw)">
-    <img id="lb-img" src="" alt="" style="max-width:100%;max-height:70vh;object-fit:contain;border-radius:var(--r)">
-    <div style="background:rgba(255,255,255,0.08);backdrop-filter:blur(8px);border-radius:var(--r);padding:1rem 1.25rem;width:100%;text-align:center">
-      <div id="lb-cap" style="color:rgba(255,255,255,.5);font-size:11px;letter-spacing:1px;text-transform:uppercase;margin-bottom:10px"></div>
-      <div id="lb-share-text" style="color:rgba(255,255,255,.85);font-size:14px;margin-bottom:14px;line-height:1.5"></div>
-      <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
-        <button id="lb-vote-btn" onclick="lb_vote()" style="display:flex;align-items:center;gap:6px;padding:9px 20px;border-radius:50px;border:none;background:#fff;color:#1a1a18;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit">
-          <span id="lb-heart">♡</span> Hlasovat
-        </button>
-        <a id="lb-share-btn" href="#" target="_blank" style="display:flex;align-items:center;gap:6px;padding:9px 20px;border-radius:50px;border:1px solid rgba(255,255,255,.3);background:transparent;color:#fff;font-size:13px;font-weight:500;text-decoration:none">
-          <i class="ti ti-share-3" aria-hidden="true"></i> Sdílet
-        </a>
+<div class="lb-wrap" id="lb-wrap">
+  <button class="lb-close" onclick="closeLB()">✕</button>
+  <button class="lb-arrow lb-prev" onclick="prevLB()">‹</button>
+  <button class="lb-arrow lb-next" onclick="nextLB()">›</button>
+  <div class="lb-counter" id="lb-counter"></div>
+  <div style="display:flex;align-items:center;justify-content:center;width:100%;padding:3rem 5rem;gap:2.5rem;flex-wrap:wrap">
+    <div style="flex-shrink:0;max-width:min(420px,50vw);max-height:80vh">
+      <img id="lb-img" src="" alt="" style="max-width:100%;max-height:80vh;object-fit:contain;border-radius:var(--r);display:block">
+    </div>
+    <div style="width:260px;flex-shrink:0;display:flex;flex-direction:column;gap:1rem">
+      <div>
+        <div id="lb-num" style="font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:6px"></div>
+      </div>
+      <div style="background:rgba(255,255,255,.07);border-radius:var(--r);padding:1rem">
+        <div style="font-size:12px;color:rgba(255,255,255,.5);letter-spacing:.5px;text-transform:uppercase;margin-bottom:8px">Hlasovat</div>
+        <input type="email" id="lb-email" placeholder="vas@email.cz" style="width:100%;padding:9px 12px;font-size:14px;border:0.5px solid rgba(255,255,255,.2);border-radius:var(--r);background:rgba(255,255,255,.08);color:#fff;font-family:'Inter',sans-serif;margin-bottom:8px">
+        <button id="lb-vote-btn" onclick="lbVote()" style="width:100%;padding:10px;background:#fff;color:#1a1a18;border:none;border-radius:var(--r);font-size:13px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif">♡ Hlasovat</button>
+        <div id="lb-err" style="font-size:12px;color:#f09595;margin-top:6px;display:none"></div>
+        <div id="lb-success" style="font-size:13px;color:#5DCAA5;margin-top:6px;display:none">✓ Hlas byl zaznamenán!</div>
+        <div id="lb-switch-box" style="background:rgba(255,200,0,.08);border:0.5px solid rgba(255,200,0,.3);border-radius:var(--r);padding:.875rem;margin-top:10px;display:none">
+          <div id="lb-switch-text" style="font-size:12px;color:rgba(255,255,255,.85);line-height:1.5;margin-bottom:8px"></div>
+          <div style="display:flex;gap:8px">
+            <button onclick="lbSwitchConfirm()" style="flex:1;padding:7px;background:#fff;color:#1a1a18;border:none;border-radius:var(--r);font-size:12px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif">Ano, změnit</button>
+            <button onclick="hideSwitchBox()" style="flex:1;padding:7px;background:transparent;color:rgba(255,255,255,.6);border:0.5px solid rgba(255,255,255,.2);border-radius:var(--r);font-size:12px;cursor:pointer;font-family:'Inter',sans-serif">Ne</button>
+          </div>
+        </div>
+      </div>
+      <div style="border-top:0.5px solid rgba(255,255,255,.1);padding-top:1rem">
+        <div style="font-size:13px;color:rgba(255,255,255,.5);margin-bottom:8px">Líbí se ti tento zadeček? Sdílej ho!</div>
+        <div style="display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.07);border:0.5px solid rgba(255,255,255,.15);border-radius:var(--r);padding:8px 12px">
+          <span id="lb-share-url" style="font-size:11px;color:rgba(255,255,255,.4);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:monospace"></span>
+          <button onclick="copyLink()" style="font-size:11px;color:#fff;background:rgba(255,255,255,.15);border:none;border-radius:4px;padding:4px 10px;cursor:pointer;font-family:'Inter',sans-serif;white-space:nowrap">Kopírovat</button>
+        </div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- Hlasovací modal -->
-<div class="modal-wrap" id="modal-wrap" onclick="closeOnBg(event)">
-  <div class="modal">
-    <h3>Potvrdit hlas</h3>
-    <p>Hlasujete pro:</p>
-    <div class="modal-subject" id="modal-subject"></div>
-    <label>Váš e-mail</label>
-    <input type="email" id="modal-email" placeholder="vas@email.cz">
-    <div class="modal-hint"><%= settings.vote_modal_hint||'Každý e-mail může hlasovat jednou. E-mail nebude zveřejněn.' %></div>
-    <div class="modal-err" id="modal-err"></div>
-    <div class="modal-actions">
-      <button class="btn-cancel" onclick="closeModal()">Zrušit</button>
-      <button class="btn-modal" id="modal-submit" onclick="submitVote()"><%= settings.vote_submit||'Hlasovat →' %></button>
-    </div>
-  </div>
-</div>
+
 
 <footer>
   <div class="footer-inner">
@@ -473,6 +477,8 @@ function renderLB(){
   if(!lbEntries.length) return;
   const e=lbEntries[lbIdx];
   document.getElementById('lb-img').src='/uploads/'+e.photo;
+  const savedEmail = '<%= voterEmail||"" %>';
+  if(savedEmail && !document.getElementById('lb-email').value) document.getElementById('lb-email').value = savedEmail;
   document.getElementById('lb-num').textContent='Zadeček č. '+e.anon;
   document.getElementById('lb-counter').textContent=(lbIdx+1)+' / '+lbEntries.length;
   document.getElementById('lb-share-url').textContent=appUrl+'/zadecek/'+e.id;
@@ -522,51 +528,15 @@ async function lbSwitchConfirm(){
 
 function copyLink(){navigator.clipboard.writeText(appUrl+'/zadecek/'+lbEntries[lbIdx].id).then(()=>showToast('✓ Odkaz zkopírován!')).catch(()=>{});}
 
-// Voting modal
-let pendingId = null;
-function openModal(id, num) {
-  pendingId = id;
-  document.getElementById('modal-subject').textContent = 'Zadeček č. ' + num;
-  document.getElementById('modal-err').style.display = 'none';
-  document.getElementById('modal-wrap').classList.add('open');
-  setTimeout(() => document.getElementById('modal-email').focus(), 50);
-}
-function closeModal() { document.getElementById('modal-wrap').classList.remove('open'); pendingId = null; }
-function closeOnBg(e) { if (e.target === document.getElementById('modal-wrap')) closeModal(); }
+
 document.addEventListener('keydown', e => {
   if(document.getElementById('lb-wrap').classList.contains('open')){
     if(e.key==='Escape') closeLB();
     if(e.key==='ArrowLeft') prevLB();
     if(e.key==='ArrowRight') nextLB();
-  } else if(e.key==='Escape') closeModal();
+  }
 });
 
-async function switchVote(e) {
-  e.preventDefault();
-  const email = document.getElementById('modal-email').value.trim();
-  const errEl = document.getElementById('modal-err');
-  const btn = document.getElementById('modal-submit');
-  errEl.style.display = 'none';
-  btn.disabled = true; btn.textContent = 'Odesílám...';
-  // Force switch - send new vote (server handles removing old one)
-  const r = await fetch('/hlasovat-prepsat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ entry_id: pendingId, voter_email: email }) });
-  const data = await r.json();
-  if (!data.ok) { errEl.textContent = data.error; errEl.style.display = 'block'; btn.disabled = false; btn.textContent = 'Hlasovat →'; return; }
-  if (data.oldEntryId) {
-    const pb = document.getElementById('vbtn-' + data.oldEntryId);
-    if (pb) { pb.className = 'btn-vote'; pb.textContent = '♡'; }
-    const pt = document.querySelector('#card-' + data.oldEntryId + ' .voted-tag');
-    if (pt) pt.remove();
-  }
-  const btn2 = document.getElementById('vbtn-' + pendingId);
-  const vc = document.getElementById('vc-' + pendingId);
-  if (btn2) { btn2.className = 'btn-vote voted'; btn2.textContent = '♥'; }
-  if (vc) vc.innerHTML = '<b>' + data.votes + '</b> hl.';
-  const thumb2 = document.querySelector('#card-' + pendingId + ' .thumb');
-  if (thumb2 && !thumb2.querySelector('.voted-tag')) { const t = document.createElement('span'); t.className = 'voted-tag'; t.textContent = '✓ Váš hlas'; thumb2.appendChild(t); }
-  closeModal();
-  showToast('✓ Hlas byl změněn!');
-}
 
 function showToast(msg) {
   const t = document.getElementById('toast');
@@ -575,41 +545,7 @@ function showToast(msg) {
   setTimeout(() => t.classList.remove('show'), 3000);
 }
 
-async function submitVote() {
-  const email = document.getElementById('modal-email').value.trim();
-  const errEl = document.getElementById('modal-err');
-  const btn = document.getElementById('modal-submit');
-  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { errEl.textContent = 'Zadejte platný e-mail.'; errEl.style.display = 'block'; return; }
-  btn.disabled = true; btn.textContent = 'Odesílám...';
-  try {
-    const r = await fetch('/hlasovat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ entry_id: pendingId, voter_email: email }) });
-    const data = await r.json();
-    if (!data.ok) {
-      errEl.innerHTML = data.error;
-      if (data.canSwitch) {
-        errEl.innerHTML += ' <a href="#" onclick="switchVote(event)" style="color:inherit;font-weight:600;text-decoration:underline">Změnit hlas</a>';
-      }
-      errEl.style.display = 'block';
-      btn.disabled = false;
-      btn.textContent = 'Hlasovat →';
-      return;
-    }
-    if (data.oldEntryId) {
-      const pb = document.getElementById('vbtn-' + data.oldEntryId);
-      if (pb) { pb.className = 'btn-vote'; pb.textContent = '♡'; }
-      const pt = document.querySelector('#card-' + data.oldEntryId + ' .voted-tag');
-      if (pt) pt.remove();
-    }
-    const btn2 = document.getElementById('vbtn-' + pendingId);
-    const vc = document.getElementById('vc-' + pendingId);
-    if (btn2) { btn2.className = 'btn-vote voted'; btn2.textContent = '♥'; }
-    if (vc) vc.innerHTML = '<b>' + data.votes + '</b> hl.';
-    const thumb2 = document.querySelector('#card-' + pendingId + ' .thumb');
-    if (thumb2 && !thumb2.querySelector('.voted-tag')) { const t = document.createElement('span'); t.className = 'voted-tag'; t.textContent = '✓ Váš hlas'; thumb2.appendChild(t); }
-    closeModal();
-    showToast('✓ Hlas byl úspěšně odevzdán!');
-  } catch { errEl.textContent = 'Chyba připojení.'; errEl.style.display = 'block'; btn.disabled = false; btn.textContent = 'Hlasovat →'; }
-}
+
 </script>
 <div class="toast" id="toast"></div>
 </body>
