@@ -138,7 +138,10 @@ router.post('/hlasovat', (req, res) => {
   if (!entry) return res.json({ ok: false, error: 'Příspěvek nenalezen.' });
   const existingVote = db.prepare('SELECT entry_id FROM votes WHERE voter_email = ?').get(email);
   if (existingVote) {
-    if (existingVote.entry_id === id) return res.json({ ok: false, error: 'Z tohoto e-mailu již byl hlas odevzdán.' });
+    if (existingVote.entry_id === id) {
+      const voted = db.prepare('SELECT anon_number FROM entries WHERE id = ?').get(existingVote.entry_id);
+      return res.json({ ok: false, error: `Z tohoto e-mailu již byl odevzdán hlas pro Zadečka č. ${voted ? voted.anon_number : '?'}. Chcete změnit svůj hlas na tohoto účastníka?`, canSwitch: true, oldEntryId: existingVote.entry_id });
+    }
     db.prepare('UPDATE entries SET votes = MAX(0, votes - 1) WHERE id = ?').run(existingVote.entry_id);
     db.prepare('UPDATE votes SET entry_id = ? WHERE voter_email = ?').run(id, email);
     db.prepare('UPDATE entries SET votes = votes + 1 WHERE id = ?').run(id);
@@ -163,6 +166,30 @@ router.get('/vysledky', (req, res) => {
   }
   const entries = db.prepare("SELECT id, photo, votes, anon_number FROM entries WHERE status = 'approved' ORDER BY votes DESC").all();
   res.render('results', { settings, entries, formatDate });
+});
+
+// ── Přehlasování (vynutit změnu hlasu) ──────────────────────────────────────
+router.post('/hlasovat-prepsat', (req, res) => {
+  const { entry_id, voter_email } = req.body;
+  const settings = getSettings();
+  if (settings.phase !== 'voting') return res.json({ ok: false, error: 'Hlasování není otevřeno.' });
+  const email = (voter_email || '').trim().toLowerCase();
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return res.json({ ok: false, error: 'Zadejte platný e-mail.' });
+  const id = parseInt(entry_id);
+  const entry = db.prepare("SELECT id FROM entries WHERE id = ? AND status = 'approved'").get(id);
+  if (!entry) return res.json({ ok: false, error: 'Příspěvek nenalezen.' });
+  const existingVote = db.prepare('SELECT entry_id FROM votes WHERE voter_email = ?').get(email);
+  if (existingVote) {
+    db.prepare('UPDATE entries SET votes = MAX(0, votes - 1) WHERE id = ?').run(existingVote.entry_id);
+    db.prepare('UPDATE votes SET entry_id = ? WHERE voter_email = ?').run(id, email);
+  } else {
+    db.prepare('INSERT INTO votes (entry_id, voter_email, voter_ip) VALUES (?, ?, ?)').run(id, email, req.ip || '');
+  }
+  db.prepare('UPDATE entries SET votes = votes + 1 WHERE id = ?').run(id);
+  req.session.voterEmail = email;
+  req.session.votedFor = id;
+  const votes = db.prepare('SELECT votes FROM entries WHERE id = ?').get(id).votes;
+  res.json({ ok: true, votes, oldEntryId: existingVote?.entry_id || null });
 });
 
 // ── Pravidla ──────────────────────────────────────────────────────────────────

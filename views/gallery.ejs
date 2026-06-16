@@ -59,6 +59,8 @@
     .lb-close{position:absolute;top:1.25rem;right:1.5rem;color:#fff;font-size:28px;cursor:pointer;opacity:.7;transition:opacity .15s;line-height:1}
     .lb-close:hover{opacity:1}
     .lb-caption{position:absolute;bottom:1.5rem;left:50%;transform:translateX(-50%);color:rgba(255,255,255,.6);font-size:13px;letter-spacing:.5px;text-transform:uppercase}
+    .toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%) translateY(20px);background:var(--text);color:var(--bg);padding:12px 24px;border-radius:50px;font-size:14px;font-weight:500;opacity:0;transition:all .3s;pointer-events:none;z-index:400;white-space:nowrap}
+    .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
     /* Modal */
     .modal-wrap{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;align-items:center;justify-content:center;padding:1rem}
     .modal-wrap.open{display:flex}
@@ -126,12 +128,12 @@
   <div class="gallery-grid">
     <% entries.forEach(e=>{ const isVoted=votedFor===e.id; %>
     <div class="card" id="card-<%= e.id %>">
-      <div class="thumb" onclick="openLightbox('/uploads/<%= e.photo %>','Účastník č. <%= e.anon_number %>')">
-        <img src="/uploads/<%= e.photo %>" alt="Účastník č. <%= e.anon_number %>" loading="lazy">
+      <div class="thumb" onclick="openLightbox('/uploads/<%= e.photo %>','Zadeček č. <%= e.anon_number %>')">
+        <img src="/uploads/<%= e.photo %>" alt="Zadeček č. <%= e.anon_number %>" loading="lazy">
         <% if(isVoted){%><span class="voted-tag">✓ Váš hlas</span><%}%>
       </div>
       <div class="card-info">
-        <div class="card-num">Účastník č. <%= e.anon_number %></div>
+        <div class="card-num">Zadeček č. <%= e.anon_number %></div>
         <div class="card-footer">
           <span class="card-votes" id="vc-<%= e.id %>" style="display:none"><b><%= e.votes %></b> hlasů</span>
           <div class="card-actions">
@@ -197,8 +199,36 @@ function closeLightbox(){document.getElementById('lightbox').classList.remove('o
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeLightbox();closeModal();}});
 
 // Voting modal
+async function switchVote(e) {
+  e.preventDefault();
+  const email = document.getElementById('modal-email').value.trim();
+  const errEl = document.getElementById('modal-err');
+  const btn = document.getElementById('modal-submit');
+  errEl.style.display = 'none';
+  btn.disabled = true; btn.textContent = 'Odesílám...';
+  // Force switch - send new vote (server handles removing old one)
+  const r = await fetch('/hlasovat-prepsat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ entry_id: pendingId, voter_email: email }) });
+  const data = await r.json();
+  if (!data.ok) { errEl.textContent = data.error; errEl.style.display = 'block'; btn.disabled = false; btn.textContent = 'Hlasovat →'; return; }
+  if (data.oldEntryId) {
+    const pb = document.getElementById('vbtn-' + data.oldEntryId);
+    if (pb) { pb.className = 'btn-vote'; pb.textContent = '♡'; }
+    const pt = document.querySelector('#card-' + data.oldEntryId + ' .voted-tag');
+    if (pt) pt.remove();
+  }
+  const btn2 = document.getElementById('vbtn-' + pendingId);
+  const vc = document.getElementById('vc-' + pendingId);
+  if (btn2) { btn2.className = 'btn-vote voted'; btn2.textContent = '♥'; }
+  if (vc) vc.innerHTML = '<b>' + data.votes + '</b> hl.';
+  const thumb2 = document.querySelector('#card-' + pendingId + ' .thumb');
+  if (thumb2 && !thumb2.querySelector('.voted-tag')) { const t = document.createElement('span'); t.className = 'voted-tag'; t.textContent = '✓ Váš hlas'; thumb2.appendChild(t); }
+  closeModal();
+  showToast('✓ Hlas byl změněn!');
+}
+
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);}
 let pendingId=null;
-function openModal(id,num){pendingId=id;document.getElementById('modal-subject').textContent='Účastník č. '+num;document.getElementById('modal-err').style.display='none';document.getElementById('modal-wrap').classList.add('open');setTimeout(()=>document.getElementById('modal-email').focus(),50);}
+function openModal(id,num){pendingId=id;document.getElementById('modal-subject').textContent='Zadeček č. '+num;document.getElementById('modal-err').style.display='none';document.getElementById('modal-wrap').classList.add('open');setTimeout(()=>document.getElementById('modal-email').focus(),50);}
 function closeModal(){document.getElementById('modal-wrap').classList.remove('open');pendingId=null;}
 function closeOnBg(e){if(e.target===document.getElementById('modal-wrap'))closeModal();}
 document.getElementById('modal-email').addEventListener('keydown',e=>{if(e.key==='Enter')submitVote();});
@@ -220,10 +250,12 @@ async function submitVote(){
     const thumb=document.querySelector('#card-'+pendingId+' .thumb');
     if(thumb&&!thumb.querySelector('.voted-tag')){const t=document.createElement('span');t.className='voted-tag';t.textContent='✓ Váš hlas';thumb.appendChild(t);}
     closeModal();
+    showToast('✓ Hlas byl úspěšně odevzdán!');
     const vbar=document.querySelector('.voter-bar');
     if(vbar)vbar.innerHTML='✓ Hlasujete jako <strong style="margin:0 3px">'+email+'</strong> — hlas odevzdán';
   }catch{errEl.textContent='Chyba připojení.';errEl.style.display='block';btn.disabled=false;btn.textContent='Hlasovat →';}
 }
 </script>
+<div class="toast" id="toast"></div>
 </body>
 </html>

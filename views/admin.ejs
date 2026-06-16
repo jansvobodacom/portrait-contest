@@ -182,6 +182,15 @@
     <%}%>
   </div>
 
+  <!-- Smazat hlas -->
+  <div style="background:var(--surface);border:0.5px solid var(--border);border-radius:var(--r);padding:1rem 1.25rem;margin-bottom:.5rem;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+    <span style="font-size:13px;color:var(--text2);flex-shrink:0">Smazat hlas podle e-mailu:</span>
+    <form action="/admin/smazat-hlas" method="POST" style="display:flex;gap:8px;flex:1;flex-wrap:wrap">
+      <input type="email" name="voter_email" placeholder="testovaci@email.cz" required style="flex:1;min-width:200px;padding:7px 12px;font-size:13px;border:0.5px solid var(--border2);border-radius:7px;background:var(--bg);color:var(--text);font-family:inherit">
+      <button class="btn btn-red" type="submit" onclick="return confirm('Opravdu smazat hlas?')">Smazat hlas</button>
+    </form>
+  </div>
+
   <!-- Moderace -->
   <div id="moderace"></div>
   <div class="sec-title">Čeká na moderaci (<%= pending.length %>)</div>

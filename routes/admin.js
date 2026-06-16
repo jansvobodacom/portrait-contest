@@ -167,7 +167,7 @@ router.get('/export-voters-csv', requireAdmin, (req, res) => {
     FROM votes v LEFT JOIN entries e ON v.entry_id = e.id
     ORDER BY v.created_at DESC
   `).all();
-  const header = 'E-mail hlasujícího,Hlasoval pro účastníka č.,Čas hlasu\n';
+  const header = 'E-mail hlasujícího,Hlasoval pro zadečka č.,Čas hlasu\n';
   const rows = voters.map(v => `"${v.voter_email}",${v.anon_number||'?'},"${v.created_at}"`).join('\n');
   res.setHeader('Content-Type', 'text/csv; charset=utf-8');
   res.setHeader('Content-Disposition', 'attachment; filename="hlasujici-export.csv"');
@@ -183,7 +183,7 @@ router.get('/qr/:id', requireAdmin, async (req, res) => {
   try {
     const qrcode = require('qrcode');
     const qrDataUrl = await qrcode.toDataURL(url, { width: 400, margin: 2, color: { dark: '#1a1a18', light: '#fafaf8' } });
-    res.send(`<!DOCTYPE html><html lang="cs"><head><meta charset="UTF-8"><title>QR kód – Účastník č. ${entry.anon_number}</title>
+    res.send(`<!DOCTYPE html><html lang="cs"><head><meta charset="UTF-8"><title>QR kód – Zadeček č. ${entry.anon_number}</title>
     <style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:sans-serif;background:#fafaf8;display:flex;align-items:center;justify-content:center;min-height:100vh;padding:2rem}
     .card{background:#fff;border:0.5px solid rgba(0,0,0,0.1);border-radius:12px;padding:2rem;text-align:center;max-width:340px;width:100%}
     h1{font-size:16px;font-weight:500;margin-bottom:4px}p{font-size:13px;color:#5a5955;margin-bottom:1.5rem}
@@ -192,7 +192,7 @@ router.get('/qr/:id', requireAdmin, async (req, res) => {
     .btn{display:inline-block;background:#1a1a18;color:#fff;padding:10px 20px;border-radius:6px;font-size:13px;font-weight:500;text-decoration:none;margin-right:8px}
     .btn-ghost{display:inline-block;padding:10px 20px;border:0.5px solid rgba(0,0,0,0.2);border-radius:6px;font-size:13px;color:#5a5955;text-decoration:none}
     </style></head><body><div class="card">
-    <h1>Účastník č. ${entry.anon_number}</h1>
+    <h1>Zadeček č. ${entry.anon_number}</h1>
     <p>QR kód pro sdílení</p>
     <img src="${qrDataUrl}" alt="QR kód">
     <div class="url">${url}</div>
@@ -239,6 +239,17 @@ router.post('/header-foto-smazat', requireAdmin, (req, res) => {
   }
   db.prepare("UPDATE settings SET value = '' WHERE key = 'header_photo'").run();
   res.redirect('/admin?success=Header+fotka+smazána');
+});
+
+// ── Smazat hlas ──────────────────────────────────────────────────────────────
+router.post('/smazat-hlas', requireAdmin, (req, res) => {
+  const { voter_email } = req.body;
+  if (!voter_email) return res.redirect('/admin?error=Zadejte+e-mail');
+  const vote = db.prepare('SELECT * FROM votes WHERE voter_email = ?').get(voter_email.trim().toLowerCase());
+  if (!vote) return res.redirect('/admin?error=Hlas+s+tímto+e-mailem+nenalezen');
+  db.prepare('UPDATE entries SET votes = MAX(0, votes - 1) WHERE id = ?').run(vote.entry_id);
+  db.prepare('DELETE FROM votes WHERE voter_email = ?').run(voter_email.trim().toLowerCase());
+  res.redirect('/admin?success=Hlas+smazán+('+encodeURIComponent(voter_email)+')');
 });
 
 // ── Poznámka k účastníkovi ───────────────────────────────────────────────────

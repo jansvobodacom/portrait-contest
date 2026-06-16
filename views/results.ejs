@@ -81,7 +81,7 @@
     <img src="/uploads/<%= entries[0].photo %>" class="winner-img" alt="">
     <div>
       <div class="winner-label">🏆 Vítěz</div>
-      <div class="winner-name">Účastník č. <%= entries[0].anon_number %></div>
+      <div class="winner-name">Zadeček č. <%= entries[0].anon_number %></div>
       <div class="winner-votes"><%= settings.prize_description %></div>
     </div>
   </div>
@@ -96,7 +96,7 @@
       <span class="rank <%=i<3?'top':''%>"><%=i+1%></span>
       <img src="/uploads/<%= e.photo %>" class="result-img" alt="">
       <div class="result-info">
-        <div class="result-num">Účastník č. <%= e.anon_number %></div>
+        <div class="result-num">Zadeček č. <%= e.anon_number %></div>
         <div class="bar-wrap"><div class="bar" style="width:<%=Math.round(e.votes/maxV*100)%>%"></div></div>
       </div>
       <div class="result-votes" style="display:none"><%= e.votes %><span>hl.</span></div>
