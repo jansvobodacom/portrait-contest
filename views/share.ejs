@@ -74,6 +74,11 @@
       </div>
       <% } %>
 
+      <div style="background:#FAEEDA;border:0.5px solid #FAC775;border-radius:6px;padding:1rem;text-align:center;margin-bottom:1rem">
+        <div style="font-size:13px;color:#854F0B;font-weight:500;margin-bottom:4px">📅 Zadečkový kalendář 2027</div>
+        <div style="font-size:13px;color:#854F0B;line-height:1.5;margin-bottom:8px">Hlasuj a pomoč vítězce dostat se do kalendáře! Kalendář bude brzy v prodeji.</div>
+        <a href="https://shop.jansvoboda.com" target="_blank" style="font-size:13px;color:#854F0B;font-weight:600;text-decoration:underline">shop.jansvoboda.com →</a>
+      </div>
       <a href="/" style="display:block;text-align:center;font-size:13px;color:var(--text2)">← Zpět na hlavní stránku</a>
     </div>
   </div>
@@ -117,7 +122,7 @@ async function doVote(){
     }
     btn.disabled=false;btn.textContent='♥ Hlasováno!';btn.className='btn-vote voted';
     sucEl.style.display='block';
-    showToast('✓ Hlas zaznamenán!');
+    showToast('✓ Hlas zaznamenán! Vítěz se dostane do kalendáře 2027 🎉');
   }catch{errEl.textContent='Chyba připojení.';errEl.style.display='block';btn.disabled=false;btn.textContent='♡ Hlasovat pro tohoto zadečka';}
 }
 

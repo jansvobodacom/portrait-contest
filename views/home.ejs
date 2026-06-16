@@ -99,6 +99,9 @@
     .voted-tag{position:absolute;top:8px;right:8px;background:var(--accent);color:#fff;font-size:10px;padding:3px 8px;border-radius:20px}
     .card-info{padding:8px 10px;border-top:0.5px solid var(--border)}
     .card-num{font-size:11px;color:var(--text3);letter-spacing:.5px;text-transform:uppercase}
+    .card-footer{display:flex;align-items:center;justify-content:space-between;margin-top:6px}
+    .btn-vote-sm{font-size:11px;padding:5px 10px;background:var(--text);color:var(--bg);border:none;border-radius:var(--r);cursor:pointer;font-family:'Inter',sans-serif;white-space:nowrap}
+    .btn-vote-sm.voted{background:var(--accent)}
 
     /* PRIZES */
     .prizes{display:grid;grid-template-columns:repeat(3,1fr);border-top:0.5px solid var(--border);max-width:720px;margin:0 auto;background:var(--surface)}
@@ -272,7 +275,14 @@
         <img src="/uploads/<%= e.photo %>" alt="Zadeček č. <%= e.anon_number %>" loading="lazy">
         <% if(isVoted){%><span class="voted-tag">✓ Váš hlas</span><%}%>
       </div>
-      <div class="card-info"><div class="card-num">Zadeček č. <%= e.anon_number %></div></div>
+      <div class="card-info">
+        <div class="card-num">Zadeček č. <%= e.anon_number %></div>
+        <div class="card-footer">
+          <button class="btn-vote-sm <%= isVoted?'voted':'' %>" onclick="event.stopPropagation();openLB(<%= idx %>)" title="Hlasovat">
+            <%= isVoted?'♥ Hlasováno':'♡ Hlasovat' %>
+          </button>
+        </div>
+      </div>
     </div>
     <%})%>
   </div>
@@ -314,7 +324,7 @@
       <input type="email" id="lb-email" class="lb-email" placeholder="vas@email.cz" value="<%= typeof voterEmail!=='undefined'&&voterEmail?voterEmail:'' %>">
       <button id="lb-vote-btn" class="lb-vote-btn" onclick="lbVote()">♡ Hlasovat</button>
       <div id="lb-err" class="lb-err"></div>
-      <div id="lb-success" class="lb-success">✓ Hlas byl zaznamenán!</div>
+      <div id="lb-success" class="lb-success">✓ Hlas zaznamenán! Vítěz se dostane do Zadečkového kalendáře 2027 🎉</div>
       <div id="lb-switch" class="lb-switch">
         <div id="lb-switch-text" class="lb-switch-text"></div>
         <div class="lb-switch-btns">
@@ -322,6 +332,15 @@
           <button class="lb-btn-no" onclick="lbHideSwitchBox()">Ne, ponechat</button>
         </div>
       </div>
+    </div>
+    <% } %>
+
+    <!-- Kalendář promo -->
+    <% if(settings.phase==='voting'){ %>
+    <div style="background:var(--amber-bg);border:0.5px solid var(--amber-brd);border-radius:var(--r);padding:1rem;text-align:center">
+      <div style="font-size:12px;color:var(--amber);font-weight:500;margin-bottom:4px">📅 Zadečkový kalendář 2027</div>
+      <div style="font-size:12px;color:var(--amber);line-height:1.5;margin-bottom:8px">Hlasuj a pomoč vítězce dostat se do kalendáře!</div>
+      <a href="https://shop.jansvoboda.com" target="_blank" style="font-size:12px;color:var(--amber);text-decoration:underline;font-weight:500">shop.jansvoboda.com →</a>
     </div>
     <% } %>
 
@@ -499,7 +518,7 @@ async function lbSwitchConfirm(){
     sucEl.style.display='flex';
     document.getElementById('lb-voted-badge').style.display='flex';
     lbUpdateCard(newId,true,oldId);
-    showToast('✓ Hlas byl změněn!');
+    showToast('✓ Hlas byl změněn! Vítěz se dostane do kalendáře 2027 🎉');
   }catch{errEl.textContent='Chyba.';errEl.style.display='block';btn.disabled=false;btn.textContent='♡ Hlasovat';}
 }
 
