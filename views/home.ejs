@@ -270,7 +270,7 @@
   <% } %>
   <div class="gallery-grid">
     <% (typeof entries!=='undefined'?entries:[]).forEach((e,idx)=>{ const isVoted=votedFor===e.id; %>
-    <div class="card" onclick="openLB(<%= idx %>)">
+    <div class="card" onclick="openLB(lbFindIdx(<%= e.id %>))">
       <div class="thumb">
         <img src="/uploads/<%= e.photo %>" alt="Zadeček č. <%= e.anon_number %>" loading="lazy">
         <% if(isVoted){%><span class="voted-tag">✓ Váš hlas</span><%}%>
@@ -278,7 +278,7 @@
       <div class="card-info">
         <div class="card-num">Zadeček č. <%= e.anon_number %></div>
         <div class="card-footer">
-          <button class="btn-vote-sm <%= isVoted?'voted':'' %>" onclick="event.stopPropagation();openLB(<%= idx %>)" title="Hlasovat">
+          <button class="btn-vote-sm <%= isVoted?'voted':'' %>" onclick="event.stopPropagation();openLB(lbFindIdx(<%= e.id %>))" title="Hlasovat">
             <%= isVoted?'♥ Hlasováno':'♡ Hlasovat' %>
           </button>
         </div>
@@ -412,21 +412,22 @@ function handleFile(input){
 }
 
 // ── Lightbox ───────────────────────────────────────────────────────────────────
+function lbFindIdx(entryId){ return lbEntries.findIndex(e=>e.id===entryId); }
 function openLB(idx){
   lbIdx=idx;
   lbRender();
   document.getElementById('lb-wrap').classList.add('open');
   document.getElementById('lb-wrap').scrollTop=0;
   document.body.style.overflow='hidden';
-  history.pushState({lbId:lbEntries[idx].id},'','/zadecek/'+lbEntries[idx].id);
+  history.pushState({lbId:lbEntries[idx].id},'','/zadecek/'+lbEntries[idx].anon);
 }
 function closeLB(){
   document.getElementById('lb-wrap').classList.remove('open');
   document.body.style.overflow='';
   history.pushState(null,'','/');
 }
-function prevLB(){lbIdx=(lbIdx-1+lbEntries.length)%lbEntries.length;lbRender();history.replaceState({lbId:lbEntries[lbIdx].id},'','/zadecek/'+lbEntries[lbIdx].id);}
-function nextLB(){lbIdx=(lbIdx+1)%lbEntries.length;lbRender();history.replaceState({lbId:lbEntries[lbIdx].id},'','/zadecek/'+lbEntries[lbIdx].id);}
+function prevLB(){lbIdx=(lbIdx-1+lbEntries.length)%lbEntries.length;lbRender();history.replaceState({lbId:lbEntries[lbIdx].id},'','/zadecek/'+lbEntries[lbIdx].anon);}
+function nextLB(){lbIdx=(lbIdx+1)%lbEntries.length;lbRender();history.replaceState({lbId:lbEntries[lbIdx].id},'','/zadecek/'+lbEntries[lbIdx].anon);}
 
 function lbRender(){
   if(!lbEntries.length)return;
@@ -434,7 +435,7 @@ function lbRender(){
   document.getElementById('lb-img').src='/uploads/'+e.photo;
   document.getElementById('lb-num').textContent='Zadeček č. '+e.anon;
   document.getElementById('lb-counter').textContent=(lbIdx+1)+' / '+lbEntries.length;
-  document.getElementById('lb-share-url').textContent=appUrl+'/zadecek/'+e.id;
+  document.getElementById('lb-share-url').textContent=appUrl+'/zadecek/'+e.anon;
   document.getElementById('lb-voted-badge').style.display=e.voted?'flex':'none';
   // Email předvyplnit
   const emailEl=document.getElementById('lb-email');
@@ -538,7 +539,7 @@ function lbUpdateCard(id,isVoted,oldId){
 }
 
 function lbCopyLink(){
-  const url=appUrl+'/zadecek/'+lbEntries[lbIdx].id;
+  const url=appUrl+'/zadecek/'+lbEntries[lbIdx].anon;
   navigator.clipboard.writeText(url).then(()=>showToast('✓ Odkaz zkopírován!')).catch(()=>{});
 }
 
@@ -546,9 +547,9 @@ function lbCopyLink(){
 (function(){
   const m=window.location.pathname.match(/\/zadecek\/(\d+)/);
   if(m&&lbEntries.length){
-    const idx=lbEntries.findIndex(e=>e.id===parseInt(m[1]));
+    const anonNum=parseInt(m[1]);
+    const idx=lbEntries.findIndex(e=>e.anon===anonNum);
     if(idx>=0){
-      // Otevři lightbox bez pushState (URL je už správná)
       lbIdx=idx;lbRender();
       document.getElementById('lb-wrap').classList.add('open');
       document.body.style.overflow='hidden';
