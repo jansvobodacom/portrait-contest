@@ -57,6 +57,7 @@ router.get('/', (req, res) => {
   res.render('home', {
     settings, entries, formatDate,
     votedFor: req.session.votedFor || null,
+    voterEmail: req.session.voterEmail || null,
     success: req.query.success || null,
     error: req.query.error || null
   });
