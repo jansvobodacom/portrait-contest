@@ -144,16 +144,15 @@ router.post('/hlasovat', (req, res) => {
   const existingVote = db.prepare('SELECT entry_id FROM votes WHERE voter_email = ?').get(email);
   if (existingVote) {
     if (existingVote.entry_id === id) {
-      const voted = db.prepare('SELECT anon_number FROM entries WHERE id = ?').get(existingVote.entry_id);
-      return res.json({ ok: false, error: `Z tohoto e-mailu již byl odevzdán hlas pro Zadečka č. ${voted ? voted.anon_number : '?'}. Chcete změnit svůj hlas na tohoto účastníka?`, canSwitch: true, oldEntryId: existingVote.entry_id });
+      // Hlasuje pro stejný zadeček - už hlasoval
+      const voted = db.prepare('SELECT anon_number FROM entries WHERE id = ?').get(id);
+      return res.json({ ok: false, error: `Z tohoto e-mailu již byl odevzdán hlas pro Zadečka č. ${voted ? voted.anon_number : '?'}.`, canSwitch: false });
     }
-    db.prepare('UPDATE entries SET votes = MAX(0, votes - 1) WHERE id = ?').run(existingVote.entry_id);
-    db.prepare('UPDATE votes SET entry_id = ? WHERE voter_email = ?').run(id, email);
-    db.prepare('UPDATE entries SET votes = votes + 1 WHERE id = ?').run(id);
-    req.session.voterEmail = email;
-    req.session.votedFor = id;
-    const votes = db.prepare('SELECT votes FROM entries WHERE id = ?').get(id).votes;
-    return res.json({ ok: true, votes, oldEntryId: existingVote.entry_id });
+    // Hlasuje pro jiný zadeček - zeptej se na změnu
+    const oldVoted = db.prepare('SELECT anon_number FROM entries WHERE id = ?').get(existingVote.entry_id);
+    const newVoted = db.prepare('SELECT anon_number FROM entries WHERE id = ?').get(id);
+    return res.json({ ok: false, canSwitch: true, oldEntryId: existingVote.entry_id,
+      error: `Již jste hlasoval/a pro Zadečka č. ${oldVoted ? oldVoted.anon_number : '?'}. Chcete změnit hlas na Zadečka č. ${newVoted ? newVoted.anon_number : '?'}?` });
   }
   db.prepare('INSERT INTO votes (entry_id, voter_email, voter_ip) VALUES (?, ?, ?)').run(id, email, req.ip || '');
   db.prepare('UPDATE entries SET votes = votes + 1 WHERE id = ?').run(id);
@@ -207,8 +206,8 @@ router.get('/pravidla', (req, res) => {
 router.get('/zadecek/:id', (req, res) => {
   const settings = getSettings();
   const entry = db.prepare("SELECT id, photo, votes, anon_number FROM entries WHERE id = ? AND status = 'approved'").get(req.params.id);
-  if (!entry) return res.redirect('/galerie');
-  res.render('share', { settings, entry, formatDate, appUrl: process.env.APP_URL || '' });
+  if (!entry) return res.redirect('/');
+  res.render('share', { settings, entry, formatDate, appUrl: process.env.APP_URL || 'https://soutez.jansvoboda.com' });
 });
 
 module.exports = router;
