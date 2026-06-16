@@ -53,7 +53,7 @@
       <div class="vote-box">
         <div class="vote-label">Hlasovat</div>
         <input type="email" id="email" placeholder="vas@email.cz">
-        <button id="vote-btn" class="btn-vote" onclick="doVote()">♡ Hlasovat pro tohoto zadečka</button>
+        <button id="vote-btn" class="btn-vote" onclick="doVote()">♡ Hlasovat</button>
         <div id="err-msg" class="msg error"></div>
         <div id="suc-msg" class="msg success">✓ Hlas byl zaznamenán!</div>
         <div id="switch-box" class="switch-box">
@@ -76,7 +76,7 @@
 
       <div style="background:#FAEEDA;border:0.5px solid #FAC775;border-radius:6px;padding:1rem;text-align:center;margin-bottom:1rem">
         <div style="font-size:13px;color:#854F0B;font-weight:500;margin-bottom:4px">📅 Zadečkový kalendář 2027</div>
-        <div style="font-size:13px;color:#854F0B;line-height:1.5;margin-bottom:8px">Hlasuj a pomoč vítězce dostat se do kalendáře! Kalendář bude brzy v prodeji.</div>
+        <div style="font-size:13px;color:#854F0B;line-height:1.5;margin-bottom:8px">Hlasuj a pomoc vítězce dostat se do kalendáře! Kalendář bude brzy v prodeji.</div>
         <a href="https://shop.jansvoboda.com" target="_blank" style="font-size:13px;color:#854F0B;font-weight:600;text-decoration:underline">shop.jansvoboda.com →</a>
       </div>
       <a href="/" style="display:block;text-align:center;font-size:13px;color:var(--text2)">← Zpět na hlavní stránku</a>
@@ -110,20 +110,20 @@ async function doVote(){
     if(!data.ok){
       btn.disabled=false;
       if(data.canSwitch){
-        btn.textContent='♡ Hlasovat pro tohoto zadečka';
+        btn.textContent='♡ Hlasovat';
         swText.textContent=data.error;
         sw.style.display='block';
         pendingSwitch={email,newId:ENTRY_ID,oldId:data.oldEntryId};
       }else{
         errEl.textContent=data.error;errEl.style.display='block';
-        btn.textContent='♡ Hlasovat pro tohoto zadečka';
+        btn.textContent='♡ Hlasovat';
       }
       return;
     }
     btn.disabled=false;btn.textContent='♥ Hlasováno!';btn.className='btn-vote voted';
     sucEl.style.display='block';
     showToast('✓ Hlas zaznamenán! Vítěz se dostane do kalendáře 2027 🎉');
-  }catch{errEl.textContent='Chyba připojení.';errEl.style.display='block';btn.disabled=false;btn.textContent='♡ Hlasovat pro tohoto zadečka';}
+  }catch{errEl.textContent='Chyba připojení.';errEl.style.display='block';btn.disabled=false;btn.textContent='♡ Hlasovat';}
 }
 
 async function doSwitch(){
@@ -137,11 +137,11 @@ async function doSwitch(){
   try{
     const r=await fetch('/hlasovat-prepsat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({entry_id:newId,voter_email:email})});
     const data=await r.json();
-    if(!data.ok){errEl.textContent=data.error;errEl.style.display='block';btn.disabled=false;btn.textContent='♡ Hlasovat pro tohoto zadečka';return;}
+    if(!data.ok){errEl.textContent=data.error;errEl.style.display='block';btn.disabled=false;btn.textContent='♡ Hlasovat';return;}
     btn.disabled=false;btn.textContent='♥ Hlasováno!';btn.className='btn-vote voted';
     sucEl.style.display='block';
     showToast('✓ Hlas byl změněn!');
-  }catch{errEl.textContent='Chyba.';errEl.style.display='block';btn.disabled=false;btn.textContent='♡ Hlasovat pro tohoto zadečka';}
+  }catch{errEl.textContent='Chyba.';errEl.style.display='block';btn.disabled=false;btn.textContent='♡ Hlasovat';}
 }
 
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);}
