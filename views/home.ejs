@@ -477,17 +477,16 @@ function nextLB(){ lbIdx=(lbIdx+1)%lbEntries.length; renderLB(); }
 function renderLB(){
   if(!lbEntries.length) return;
   const e=lbEntries[lbIdx];
-  document.getElementById('lb-img').src='/uploads/'+e.photo;
-  if(lbSavedEmail && !document.getElementById('lb-email').value) document.getElementById('lb-email').value = lbSavedEmail;
-  document.getElementById('lb-num').textContent='Zadeček č. '+e.anon;
-  document.getElementById('lb-counter').textContent=(lbIdx+1)+' / '+lbEntries.length;
-  document.getElementById('lb-share-url').textContent=appUrl+'/zadecek/'+e.id;
-  document.getElementById('lb-voted-badge').style.display=e.voted?'inline-flex':'none';
-  const btn=document.getElementById('lb-vote-btn');
-  const errEl=document.getElementById('lb-err');
-  const sucEl=document.getElementById('lb-success');
-  if(errEl) errEl.style.display='none';
-  if(sucEl) sucEl.style.display='none';
+  const g = id => document.getElementById(id);
+  if(g('lb-img')) g('lb-img').src='/uploads/'+e.photo;
+  if(lbSavedEmail && g('lb-email') && !g('lb-email').value) g('lb-email').value=lbSavedEmail;
+  if(g('lb-num')) g('lb-num').textContent='Zadeček č. '+e.anon;
+  if(g('lb-counter')) g('lb-counter').textContent=(lbIdx+1)+' / '+lbEntries.length;
+  if(g('lb-share-url')) g('lb-share-url').textContent=appUrl+'/zadecek/'+e.id;
+  if(g('lb-voted-badge')) g('lb-voted-badge').style.display=e.voted?'inline-flex':'none';
+  const btn=g('lb-vote-btn');
+  if(g('lb-err')) g('lb-err').style.display='none';
+  if(g('lb-success')) g('lb-success').style.display='none';
   hideSwitchBox();
   if(btn){btn.disabled=false;if(e.voted){btn.className='lb-vote-btn voted';btn.textContent='♥ Hlasováno';}else{btn.className='lb-vote-btn';btn.textContent='♡ Hlasovat';}}
 }
