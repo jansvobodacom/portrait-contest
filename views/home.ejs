@@ -465,6 +465,7 @@ function handleFile(input) {
 // Lightbox
 const appUrl = window.location.origin;
 const lbEntries = <%- typeof entries !== 'undefined' ? JSON.stringify(entries.map(e=>({id:e.id,photo:e.photo,anon:e.anon_number,voted:votedFor===e.id}))) : '[]' %>;
+const lbSavedEmail = '<%= voterEmail||'' %>';
 let lbIdx = 0;
 let pendingSwitch = null;
 
@@ -477,8 +478,7 @@ function renderLB(){
   if(!lbEntries.length) return;
   const e=lbEntries[lbIdx];
   document.getElementById('lb-img').src='/uploads/'+e.photo;
-  const savedEmail = '<%= voterEmail||"" %>';
-  if(savedEmail && !document.getElementById('lb-email').value) document.getElementById('lb-email').value = savedEmail;
+  if(lbSavedEmail && !document.getElementById('lb-email').value) document.getElementById('lb-email').value = lbSavedEmail;
   document.getElementById('lb-num').textContent='Zadeček č. '+e.anon;
   document.getElementById('lb-counter').textContent=(lbIdx+1)+' / '+lbEntries.length;
   document.getElementById('lb-share-url').textContent=appUrl+'/zadecek/'+e.id;
