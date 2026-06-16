@@ -276,7 +276,7 @@
   <div class="gallery-grid">
     <% (typeof entries !== 'undefined' ? entries : []).forEach(e=>{ const isVoted=votedFor===e.id; %>
     <div class="card" id="card-<%= e.id %>">
-      <div class="thumb" onclick="openLightbox('/uploads/<%= e.photo %>','Zadeček č. <%= e.anon_number %>')">
+      <div class="thumb" onclick="openLightbox('/uploads/<%= e.photo %>','Zadeček č. <%= e.anon_number %>',<%= e.id %>,<%= e.anon_number %>,<%- votedFor===e.id ? 'true' : 'false' %>)">
         <img src="/uploads/<%= e.photo %>" alt="Zadeček č. <%= e.anon_number %>" loading="lazy">
         <% if(isVoted){%><span class="voted-tag">✓ Váš hlas</span><%}%>
       </div>
@@ -285,7 +285,7 @@
         <div class="card-footer">
           <span class="card-votes" id="vc-<%= e.id %>" style="display:none"><b><%= e.votes %></b> hl.</span>
           <div style="display:flex;gap:6px;align-items:center">
-            <a href="/ucastnik/<%= e.id %>" style="font-size:13px;color:var(--text3);padding:5px 8px;border:0.5px solid var(--border2);border-radius:var(--r);text-decoration:none;transition:color .15s" title="Sdílet">↗</a>
+            <a href="/zadecek/<%= e.id %>" style="font-size:13px;color:var(--text3);padding:5px 8px;border:0.5px solid var(--border2);border-radius:var(--r);text-decoration:none;transition:color .15s" title="Sdílet">↗</a>
             <button class="btn-vote <%=isVoted?'voted':''%>" id="vbtn-<%= e.id %>" onclick="openModal(<%= e.id %>,<%= e.anon_number %>)">
               <%=isVoted?'♥ Hlasováno':'♡ Hlasovat'%>
             </button>
@@ -331,10 +331,23 @@
 </div>
 
 <!-- Lightbox -->
-<div class="lightbox" id="lightbox" onclick="closeLightbox()">
-  <span style="position:absolute;top:1.25rem;right:1.5rem;color:#fff;font-size:28px;cursor:pointer;opacity:.7;line-height:1" onclick="closeLightbox()">✕</span>
-  <img id="lb-img" src="" alt="" style="max-width:90vw;max-height:90vh;object-fit:contain;border-radius:var(--r)">
-  <div id="lb-cap" style="position:absolute;bottom:1.5rem;left:50%;transform:translateX(-50%);color:rgba(255,255,255,.6);font-size:13px;letter-spacing:.5px;text-transform:uppercase"></div>
+<div class="lightbox" id="lightbox">
+  <span style="position:absolute;top:1.25rem;right:1.5rem;color:#fff;font-size:28px;cursor:pointer;opacity:.7;line-height:1;z-index:2" onclick="closeLightbox()">✕</span>
+  <div style="display:flex;flex-direction:column;align-items:center;gap:1rem;max-width:min(600px,90vw)">
+    <img id="lb-img" src="" alt="" style="max-width:100%;max-height:70vh;object-fit:contain;border-radius:var(--r)">
+    <div style="background:rgba(255,255,255,0.08);backdrop-filter:blur(8px);border-radius:var(--r);padding:1rem 1.25rem;width:100%;text-align:center">
+      <div id="lb-cap" style="color:rgba(255,255,255,.5);font-size:11px;letter-spacing:1px;text-transform:uppercase;margin-bottom:10px"></div>
+      <div id="lb-share-text" style="color:rgba(255,255,255,.85);font-size:14px;margin-bottom:14px;line-height:1.5"></div>
+      <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+        <button id="lb-vote-btn" onclick="lb_vote()" style="display:flex;align-items:center;gap:6px;padding:9px 20px;border-radius:50px;border:none;background:#fff;color:#1a1a18;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit">
+          <span id="lb-heart">♡</span> Hlasovat
+        </button>
+        <a id="lb-share-btn" href="#" target="_blank" style="display:flex;align-items:center;gap:6px;padding:9px 20px;border-radius:50px;border:1px solid rgba(255,255,255,.3);background:transparent;color:#fff;font-size:13px;font-weight:500;text-decoration:none">
+          <i class="ti ti-share-3" aria-hidden="true"></i> Sdílet
+        </a>
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- Hlasovací modal -->
@@ -419,12 +432,22 @@ function handleFile(input) {
 }
 
 // Lightbox
-function openLightbox(src,caption){
+function openLightbox(src,caption,entryId,anonNum,isVoted){
   document.getElementById('lb-img').src=src;
   document.getElementById('lb-cap').textContent=caption;
+  document.getElementById('lb-share-text').textContent='Líbí se ti tento zadeček? Sdílej ho – odkaz máš tady';
+  const appUrl = window.location.origin;
+  document.getElementById('lb-share-btn').href = appUrl+'/zadecek/'+entryId;
+  const heart = document.getElementById('lb-heart');
+  const vbtn = document.getElementById('lb-vote-btn');
+  if(isVoted){heart.textContent='♥';vbtn.style.background='#fee2e2';vbtn.style.color='#a32d2d';}
+  else{heart.textContent='♡';vbtn.style.background='#fff';vbtn.style.color='#1a1a18';}
+  window._lb_entryId = entryId;
+  window._lb_anonNum = anonNum;
   document.getElementById('lightbox').classList.add('open');
   document.body.style.overflow='hidden';
 }
+function lb_vote(){ closeLightbox(); openModal(window._lb_entryId, window._lb_anonNum); }
 function closeLightbox(){document.getElementById('lightbox').classList.remove('open');document.body.style.overflow='';}
 
 // Voting modal

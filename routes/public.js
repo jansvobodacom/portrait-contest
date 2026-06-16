@@ -199,7 +199,7 @@ router.get('/pravidla', (req, res) => {
 });
 
 // ── Sdílení ───────────────────────────────────────────────────────────────────
-router.get('/ucastnik/:id', (req, res) => {
+router.get('/zadecek/:id', (req, res) => {
   const settings = getSettings();
   const entry = db.prepare("SELECT id, photo, votes, anon_number FROM entries WHERE id = ? AND status = 'approved'").get(req.params.id);
   if (!entry) return res.redirect('/galerie');
