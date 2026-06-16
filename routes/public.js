@@ -203,9 +203,11 @@ router.get('/pravidla', (req, res) => {
 });
 
 // ── Sdílení ───────────────────────────────────────────────────────────────────
-router.get('/zadecek/:id', (req, res) => {
+router.get('/zadecek/:num', (req, res) => {
   const settings = getSettings();
-  const entry = db.prepare("SELECT id, photo, votes, anon_number FROM entries WHERE id = ? AND status = 'approved'").get(req.params.id);
+  const num = parseInt(req.params.num);
+  // Vždy hledej podle anon_number
+  const entry = db.prepare("SELECT id, photo, votes, anon_number FROM entries WHERE anon_number = ? AND status = 'approved'").get(num);
   if (!entry) return res.redirect('/');
   res.render('share', { settings, entry, formatDate, appUrl: process.env.APP_URL || 'https://soutez.jansvoboda.com' });
 });
