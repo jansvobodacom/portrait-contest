@@ -369,7 +369,8 @@
     </div>
     <div style="width:260px;flex-shrink:0;display:flex;flex-direction:column;gap:1rem">
       <div>
-        <div id="lb-num" style="font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:6px"></div>
+        <div id="lb-num" style="font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:4px"></div>
+        <div id="lb-voted-badge" style="display:none;align-items:center;gap:5px;background:rgba(15,110,86,.25);border:0.5px solid rgba(93,202,165,.4);color:#5DCAA5;font-size:12px;padding:4px 12px;border-radius:20px;margin-bottom:8px">✓ Váš hlas</div>
       </div>
       <div style="background:rgba(255,255,255,.07);border-radius:var(--r);padding:1rem">
         <div style="font-size:12px;color:rgba(255,255,255,.5);letter-spacing:.5px;text-transform:uppercase;margin-bottom:8px">Hlasovat</div>
@@ -506,7 +507,7 @@ async function lbVote(){
       else{errEl.textContent=data.error;errEl.style.display='block';btn.disabled=false;btn.textContent='♡ Hlasovat';}
       return;
     }
-    e.voted=true;btn.className='lb-vote-btn voted';btn.textContent='♥ Hlasováno';btn.disabled=false;sucEl.style.display='flex';document.getElementById('lb-voted-badge').style.display='inline-flex';
+    e.voted=true;btn.className='lb-vote-btn voted';btn.textContent='♥ Hlasováno';btn.disabled=false;sucEl.style.display='flex';const vb1=document.getElementById('lb-voted-badge');if(vb1)vb1.style.display='inline-flex';
   }catch{errEl.textContent='Chyba připojení.';errEl.style.display='block';btn.disabled=false;btn.textContent='♡ Hlasovat';}
 }
 
@@ -519,7 +520,7 @@ async function lbSwitchConfirm(){
     const data=await r.json();
     if(!data.ok){document.getElementById('lb-err').textContent=data.error;document.getElementById('lb-err').style.display='block';btn.disabled=false;btn.textContent='♡ Hlasovat';return;}
     lbEntries[lbIdx].voted=true;btn.className='lb-vote-btn voted';btn.textContent='♥ Hlasováno';btn.disabled=false;
-    document.getElementById('lb-success').style.display='flex';document.getElementById('lb-voted-badge').style.display='inline-flex';
+    const ls=document.getElementById('lb-success');if(ls)ls.style.display='flex';const vb2=document.getElementById('lb-voted-badge');if(vb2)vb2.style.display='inline-flex';
     if(oldId){const old=lbEntries.find(e=>e.id===oldId);if(old)old.voted=false;}
     showToast('✓ Hlas byl změněn!');
   }catch{document.getElementById('lb-err').textContent='Chyba.';document.getElementById('lb-err').style.display='block';btn.disabled=false;btn.textContent='♡ Hlasovat';}
