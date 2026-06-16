@@ -3,13 +3,12 @@
 <head>
   <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Galerie – <%= settings.contest_title %></title>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     :root{--bg:<%= settings.color_bg||'#fafaf8' %>;--surface:#fff;--text:<%= settings.color_primary||'#1a1a18' %>;--text2:#5a5955;--text3:#9a9893;--border:rgba(0,0,0,0.09);--border2:rgba(0,0,0,0.18);--accent:<%= settings.color_accent||'#0F6E56' %>;--accent-bg:#E1F5EE;--accent-brd:#5DCAA5;--red:#A32D2D;--red-bg:#FCEBEB;--r:6px}
     body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
     a{color:inherit;text-decoration:none}
-    /* NAV */
     nav{background:var(--surface);border-bottom:0.5px solid var(--border);position:sticky;top:0;z-index:100}
     .nav-inner{max-width:960px;margin:0 auto;padding:0 2rem;height:56px;display:flex;align-items:center;justify-content:space-between}
     .nav-logo{font-family:'Playfair Display',serif;font-size:16px}
@@ -17,73 +16,87 @@
     .nav-links{display:flex;gap:1.5rem}
     .nav-links a{font-size:12px;color:var(--text2);letter-spacing:.5px;text-transform:uppercase;transition:color .2s}
     .nav-links a:hover,.nav-links a.active{color:var(--text)}
-    /* Hamburger */
     .hamburger{display:none;flex-direction:column;gap:4px;cursor:pointer;padding:4px}
-    .hamburger span{width:20px;height:1.5px;background:var(--text);display:block;transition:all .3s}
+    .hamburger span{width:20px;height:1.5px;background:var(--text);display:block}
     .mobile-menu{display:none;position:fixed;inset:0;background:var(--surface);z-index:99;padding:5rem 2rem 2rem;flex-direction:column;gap:1.5rem}
     .mobile-menu.open{display:flex}
-    .mobile-menu a{font-size:22px;font-family:'Playfair Display',serif;color:var(--text);font-weight:400}
+    .mobile-menu a{font-size:22px;font-family:'Playfair Display',serif;color:var(--text)}
     .mobile-close{position:absolute;top:1.25rem;right:2rem;font-size:24px;cursor:pointer;color:var(--text2)}
     @media(max-width:600px){.nav-links{display:none}.hamburger{display:flex}}
-    /* Header */
     .page-header{max-width:960px;margin:0 auto;padding:2rem 2rem 1rem;display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:10px}
     .page-title{font-family:'Playfair Display',serif;font-size:28px;font-weight:400;letter-spacing:-.8px}
     .page-meta{font-size:13px;color:var(--text2)}
     .voter-bar{background:var(--accent-bg);border-bottom:0.5px solid var(--accent-brd);padding:9px 2rem;font-size:13px;color:var(--accent)}
     .phase-note{background:#f5f4f0;border-bottom:0.5px solid var(--border);padding:9px 2rem;font-size:13px;color:var(--text2)}
-    /* Gallery */
     .gallery-wrap{max-width:960px;margin:0 auto;padding:0 2rem 3rem}
     .gallery-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;margin-top:1.25rem}
-    .card{background:var(--surface);border:0.5px solid var(--border);border-radius:var(--r);overflow:hidden;transition:transform .2s,box-shadow .2s}
+    .card{background:var(--surface);border:0.5px solid var(--border);border-radius:var(--r);overflow:hidden;transition:transform .2s,box-shadow .2s;cursor:pointer}
     .card:hover{transform:translateY(-2px);box-shadow:0 4px 16px rgba(0,0,0,.07)}
-    .thumb{aspect-ratio:3/4;overflow:hidden;background:var(--bg);display:flex;align-items:center;justify-content:center;position:relative;cursor:zoom-in}
+    .thumb{aspect-ratio:3/4;overflow:hidden;background:var(--bg);display:flex;align-items:center;justify-content:center;position:relative}
     .thumb img{width:100%;height:100%;object-fit:cover;transition:transform .4s}
     .card:hover .thumb img{transform:scale(1.03)}
     .voted-tag{position:absolute;top:8px;right:8px;background:var(--accent);color:#fff;font-size:10px;padding:3px 8px;border-radius:20px}
     .card-info{padding:10px 12px;border-top:0.5px solid var(--border)}
-    .card-num{font-size:11px;color:var(--text3);letter-spacing:.5px;text-transform:uppercase;margin-bottom:7px}
-    .card-footer{display:flex;align-items:center;justify-content:space-between}
-    .card-votes{font-size:13px;color:var(--text2)}
-    .card-votes b{color:var(--text)}
-    .card-actions{display:flex;gap:6px;align-items:center}
-    .btn-share{font-size:13px;color:var(--text3);padding:5px 8px;border:0.5px solid var(--border2);border-radius:var(--r);transition:color .15s;text-decoration:none}
-    .btn-share:hover{color:var(--text)}
-    .btn-vote{padding:6px 13px;font-size:12px;border-radius:var(--r);cursor:pointer;border:0.5px solid var(--border2);background:transparent;color:var(--text);transition:all .15s;font-family:'Inter',sans-serif}
-    .btn-vote:hover{background:var(--bg)}
-    .btn-vote.voted{background:var(--red-bg);border-color:#F09595;color:var(--red)}
+    .card-num{font-size:11px;color:var(--text3);letter-spacing:.5px;text-transform:uppercase}
     .empty{text-align:center;padding:5rem 2rem;color:var(--text2)}
-    /* Lightbox */
-    .lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:300;align-items:center;justify-content:center;padding:1rem;cursor:default}
-    .lightbox.open{display:flex}
-    .lightbox img{max-width:90vw;max-height:90vh;object-fit:contain;border-radius:var(--r)}
-    .lb-close{position:absolute;top:1.25rem;right:1.5rem;color:#fff;font-size:28px;cursor:pointer;opacity:.7;transition:opacity .15s;line-height:1}
-    .lb-close:hover{opacity:1}
-    .lb-caption{position:absolute;bottom:1.5rem;left:50%;transform:translateX(-50%);color:rgba(255,255,255,.6);font-size:13px;letter-spacing:.5px;text-transform:uppercase}
-    .toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%) translateY(20px);background:var(--text);color:var(--bg);padding:12px 24px;border-radius:50px;font-size:14px;font-weight:500;opacity:0;transition:all .3s;pointer-events:none;z-index:400;white-space:nowrap}
-    .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-    /* Modal */
-    .modal-wrap{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;align-items:center;justify-content:center;padding:1rem}
-    .modal-wrap.open{display:flex}
-    .modal{background:var(--surface);border-radius:10px;padding:1.75rem;width:100%;max-width:380px}
-    .modal h3{font-family:'Playfair Display',serif;font-size:20px;font-weight:400;margin-bottom:6px}
-    .modal p{font-size:14px;color:var(--text2);margin-bottom:1rem;line-height:1.6}
-    .modal-subject{background:var(--bg);border-radius:var(--r);padding:9px 14px;margin-bottom:1rem;font-size:14px;font-weight:500;border:0.5px solid var(--border)}
-    .modal label{font-size:11px;color:var(--text2);font-weight:500;display:block;margin-bottom:5px;letter-spacing:.4px;text-transform:uppercase}
-    .modal input{width:100%;padding:10px 14px;font-size:14px;border:0.5px solid var(--border2);border-radius:var(--r);background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;margin-bottom:6px}
-    .modal input:focus{outline:none;border-color:var(--text)}
-    .modal-hint{font-size:12px;color:var(--text3);margin-bottom:1rem}
-    .modal-err{font-size:13px;color:var(--red);margin-bottom:10px;display:none}
-    .modal-actions{display:flex;gap:8px}
-    .btn-dark{flex:1;padding:10px;background:var(--text);color:var(--bg);border:none;border-radius:var(--r);font-size:13px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif;transition:opacity .15s}
-    .btn-dark:hover{opacity:.85}
-    .btn-dark:disabled{opacity:.5;cursor:wait}
-    .btn-cancel{padding:10px 18px;background:transparent;border:0.5px solid var(--border2);border-radius:var(--r);font-size:13px;cursor:pointer;font-family:'Inter',sans-serif;color:var(--text)}
     footer{background:var(--surface);border-top:0.5px solid var(--border);margin-top:2rem}
     .footer-inner{max-width:960px;margin:0 auto;padding:1.5rem 2rem;display:flex;align-items:center;justify-content:space-between}
     .footer-logo{font-family:'Playfair Display',serif;font-size:14px}
     .footer-links{display:flex;gap:1.5rem}
     .footer-links a{font-size:12px;color:var(--text2)}
     .footer-links a:hover{color:var(--text)}
+
+    /* LIGHTBOX */
+    .lb-wrap{display:none;position:fixed;inset:0;background:rgba(0,0,0,.94);z-index:300;align-items:stretch;justify-content:center}
+    .lb-wrap.open{display:flex}
+    .lb-close{position:absolute;top:1rem;right:1.25rem;color:#fff;font-size:26px;cursor:pointer;opacity:.6;transition:opacity .15s;z-index:2;line-height:1;background:none;border:none}
+    .lb-close:hover{opacity:1}
+    .lb-arrow{position:absolute;top:50%;transform:translateY(-50%);color:#fff;font-size:28px;cursor:pointer;opacity:.5;transition:opacity .15s;background:none;border:none;padding:1rem;z-index:2}
+    .lb-arrow:hover{opacity:1}
+    .lb-prev{left:0}
+    .lb-next{right:0}
+    .lb-counter{position:absolute;top:1rem;left:50%;transform:translateX(-50%);color:rgba(255,255,255,.4);font-size:12px;letter-spacing:1px}
+    .lb-inner{display:flex;align-items:center;justify-content:center;width:100%;padding:3rem 5rem;gap:3rem}
+    @media(max-width:700px){.lb-inner{flex-direction:column;padding:3rem 1.5rem;gap:1.5rem}}
+    .lb-photo{flex-shrink:0;max-width:min(420px,50vw);max-height:80vh}
+    .lb-photo img{max-width:100%;max-height:80vh;object-fit:contain;border-radius:var(--r);display:block}
+    @media(max-width:700px){.lb-photo{max-width:100%;max-height:45vh}}
+    .lb-panel{width:280px;flex-shrink:0;display:flex;flex-direction:column;gap:1rem}
+    @media(max-width:700px){.lb-panel{width:100%}}
+    .lb-num{font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:4px}
+    .lb-voted-badge{display:inline-flex;align-items:center;gap:5px;background:rgba(15,110,86,.25);border:0.5px solid rgba(93,202,165,.4);color:#5DCAA5;font-size:12px;padding:4px 12px;border-radius:20px;margin-bottom:8px}
+
+    /* Vote form in lightbox */
+    .lb-vote-form{background:rgba(255,255,255,.07);border-radius:var(--r);padding:1rem}
+    .lb-vote-label{font-size:12px;color:rgba(255,255,255,.5);letter-spacing:.5px;text-transform:uppercase;margin-bottom:8px;display:block}
+    .lb-email-input{width:100%;padding:9px 12px;font-size:14px;border:0.5px solid rgba(255,255,255,.2);border-radius:var(--r);background:rgba(255,255,255,.08);color:#fff;font-family:'Inter',sans-serif;margin-bottom:8px}
+    .lb-email-input::placeholder{color:rgba(255,255,255,.3)}
+    .lb-email-input:focus{outline:none;border-color:rgba(255,255,255,.4)}
+    .lb-vote-btn{width:100%;padding:10px;background:#fff;color:#1a1a18;border:none;border-radius:var(--r);font-size:13px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif;transition:opacity .15s;display:flex;align-items:center;justify-content:center;gap:6px}
+    .lb-vote-btn:hover{opacity:.9}
+    .lb-vote-btn:disabled{opacity:.5;cursor:wait}
+    .lb-vote-btn.voted{background:rgba(15,110,86,.3);color:#5DCAA5;border:0.5px solid rgba(93,202,165,.4)}
+    .lb-err{font-size:12px;color:#f09595;margin-top:6px;display:none}
+    .lb-success{font-size:13px;color:#5DCAA5;display:none;align-items:center;gap:6px;margin-top:6px}
+
+    /* Switch vote confirm */
+    .lb-switch-box{background:rgba(255,255,255,.07);border:0.5px solid rgba(255,255,255,.15);border-radius:var(--r);padding:1rem;display:none}
+    .lb-switch-box.show{display:block}
+    .lb-switch-text{font-size:13px;color:rgba(255,255,255,.85);line-height:1.5;margin-bottom:10px}
+    .lb-switch-actions{display:flex;gap:8px}
+    .lb-btn-yes{flex:1;padding:8px;background:#fff;color:#1a1a18;border:none;border-radius:var(--r);font-size:13px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif}
+    .lb-btn-no{flex:1;padding:8px;background:transparent;color:rgba(255,255,255,.6);border:0.5px solid rgba(255,255,255,.2);border-radius:var(--r);font-size:13px;cursor:pointer;font-family:'Inter',sans-serif}
+
+    /* Share */
+    .lb-share{border-top:0.5px solid rgba(255,255,255,.1);padding-top:1rem;margin-top:.5rem}
+    .lb-share-text{font-size:13px;color:rgba(255,255,255,.6);margin-bottom:8px;line-height:1.5}
+    .lb-share-link{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.07);border:0.5px solid rgba(255,255,255,.15);border-radius:var(--r);padding:8px 12px}
+    .lb-share-url{font-size:12px;color:rgba(255,255,255,.5);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:monospace}
+    .lb-copy-btn{font-size:11px;color:#fff;background:rgba(255,255,255,.15);border:none;border-radius:4px;padding:4px 10px;cursor:pointer;font-family:'Inter',sans-serif;white-space:nowrap;transition:background .15s}
+    .lb-copy-btn:hover{background:rgba(255,255,255,.25)}
+
+    .toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%) translateY(20px);background:var(--text);color:var(--bg);padding:10px 22px;border-radius:50px;font-size:13px;font-weight:500;opacity:0;transition:all .3s;pointer-events:none;z-index:400;white-space:nowrap}
+    .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
   </style>
 </head>
 <body>
@@ -99,7 +112,7 @@
     <div class="hamburger" onclick="openMenu()"><span></span><span></span><span></span></div>
   </div>
 </nav>
-<div class="mobile-menu" id="mobile-menu">
+<div class="mobile-menu" id="mm">
   <span class="mobile-close" onclick="closeMenu()">✕</span>
   <a href="/" onclick="closeMenu()">Domů</a>
   <a href="/galerie" onclick="closeMenu()">Galerie</a>
@@ -111,11 +124,13 @@
   <% if(voterEmail){ %>
     <div class="voter-bar">✓ Hlasujete jako <strong style="margin:0 3px"><%= voterEmail %></strong><% if(votedFor){%> — hlas odevzdán<%}%></div>
   <% }else{ %>
-    <div class="voter-bar">🗳 <%= settings.gallery_subtitle||'Klikněte na fotografii a zadejte e-mail pro hlasování.' %></div>
-  <% } %>
+    <div class="voter-bar">🗳 Klikněte na fotografii pro hlasování.</div>
+  <% }%>
+<% }else if(settings.phase==='registration'){ %>
+  <div class="phase-note">Přihlašování stále probíhá. Hlasování bude spuštěno brzy.</div>
 <% }else{ %>
   <div class="phase-note">Hlasování ukončeno. <a href="/vysledky" style="color:var(--text);font-weight:500;text-decoration:underline">Výsledky →</a></div>
-<% } %>
+<% }%>
 
 <div class="gallery-wrap">
   <div class="page-header" style="padding-left:0;padding-right:0">
@@ -126,25 +141,14 @@
     <div class="empty">Zatím žádné schválené fotografie.</div>
   <% }else{ %>
   <div class="gallery-grid">
-    <% entries.forEach(e=>{ const isVoted=votedFor===e.id; %>
-    <div class="card" id="card-<%= e.id %>">
-      <div class="thumb" onclick="openLightbox('/uploads/<%= e.photo %>','Zadeček č. <%= e.anon_number %>',<%= e.id %>,<%= e.anon_number %>,<%- votedFor===e.id ? 'true' : 'false' %>)">
+    <% entries.forEach((e,idx)=>{ const isVoted=votedFor===e.id; %>
+    <div class="card" onclick="openLB(<%= idx %>)">
+      <div class="thumb">
         <img src="/uploads/<%= e.photo %>" alt="Zadeček č. <%= e.anon_number %>" loading="lazy">
         <% if(isVoted){%><span class="voted-tag">✓ Váš hlas</span><%}%>
       </div>
       <div class="card-info">
         <div class="card-num">Zadeček č. <%= e.anon_number %></div>
-        <div class="card-footer">
-          <span class="card-votes" id="vc-<%= e.id %>" style="display:none"><b><%= e.votes %></b> hlasů</span>
-          <div class="card-actions">
-            <a href="/zadecek/<%= e.id %>" class="btn-share" title="Sdílet"><i class="ti ti-share-3" aria-hidden="true" style="font-size:15px;vertical-align:-2px"></i></a>
-            <% if(settings.phase==='voting'){%>
-              <button class="btn-vote <%=isVoted?'voted':''%>" id="vbtn-<%= e.id %>" onclick="openModal(<%= e.id %>,<%= e.anon_number %>)">
-                <%=isVoted?'♥ Hlasováno':'♡ Hlasovat'%>
-              </button>
-            <%}%>
-          </div>
-        </div>
       </div>
     </div>
     <%})%>
@@ -152,30 +156,52 @@
   <%}%>
 </div>
 
-<!-- Lightbox -->
-<div class="lightbox" id="lightbox" onclick="closeLightbox()">
-  <span class="lb-close" onclick="closeLightbox()">✕</span>
-  <img id="lb-img" src="" alt="">
-  <div class="lb-caption" id="lb-caption"></div>
-</div>
+<!-- LIGHTBOX -->
+<div class="lb-wrap" id="lb-wrap">
+  <button class="lb-close" onclick="closeLB()">✕</button>
+  <button class="lb-arrow lb-prev" onclick="prevLB()">‹</button>
+  <button class="lb-arrow lb-next" onclick="nextLB()">›</button>
+  <div class="lb-counter" id="lb-counter"></div>
+  <div class="lb-inner">
+    <div class="lb-photo"><img id="lb-img" src="" alt=""></div>
+    <div class="lb-panel">
+      <div>
+        <div class="lb-num" id="lb-num"></div>
+        <div id="lb-voted-badge" class="lb-voted-badge" style="display:none">✓ Váš hlas</div>
+      </div>
 
-<!-- Hlasovací modal -->
-<div class="modal-wrap" id="modal-wrap" onclick="closeOnBg(event)">
-  <div class="modal">
-    <h3>Potvrdit hlas</h3>
-    <p>Hlasujete pro:</p>
-    <div class="modal-subject" id="modal-subject"></div>
-    <label>Váš e-mail</label>
-    <input type="email" id="modal-email" placeholder="vas@email.cz" value="<%= voterEmail||'' %>">
-    <div class="modal-hint"><%= settings.vote_modal_hint||'Každý e-mail může hlasovat jednou. E-mail nebude zveřejněn.' %></div>
-    <div class="modal-err" id="modal-err"></div>
-    <div class="modal-actions">
-      <button class="btn-cancel" onclick="closeModal()">Zrušit</button>
-      <button class="btn-dark" id="modal-submit" onclick="submitVote()"><%= settings.vote_submit||'Hlasovat →' %></button>
+      <!-- Vote form -->
+      <% if(settings.phase==='voting'){ %>
+      <div class="lb-vote-form" id="lb-vote-form">
+        <label class="lb-vote-label">Hlasovat</label>
+        <input type="email" class="lb-email-input" id="lb-email" placeholder="vas@email.cz" value="<%= voterEmail||'' %>">
+        <button class="lb-vote-btn" id="lb-vote-btn" onclick="lbVote()">♡ Hlasovat</button>
+        <div class="lb-err" id="lb-err"></div>
+        <div class="lb-success" id="lb-success">✓ Hlas byl zaznamenán!</div>
+        <!-- Switch vote confirm -->
+        <div class="lb-switch-box" id="lb-switch-box">
+          <div class="lb-switch-text" id="lb-switch-text"></div>
+          <div class="lb-switch-actions">
+            <button class="lb-btn-yes" onclick="lbSwitchConfirm()">Ano, změnit hlas</button>
+            <button class="lb-btn-no" onclick="hideSwitchBox()">Ne, ponechat</button>
+          </div>
+        </div>
+      </div>
+      <% } %>
+
+      <!-- Share -->
+      <div class="lb-share">
+        <div class="lb-share-text">Líbí se ti tento zadeček? Sdílej ho!</div>
+        <div class="lb-share-link">
+          <span class="lb-share-url" id="lb-share-url"></span>
+          <button class="lb-copy-btn" onclick="copyLink()"><i class="ti ti-copy" aria-hidden="true"></i> Kopírovat</button>
+        </div>
+      </div>
     </div>
   </div>
 </div>
 
+<div class="toast" id="toast"></div>
 <footer>
   <div class="footer-inner">
     <div class="footer-logo"><%= settings.footer_text||'Jan Svoboda Photography' %></div>
@@ -184,78 +210,144 @@
 </footer>
 
 <script>
-// Mobile menu
-function openMenu(){document.getElementById('mobile-menu').classList.add('open');document.body.style.overflow='hidden';}
-function closeMenu(){document.getElementById('mobile-menu').classList.remove('open');document.body.style.overflow='';}
+const entries = <%- JSON.stringify(entries.map(e=>({id:e.id,photo:e.photo,anon:e.anon_number,voted:<%= JSON.stringify(votedFor) %>===e.id}))) %>;
+const votingOpen = <%= settings.phase==='voting'?'true':'false' %>;
+const appUrl = window.location.origin;
+let currentIdx = 0;
+let pendingSwitch = null;
 
-// Lightbox
-function openLightbox(src,caption){
-  document.getElementById('lb-img').src=src;
-  document.getElementById('lb-caption').textContent=caption;
-  document.getElementById('lightbox').classList.add('open');
-  document.body.style.overflow='hidden';
+function openMenu(){document.getElementById('mm').classList.add('open');document.body.style.overflow='hidden';}
+function closeMenu(){document.getElementById('mm').classList.remove('open');document.body.style.overflow='';}
+
+function openLB(idx) {
+  currentIdx = idx;
+  renderLB();
+  document.getElementById('lb-wrap').classList.add('open');
+  document.body.style.overflow = 'hidden';
 }
-function closeLightbox(){document.getElementById('lightbox').classList.remove('open');document.body.style.overflow='';}
-document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeLightbox();closeModal();}});
+function closeLB() {
+  document.getElementById('lb-wrap').classList.remove('open');
+  document.body.style.overflow = '';
+}
+function prevLB() { currentIdx = (currentIdx - 1 + entries.length) % entries.length; renderLB(); }
+function nextLB() { currentIdx = (currentIdx + 1) % entries.length; renderLB(); }
 
-// Voting modal
-async function switchVote(e) {
-  e.preventDefault();
-  const email = document.getElementById('modal-email').value.trim();
-  const errEl = document.getElementById('modal-err');
-  const btn = document.getElementById('modal-submit');
-  errEl.style.display = 'none';
-  btn.disabled = true; btn.textContent = 'Odesílám...';
-  // Force switch - send new vote (server handles removing old one)
-  const r = await fetch('/hlasovat-prepsat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ entry_id: pendingId, voter_email: email }) });
-  const data = await r.json();
-  if (!data.ok) { errEl.textContent = data.error; errEl.style.display = 'block'; btn.disabled = false; btn.textContent = 'Hlasovat →'; return; }
-  if (data.oldEntryId) {
-    const pb = document.getElementById('vbtn-' + data.oldEntryId);
-    if (pb) { pb.className = 'btn-vote'; pb.textContent = '♡'; }
-    const pt = document.querySelector('#card-' + data.oldEntryId + ' .voted-tag');
-    if (pt) pt.remove();
+function renderLB() {
+  const e = entries[currentIdx];
+  document.getElementById('lb-img').src = '/uploads/' + e.photo;
+  document.getElementById('lb-num').textContent = 'Zadeček č. ' + e.anon;
+  document.getElementById('lb-counter').textContent = (currentIdx+1) + ' / ' + entries.length;
+  document.getElementById('lb-share-url').textContent = appUrl + '/zadecek/' + e.id;
+  document.getElementById('lb-voted-badge').style.display = e.voted ? 'inline-flex' : 'none';
+  // Reset vote form
+  const errEl = document.getElementById('lb-err');
+  const sucEl = document.getElementById('lb-success');
+  const btn = document.getElementById('lb-vote-btn');
+  if(errEl) errEl.style.display = 'none';
+  if(sucEl) sucEl.style.display = 'none';
+  hideSwitchBox();
+  if(btn) {
+    btn.disabled = false;
+    if(e.voted) {
+      btn.className = 'lb-vote-btn voted';
+      btn.textContent = '♥ Hlasováno';
+    } else {
+      btn.className = 'lb-vote-btn';
+      btn.textContent = '♡ Hlasovat';
+    }
   }
-  const btn2 = document.getElementById('vbtn-' + pendingId);
-  const vc = document.getElementById('vc-' + pendingId);
-  if (btn2) { btn2.className = 'btn-vote voted'; btn2.textContent = '♥'; }
-  if (vc) vc.innerHTML = '<b>' + data.votes + '</b> hl.';
-  const thumb2 = document.querySelector('#card-' + pendingId + ' .thumb');
-  if (thumb2 && !thumb2.querySelector('.voted-tag')) { const t = document.createElement('span'); t.className = 'voted-tag'; t.textContent = '✓ Váš hlas'; thumb2.appendChild(t); }
-  closeModal();
-  showToast('✓ Hlas byl změněn!');
+}
+
+function hideSwitchBox() {
+  const sb = document.getElementById('lb-switch-box');
+  if(sb) { sb.classList.remove('show'); pendingSwitch = null; }
+}
+
+async function lbVote() {
+  const email = (document.getElementById('lb-email').value||'').trim();
+  const errEl = document.getElementById('lb-err');
+  const sucEl = document.getElementById('lb-success');
+  const btn = document.getElementById('lb-vote-btn');
+  if(!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    errEl.textContent = 'Zadejte platný e-mail.'; errEl.style.display='block'; return;
+  }
+  btn.disabled = true; btn.textContent = 'Odesílám...';
+  errEl.style.display = 'none';
+  const e = entries[currentIdx];
+  try {
+    const r = await fetch('/hlasovat', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({entry_id:e.id,voter_email:email})});
+    const data = await r.json();
+    if(!data.ok) {
+      if(data.canSwitch) {
+        // Show switch confirm
+        btn.disabled = false; btn.textContent = '♡ Hlasovat';
+        const sb = document.getElementById('lb-switch-box');
+        document.getElementById('lb-switch-text').textContent = data.error;
+        pendingSwitch = {email, newId: e.id, oldId: data.oldEntryId};
+        sb.classList.add('show');
+      } else {
+        errEl.textContent = data.error; errEl.style.display='block';
+        btn.disabled = false; btn.textContent = '♡ Hlasovat';
+      }
+      return;
+    }
+    // Success
+    e.voted = true;
+    btn.className = 'lb-vote-btn voted'; btn.textContent = '♥ Hlasováno'; btn.disabled = false;
+    sucEl.style.display = 'flex';
+    document.getElementById('lb-voted-badge').style.display = 'inline-flex';
+    // Update grid card
+    updateGridCard(e.id, true);
+    if(data.oldEntryId) updateGridCard(data.oldEntryId, false);
+  } catch { errEl.textContent='Chyba připojení.'; errEl.style.display='block'; btn.disabled=false; btn.textContent='♡ Hlasovat'; }
+}
+
+async function lbSwitchConfirm() {
+  if(!pendingSwitch) return;
+  const {email, newId, oldId} = pendingSwitch;
+  hideSwitchBox();
+  const btn = document.getElementById('lb-vote-btn');
+  btn.disabled = true; btn.textContent = 'Odesílám...';
+  try {
+    const r = await fetch('/hlasovat-prepsat', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({entry_id:newId,voter_email:email})});
+    const data = await r.json();
+    if(!data.ok) { document.getElementById('lb-err').textContent=data.error; document.getElementById('lb-err').style.display='block'; btn.disabled=false; btn.textContent='♡ Hlasovat'; return; }
+    entries[currentIdx].voted = true;
+    btn.className='lb-vote-btn voted'; btn.textContent='♥ Hlasováno'; btn.disabled=false;
+    document.getElementById('lb-success').style.display='flex';
+    document.getElementById('lb-voted-badge').style.display='inline-flex';
+    updateGridCard(newId, true);
+    if(oldId) { updateGridCard(oldId, false); entries.find(e=>e.id===oldId&&(e.voted=false)); }
+    showToast('✓ Hlas byl změněn!');
+  } catch { document.getElementById('lb-err').textContent='Chyba.'; document.getElementById('lb-err').style.display='block'; btn.disabled=false; btn.textContent='♡ Hlasovat'; }
+}
+
+function updateGridCard(id, isVoted) {
+  const cards = document.querySelectorAll('.card');
+  entries.forEach((e,i)=>{
+    if(e.id===id){
+      const thumb = cards[i]?.querySelector('.thumb');
+      if(!thumb) return;
+      let tag = thumb.querySelector('.voted-tag');
+      if(isVoted && !tag){ tag=document.createElement('span'); tag.className='voted-tag'; tag.textContent='✓ Váš hlas'; thumb.appendChild(tag); }
+      else if(!isVoted && tag){ tag.remove(); }
+    }
+  });
+}
+
+function copyLink() {
+  const url = appUrl + '/zadecek/' + entries[currentIdx].id;
+  navigator.clipboard.writeText(url).then(()=>showToast('✓ Odkaz zkopírován!')).catch(()=>{});
 }
 
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);}
-let pendingId=null;
-function openModal(id,num){pendingId=id;document.getElementById('modal-subject').textContent='Zadeček č. '+num;document.getElementById('modal-err').style.display='none';document.getElementById('modal-wrap').classList.add('open');setTimeout(()=>document.getElementById('modal-email').focus(),50);}
-function closeModal(){document.getElementById('modal-wrap').classList.remove('open');pendingId=null;}
-function closeOnBg(e){if(e.target===document.getElementById('modal-wrap'))closeModal();}
-document.getElementById('modal-email').addEventListener('keydown',e=>{if(e.key==='Enter')submitVote();});
 
-async function submitVote(){
-  const email=document.getElementById('modal-email').value.trim();
-  const errEl=document.getElementById('modal-err');
-  const btn=document.getElementById('modal-submit');
-  if(!email||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){errEl.textContent='Zadejte platný e-mail.';errEl.style.display='block';return;}
-  btn.disabled=true;btn.textContent='Odesílám...';
-  try{
-    const r=await fetch('/hlasovat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({entry_id:pendingId,voter_email:email})});
-    const data=await r.json();
-    if(!data.ok){errEl.textContent=data.error;errEl.style.display='block';btn.disabled=false;btn.textContent='Hlasovat →';return;}
-    if(data.oldEntryId){const pb=document.getElementById('vbtn-'+data.oldEntryId);if(pb){pb.className='btn-vote';pb.textContent='♡ Hlasovat';}const pt=document.querySelector('#card-'+data.oldEntryId+' .voted-tag');if(pt)pt.remove();}
-    const btn2=document.getElementById('vbtn-'+pendingId);const vc=document.getElementById('vc-'+pendingId);
-    if(btn2){btn2.className='btn-vote voted';btn2.textContent='♥ Hlasováno';}
-    if(vc)vc.innerHTML='<b>'+data.votes+'</b> hlasů';
-    const thumb=document.querySelector('#card-'+pendingId+' .thumb');
-    if(thumb&&!thumb.querySelector('.voted-tag')){const t=document.createElement('span');t.className='voted-tag';t.textContent='✓ Váš hlas';thumb.appendChild(t);}
-    closeModal();
-    showToast('✓ Hlas byl úspěšně odevzdán!');
-    const vbar=document.querySelector('.voter-bar');
-    if(vbar)vbar.innerHTML='✓ Hlasujete jako <strong style="margin:0 3px">'+email+'</strong> — hlas odevzdán';
-  }catch{errEl.textContent='Chyba připojení.';errEl.style.display='block';btn.disabled=false;btn.textContent='Hlasovat →';}
-}
+document.addEventListener('keydown', e => {
+  if(!document.getElementById('lb-wrap').classList.contains('open')) return;
+  if(e.key==='Escape') closeLB();
+  if(e.key==='ArrowLeft') prevLB();
+  if(e.key==='ArrowRight') nextLB();
+});
 </script>
-<div class="toast" id="toast"></div>
 </body>
 </html>

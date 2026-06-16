@@ -107,7 +107,10 @@ router.post('/prihlasit', upload.single('photo'), async (req, res) => {
 });
 
 // ── Galerie ──────────────────────────────────────────────────────────────────
-router.get('/galerie', (req, res) => {
+// Galerie přesměruje na homepage (vše je tam)
+router.get('/galerie', (req, res) => res.redirect('/'));
+
+router.get('/galerie-full', (req, res) => {
   const settings = getSettings();
   // Blokovat galerii pokud není fáze hlasování nebo výsledků
   if (settings.phase === 'registration') {
@@ -125,6 +128,7 @@ router.get('/galerie', (req, res) => {
     votedFor: req.session.votedFor || null
   });
 });
+// Also keep /galerie-full working same way
 
 // ── Hlasování (AJAX POST) ────────────────────────────────────────────────────
 router.post('/hlasovat', (req, res) => {

@@ -117,6 +117,46 @@
     .winner-label{font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--amber);margin-bottom:4px}
     .winner-name{font-family:'Playfair Display',serif;font-size:18px;color:#633806;margin-bottom:2px}
     .winner-votes{font-size:13px;color:var(--amber)}
+    /* Lightbox */
+    .lb-wrap{display:none;position:fixed;inset:0;background:rgba(0,0,0,.94);z-index:300;align-items:stretch;justify-content:center}
+    .lb-wrap.open{display:flex}
+    .lb-close{position:absolute;top:1rem;right:1.25rem;color:#fff;font-size:26px;cursor:pointer;opacity:.6;background:none;border:none;z-index:2;line-height:1}
+    .lb-close:hover{opacity:1}
+    .lb-arrow{position:absolute;top:50%;transform:translateY(-50%);color:#fff;font-size:28px;cursor:pointer;opacity:.5;background:none;border:none;padding:1rem;z-index:2}
+    .lb-arrow:hover{opacity:1}
+    .lb-prev{left:0}.lb-next{right:0}
+    .lb-counter{position:absolute;top:1rem;left:50%;transform:translateX(-50%);color:rgba(255,255,255,.4);font-size:12px;letter-spacing:1px}
+    .lb-inner{display:flex;align-items:center;justify-content:center;width:100%;padding:3rem 5rem;gap:3rem}
+    @media(max-width:700px){.lb-inner{flex-direction:column;padding:3rem 1.5rem;gap:1.5rem}}
+    .lb-photo{flex-shrink:0;max-width:min(420px,50vw);max-height:80vh}
+    .lb-photo img{max-width:100%;max-height:80vh;object-fit:contain;border-radius:var(--r);display:block}
+    @media(max-width:700px){.lb-photo{max-width:100%;max-height:45vh}}
+    .lb-panel{width:280px;flex-shrink:0;display:flex;flex-direction:column;gap:1rem}
+    @media(max-width:700px){.lb-panel{width:100%}}
+    .lb-num{font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:4px}
+    .lb-voted-badge{display:inline-flex;align-items:center;gap:5px;background:rgba(15,110,86,.25);border:0.5px solid rgba(93,202,165,.4);color:#5DCAA5;font-size:12px;padding:4px 12px;border-radius:20px;margin-bottom:8px}
+    .lb-vote-form{background:rgba(255,255,255,.07);border-radius:var(--r);padding:1rem}
+    .lb-vote-label{font-size:12px;color:rgba(255,255,255,.5);letter-spacing:.5px;text-transform:uppercase;margin-bottom:8px;display:block}
+    .lb-email-input{width:100%;padding:9px 12px;font-size:14px;border:0.5px solid rgba(255,255,255,.2);border-radius:var(--r);background:rgba(255,255,255,.08);color:#fff;font-family:'Inter',sans-serif;margin-bottom:8px}
+    .lb-email-input::placeholder{color:rgba(255,255,255,.3)}
+    .lb-email-input:focus{outline:none;border-color:rgba(255,255,255,.4)}
+    .lb-vote-btn{width:100%;padding:10px;background:#fff;color:#1a1a18;border:none;border-radius:var(--r);font-size:13px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif;display:flex;align-items:center;justify-content:center;gap:6px}
+    .lb-vote-btn.voted{background:rgba(15,110,86,.3);color:#5DCAA5;border:0.5px solid rgba(93,202,165,.4)}
+    .lb-vote-btn:disabled{opacity:.5;cursor:wait}
+    .lb-err{font-size:12px;color:#f09595;margin-top:6px;display:none}
+    .lb-success{font-size:13px;color:#5DCAA5;display:none;align-items:center;gap:6px;margin-top:6px}
+    .lb-switch-box{background:rgba(255,200,0,.08);border:0.5px solid rgba(255,200,0,.25);border-radius:var(--r);padding:1rem;display:none;margin-top:10px}
+    .lb-switch-box.show{display:block}
+    .lb-switch-text{font-size:13px;color:rgba(255,255,255,.85);line-height:1.5;margin-bottom:10px}
+    .lb-switch-actions{display:flex;gap:8px}
+    .lb-btn-yes{flex:1;padding:8px;background:#fff;color:#1a1a18;border:none;border-radius:var(--r);font-size:13px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif}
+    .lb-btn-no{flex:1;padding:8px;background:transparent;color:rgba(255,255,255,.6);border:0.5px solid rgba(255,255,255,.2);border-radius:var(--r);font-size:13px;cursor:pointer;font-family:'Inter',sans-serif}
+    .lb-share{border-top:0.5px solid rgba(255,255,255,.1);padding-top:1rem;margin-top:.5rem}
+    .lb-share-text{font-size:13px;color:rgba(255,255,255,.6);margin-bottom:8px;line-height:1.5}
+    .lb-share-link{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.07);border:0.5px solid rgba(255,255,255,.15);border-radius:var(--r);padding:8px 12px}
+    .lb-share-url{font-size:12px;color:rgba(255,255,255,.5);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:monospace}
+    .lb-copy-btn{font-size:11px;color:#fff;background:rgba(255,255,255,.15);border:none;border-radius:4px;padding:4px 10px;cursor:pointer;font-family:'Inter',sans-serif;white-space:nowrap}
+    .lb-copy-btn:hover{background:rgba(255,255,255,.25)}
     /* Prizes */
     .prizes{display:grid;grid-template-columns:repeat(3,1fr);border-top:0.5px solid var(--border);max-width:720px;margin:0 auto;background:var(--surface)}
     .prize{padding:1.25rem 2rem;border-right:0.5px solid var(--border)}
@@ -160,8 +200,6 @@
     <a href="/" class="nav-logo"><%= settings.footer_text||'Jan Svoboda Photography' %></a>
     <div class="nav-links">
       <a href="/" class="active">Domů</a>
-      <a href="/galerie">Galerie</a>
-      <a href="/vysledky">Výsledky</a>
       <a href="/pravidla">Pravidla</a>
       <% if (typeof isAdmin !== 'undefined' && isAdmin) { %><a href="/admin">Admin</a><% } %>
     </div>
@@ -171,8 +209,6 @@
 <div class="mobile-menu" id="mobile-menu">
   <span class="mobile-close" onclick="closeMenu()">✕</span>
   <a href="/" onclick="closeMenu()">Domů</a>
-  <a href="/galerie" onclick="closeMenu()">Galerie</a>
-  <a href="/vysledky" onclick="closeMenu()">Výsledky</a>
   <a href="/pravidla" onclick="closeMenu()">Pravidla</a>
   <% if(typeof isAdmin!=='undefined'&&isAdmin){%><a href="/admin" onclick="closeMenu()">Admin</a><%}%>
 </div>
@@ -264,33 +300,24 @@
 </div>
 
 <% } else if(settings.phase==='voting'){ %>
-<!-- ── Plná galerie s hlasováním na homepage ── -->
+<!-- ── Galerie s lightboxem ── -->
 <div class="inline-gallery">
   <% if(votedFor){ %>
     <div style="background:var(--accent-bg);border-radius:var(--r);padding:10px 14px;font-size:13px;color:var(--accent);margin-top:1.5rem;margin-bottom:.5rem">
-      ✓ Váš hlas byl odevzdán
+      ✓ Váš hlas byl odevzdán — klikněte na libovolnou fotku pro změnu nebo sdílení
     </div>
   <% }else{ %>
-    <div style="font-size:13px;color:var(--text2);margin-top:1.5rem;margin-bottom:.5rem"><%= settings.gallery_subtitle||'Klikněte na fotografii a zadejte e-mail pro hlasování.' %></div>
+    <div style="font-size:13px;color:var(--text2);margin-top:1.5rem;margin-bottom:.5rem">Klikněte na fotografii pro hlasování nebo sdílení.</div>
   <% } %>
   <div class="gallery-grid">
-    <% (typeof entries !== 'undefined' ? entries : []).forEach(e=>{ const isVoted=votedFor===e.id; %>
-    <div class="card" id="card-<%= e.id %>">
-      <div class="thumb" onclick="openLightbox('/uploads/<%= e.photo %>','Zadeček č. <%= e.anon_number %>',<%= e.id %>,<%= e.anon_number %>,<%- votedFor===e.id ? 'true' : 'false' %>)">
+    <% (typeof entries !== 'undefined' ? entries : []).forEach((e,idx)=>{ const isVoted=votedFor===e.id; %>
+    <div class="card" onclick="openLB(<%= idx %>)">
+      <div class="thumb">
         <img src="/uploads/<%= e.photo %>" alt="Zadeček č. <%= e.anon_number %>" loading="lazy">
         <% if(isVoted){%><span class="voted-tag">✓ Váš hlas</span><%}%>
       </div>
       <div class="card-info">
         <div class="card-num">Zadeček č. <%= e.anon_number %></div>
-        <div class="card-footer">
-          <span class="card-votes" id="vc-<%= e.id %>" style="display:none"><b><%= e.votes %></b> hl.</span>
-          <div style="display:flex;gap:6px;align-items:center">
-            <a href="/zadecek/<%= e.id %>" style="font-size:13px;color:var(--text3);padding:5px 8px;border:0.5px solid var(--border2);border-radius:var(--r);text-decoration:none;transition:color .15s" title="Sdílet">↗</a>
-            <button class="btn-vote <%=isVoted?'voted':''%>" id="vbtn-<%= e.id %>" onclick="openModal(<%= e.id %>,<%= e.anon_number %>)">
-              <%=isVoted?'♥ Hlasováno':'♡ Hlasovat'%>
-            </button>
-          </div>
-        </div>
       </div>
     </div>
     <%})%>
@@ -432,23 +459,68 @@ function handleFile(input) {
 }
 
 // Lightbox
-function openLightbox(src,caption,entryId,anonNum,isVoted){
-  document.getElementById('lb-img').src=src;
-  document.getElementById('lb-cap').textContent=caption;
-  document.getElementById('lb-share-text').textContent='Líbí se ti tento zadeček? Sdílej ho – odkaz máš tady';
-  const appUrl = window.location.origin;
-  document.getElementById('lb-share-btn').href = appUrl+'/zadecek/'+entryId;
-  const heart = document.getElementById('lb-heart');
-  const vbtn = document.getElementById('lb-vote-btn');
-  if(isVoted){heart.textContent='♥';vbtn.style.background='#fee2e2';vbtn.style.color='#a32d2d';}
-  else{heart.textContent='♡';vbtn.style.background='#fff';vbtn.style.color='#1a1a18';}
-  window._lb_entryId = entryId;
-  window._lb_anonNum = anonNum;
-  document.getElementById('lightbox').classList.add('open');
-  document.body.style.overflow='hidden';
+const appUrl = window.location.origin;
+const lbEntries = <%- typeof entries !== 'undefined' ? JSON.stringify(entries.map(e=>({id:e.id,photo:e.photo,anon:e.anon_number,voted:votedFor===e.id}))) : '[]' %>;
+let lbIdx = 0;
+let pendingSwitch = null;
+
+function openLB(idx){ lbIdx=idx; renderLB(); document.getElementById('lb-wrap').classList.add('open'); document.body.style.overflow='hidden'; }
+function closeLB(){ document.getElementById('lb-wrap').classList.remove('open'); document.body.style.overflow=''; }
+function prevLB(){ lbIdx=(lbIdx-1+lbEntries.length)%lbEntries.length; renderLB(); }
+function nextLB(){ lbIdx=(lbIdx+1)%lbEntries.length; renderLB(); }
+
+function renderLB(){
+  if(!lbEntries.length) return;
+  const e=lbEntries[lbIdx];
+  document.getElementById('lb-img').src='/uploads/'+e.photo;
+  document.getElementById('lb-num').textContent='Zadeček č. '+e.anon;
+  document.getElementById('lb-counter').textContent=(lbIdx+1)+' / '+lbEntries.length;
+  document.getElementById('lb-share-url').textContent=appUrl+'/zadecek/'+e.id;
+  document.getElementById('lb-voted-badge').style.display=e.voted?'inline-flex':'none';
+  const btn=document.getElementById('lb-vote-btn');
+  const errEl=document.getElementById('lb-err');
+  const sucEl=document.getElementById('lb-success');
+  if(errEl) errEl.style.display='none';
+  if(sucEl) sucEl.style.display='none';
+  hideSwitchBox();
+  if(btn){btn.disabled=false;if(e.voted){btn.className='lb-vote-btn voted';btn.textContent='♥ Hlasováno';}else{btn.className='lb-vote-btn';btn.textContent='♡ Hlasovat';}}
 }
-function lb_vote(){ closeLightbox(); openModal(window._lb_entryId, window._lb_anonNum); }
-function closeLightbox(){document.getElementById('lightbox').classList.remove('open');document.body.style.overflow='';}
+function hideSwitchBox(){ const sb=document.getElementById('lb-switch-box'); if(sb){sb.classList.remove('show');pendingSwitch=null;} }
+
+async function lbVote(){
+  const email=(document.getElementById('lb-email').value||'').trim();
+  const errEl=document.getElementById('lb-err'); const sucEl=document.getElementById('lb-success'); const btn=document.getElementById('lb-vote-btn');
+  if(!email||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){errEl.textContent='Zadejte platný e-mail.';errEl.style.display='block';return;}
+  btn.disabled=true;btn.textContent='Odesílám...';errEl.style.display='none';
+  const e=lbEntries[lbIdx];
+  try{
+    const r=await fetch('/hlasovat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({entry_id:e.id,voter_email:email})});
+    const data=await r.json();
+    if(!data.ok){
+      if(data.canSwitch){btn.disabled=false;btn.textContent='♡ Hlasovat';document.getElementById('lb-switch-text').textContent=data.error;pendingSwitch={email,newId:e.id,oldId:data.oldEntryId};document.getElementById('lb-switch-box').classList.add('show');}
+      else{errEl.textContent=data.error;errEl.style.display='block';btn.disabled=false;btn.textContent='♡ Hlasovat';}
+      return;
+    }
+    e.voted=true;btn.className='lb-vote-btn voted';btn.textContent='♥ Hlasováno';btn.disabled=false;sucEl.style.display='flex';document.getElementById('lb-voted-badge').style.display='inline-flex';
+  }catch{errEl.textContent='Chyba připojení.';errEl.style.display='block';btn.disabled=false;btn.textContent='♡ Hlasovat';}
+}
+
+async function lbSwitchConfirm(){
+  if(!pendingSwitch) return;
+  const {email,newId,oldId}=pendingSwitch; hideSwitchBox();
+  const btn=document.getElementById('lb-vote-btn'); btn.disabled=true;btn.textContent='Odesílám...';
+  try{
+    const r=await fetch('/hlasovat-prepsat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({entry_id:newId,voter_email:email})});
+    const data=await r.json();
+    if(!data.ok){document.getElementById('lb-err').textContent=data.error;document.getElementById('lb-err').style.display='block';btn.disabled=false;btn.textContent='♡ Hlasovat';return;}
+    lbEntries[lbIdx].voted=true;btn.className='lb-vote-btn voted';btn.textContent='♥ Hlasováno';btn.disabled=false;
+    document.getElementById('lb-success').style.display='flex';document.getElementById('lb-voted-badge').style.display='inline-flex';
+    if(oldId){const old=lbEntries.find(e=>e.id===oldId);if(old)old.voted=false;}
+    showToast('✓ Hlas byl změněn!');
+  }catch{document.getElementById('lb-err').textContent='Chyba.';document.getElementById('lb-err').style.display='block';btn.disabled=false;btn.textContent='♡ Hlasovat';}
+}
+
+function copyLink(){navigator.clipboard.writeText(appUrl+'/zadecek/'+lbEntries[lbIdx].id).then(()=>showToast('✓ Odkaz zkopírován!')).catch(()=>{});}
 
 // Voting modal
 let pendingId = null;
@@ -461,7 +533,13 @@ function openModal(id, num) {
 }
 function closeModal() { document.getElementById('modal-wrap').classList.remove('open'); pendingId = null; }
 function closeOnBg(e) { if (e.target === document.getElementById('modal-wrap')) closeModal(); }
-document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeModal(); closeLightbox(); } });
+document.addEventListener('keydown', e => {
+  if(document.getElementById('lb-wrap').classList.contains('open')){
+    if(e.key==='Escape') closeLB();
+    if(e.key==='ArrowLeft') prevLB();
+    if(e.key==='ArrowRight') nextLB();
+  } else if(e.key==='Escape') closeModal();
+});
 
 async function switchVote(e) {
   e.preventDefault();
