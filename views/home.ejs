@@ -520,17 +520,29 @@ async function lbVote(){
 
 async function lbSwitchConfirm(){
   if(!pendingSwitch) return;
-  const {email,newId,oldId}=pendingSwitch; hideSwitchBox();
-  const btn=document.getElementById('lb-vote-btn'); btn.disabled=true;btn.textContent='Odesílám...';
+  const {email,newId,oldId} = pendingSwitch;
+  hideSwitchBox();
+  const btn = document.getElementById('lb-vote-btn');
+  const errEl = document.getElementById('lb-err');
+  if(btn){btn.disabled=true;btn.textContent='Odesílám...';}
   try{
-    const r=await fetch('/hlasovat-prepsat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({entry_id:newId,voter_email:email})});
-    const data=await r.json();
-    if(!data.ok){document.getElementById('lb-err').textContent=data.error;document.getElementById('lb-err').style.display='block';btn.disabled=false;btn.textContent='♡ Hlasovat';return;}
-    lbEntries[lbIdx].voted=true;btn.className='lb-vote-btn voted';btn.textContent='♥ Hlasováno';btn.disabled=false;
-    const ls=document.getElementById('lb-success');if(ls)ls.style.display='flex';const vb2=document.getElementById('lb-voted-badge');if(vb2)vb2.style.display='inline-flex';
-    if(oldId){const old=lbEntries.find(e=>e.id===oldId);if(old)old.voted=false;}
+    const r = await fetch('/hlasovat-prepsat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({entry_id:newId,voter_email:email})});
+    const data = await r.json();
+    if(!data.ok){
+      if(errEl){errEl.textContent=data.error;errEl.style.display='block';}
+      if(btn){btn.disabled=false;btn.textContent='♡ Hlasovat';}
+      return;
+    }
+    lbEntries[lbIdx].voted=true;
+    if(btn){btn.disabled=false;btn.style.background='var(--accent)';btn.style.color='#fff';btn.textContent='♥ Hlasováno';}
+    const ls=document.getElementById('lb-success');if(ls)ls.style.display='block';
+    const vb=document.getElementById('lb-voted-badge');if(vb)vb.style.display='flex';
+    if(oldId){const oe=lbEntries.find(e=>e.id===oldId);if(oe)oe.voted=false;}
     showToast('✓ Hlas byl změněn!');
-  }catch{document.getElementById('lb-err').textContent='Chyba.';document.getElementById('lb-err').style.display='block';btn.disabled=false;btn.textContent='♡ Hlasovat';}
+  }catch{
+    if(errEl){errEl.textContent='Chyba.';errEl.style.display='block';}
+    if(btn){btn.disabled=false;btn.textContent='♡ Hlasovat';}
+  }
 }
 
 function copyLink(){navigator.clipboard.writeText(appUrl+'/zadecek/'+lbEntries[lbIdx].id).then(()=>showToast('✓ Odkaz zkopírován!')).catch(()=>{});}
