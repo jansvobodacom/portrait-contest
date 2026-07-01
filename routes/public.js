@@ -45,14 +45,18 @@ function formatDate(str) {
 router.get('/', (req, res) => {
   const settings = getSettings();
   let entries = [];
-  if (settings.phase === 'voting' || settings.phase === 'results') {
+  if (settings.phase === 'voting') {
     entries = db.prepare(
       "SELECT id, photo, votes, anon_number FROM entries WHERE status = 'approved' ORDER BY votes DESC, created_at ASC"
     ).all();
-    // Náhodné pořadí pokud je zapnuto
-    if (settings.gallery_random === '1' && settings.phase === 'voting') {
+    if (settings.gallery_random === '1') {
       entries = entries.sort(() => Math.random() - 0.5);
     }
+  } else if (settings.phase === 'results') {
+    entries = db.prepare(
+      "SELECT id, photo, votes, anon_number FROM entries WHERE status = 'approved' ORDER BY votes DESC, created_at ASC"
+    ).all();
+
   }
   res.render('home', {
     settings, entries, formatDate,

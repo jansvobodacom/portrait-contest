@@ -289,8 +289,85 @@
 </div>
 
 <% }else if(settings.phase==='results'){ %>
-<div class="inline-gallery">
-  <div class="gallery-subtitle"><a href="/vysledky" style="color:var(--text);font-weight:500;text-decoration:underline">Zobrazit výsledky →</a></div>
+<div class="inline-gallery" id="galerie">
+  <!-- Stupně vítězů -->
+  <% if(entries && entries.length >= 3){ %>
+  <div style="margin-bottom:2.5rem">
+    <div style="font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text2);margin-bottom:1.5rem;font-weight:500">Výsledky soutěže</div>
+    <!-- Podium: 2. místo, 1. místo, 3. místo -->
+    <div style="display:flex;align-items:flex-end;justify-content:center;gap:12px;margin-bottom:2rem">
+
+      <!-- 2. místo -->
+      <div style="text-align:center;flex:1;max-width:200px" onclick="openLB(lbFindIdx(<%= entries[1].id %>))" style="cursor:pointer">
+        <div style="position:relative;cursor:pointer">
+          <img src="/uploads/<%= entries[1].photo %>" style="width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:var(--r);border:2px solid #C0C0C0;display:block">
+          <div style="position:absolute;top:8px;left:8px;background:#C0C0C0;color:#fff;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px">🥈 2. místo</div>
+        </div>
+        <div style="margin-top:8px">
+          <div style="font-family:'Playfair Display',serif;font-size:16px">Zadeček č. <%= entries[1].anon_number %></div>
+          <div style="font-size:13px;color:var(--text2);margin-top:2px"><%= entries[1].votes %> hlasů</div>
+        </div>
+      </div>
+
+      <!-- 1. místo (uprostřed, větší) -->
+      <div style="text-align:center;flex:1;max-width:240px;cursor:pointer" onclick="openLB(lbFindIdx(<%= entries[0].id %>))">
+        <div style="position:relative">
+          <img src="/uploads/<%= entries[0].photo %>" style="width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:var(--r);border:3px solid #FFD700;display:block;box-shadow:0 4px 20px rgba(255,215,0,.3)">
+          <div style="position:absolute;top:8px;left:8px;background:#FFD700;color:#1a1a18;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px">🏆 1. místo</div>
+        </div>
+        <div style="margin-top:8px">
+          <div style="font-family:'Playfair Display',serif;font-size:20px">Zadeček č. <%= entries[0].anon_number %></div>
+          <div style="font-size:13px;color:var(--text2);margin-top:2px"><%= entries[0].votes %> hlasů</div>
+          <div style="font-size:12px;color:var(--accent);margin-top:4px"><%= settings.prize_description %></div>
+        </div>
+      </div>
+
+      <!-- 3. místo -->
+      <div style="text-align:center;flex:1;max-width:200px;cursor:pointer" onclick="openLB(lbFindIdx(<%= entries[2].id %>))">
+        <div style="position:relative">
+          <img src="/uploads/<%= entries[2].photo %>" style="width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:var(--r);border:2px solid #CD7F32;display:block">
+          <div style="position:absolute;top:8px;left:8px;background:#CD7F32;color:#fff;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px">🥉 3. místo</div>
+        </div>
+        <div style="margin-top:8px">
+          <div style="font-family:'Playfair Display',serif;font-size:16px">Zadeček č. <%= entries[2].anon_number %></div>
+          <div style="font-size:13px;color:var(--text2);margin-top:2px"><%= entries[2].votes %> hlasů</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Odkaz na kalendář -->
+    <div style="background:var(--amber-bg);border:0.5px solid var(--amber-brd);border-radius:var(--r);padding:1.25rem;text-align:center;margin-bottom:1.5rem">
+      <div style="font-size:14px;color:var(--amber);font-weight:500;margin-bottom:4px">📅 Zadečkový kalendář 2027</div>
+      <div style="font-size:13px;color:var(--amber);margin-bottom:8px">Vítězka se dostane do kalendáře! Kalendář bude brzy v prodeji.</div>
+      <a href="https://shop.jansvoboda.com" target="_blank" style="font-size:13px;color:var(--amber);font-weight:600;text-decoration:underline">shop.jansvoboda.com →</a>
+    </div>
+
+    <!-- Zbytek výsledků -->
+    <div style="font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text2);margin-bottom:1rem;font-weight:500">Ostatní účastnice</div>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <% entries.slice(3).forEach((e, i) => { %>
+      <div style="display:flex;align-items:center;gap:14px;background:var(--surface);border:0.5px solid var(--border);border-radius:var(--r);padding:10px;cursor:pointer" onclick="openLB(lbFindIdx(<%= e.id %>))">
+        <div style="font-size:13px;color:var(--text3);width:28px;text-align:center;flex-shrink:0"><%= i+4 %>.</div>
+        <img src="/uploads/<%= e.photo %>" style="width:48px;height:48px;object-fit:cover;border-radius:4px;flex-shrink:0">
+        <div style="flex:1">
+          <div style="font-size:14px;font-family:'Playfair Display',serif">Zadeček č. <%= e.anon_number %></div>
+        </div>
+        <div style="font-size:13px;color:var(--text2);flex-shrink:0"><%= e.votes %> hl.</div>
+      </div>
+      <% }) %>
+    </div>
+  </div>
+  <% } else if(entries && entries.length > 0) { %>
+    <!-- Méně než 3 účastníci -->
+    <div class="gallery-grid">
+      <% entries.forEach((e,idx)=>{ %>
+      <div class="card" onclick="openLB(lbFindIdx(<%= e.id %>))">
+        <div class="thumb"><img src="/uploads/<%= e.photo %>" alt="" loading="lazy"></div>
+        <div class="card-info"><div class="card-num">Zadeček č. <%= e.anon_number %> · <%= e.votes %> hl.</div></div>
+      </div>
+      <%})%>
+    </div>
+  <% } %>
 </div>
 <% } %>
 

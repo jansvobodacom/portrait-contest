@@ -179,7 +179,7 @@ router.get('/qr/:id', requireAdmin, async (req, res) => {
   const entry = db.prepare('SELECT id, anon_number FROM entries WHERE id = ?').get(req.params.id);
   if (!entry) return res.redirect('/admin');
   const appUrl = process.env.APP_URL || 'https://portrait-contest-production.up.railway.app';
-  const url = `${appUrl}/zadecek/${entry.id}`;
+  const url = `${appUrl}/zadecek/${entry.anon_number}`;
   try {
     const qrcode = require('qrcode');
     const qrDataUrl = await qrcode.toDataURL(url, { width: 400, margin: 2, color: { dark: '#1a1a18', light: '#fafaf8' } });
